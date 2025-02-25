@@ -2,6 +2,7 @@ package com.monac;
 
 import com.monac.lexer.Lexer;
 import com.monac.lexer.Token;
+import com.monac.parser.Parser;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -18,8 +19,11 @@ public class Main {
         List<Token> tokens = lexer.tokenize();
 
         for (Token token : tokens) {
-            System.out.println(token);
+            System.out.println(token.getType());
         }
+
+        Parser parser = new Parser(tokens);
+        parser.parse();
 
     }
 
