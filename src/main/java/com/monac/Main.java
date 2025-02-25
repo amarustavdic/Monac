@@ -1,10 +1,25 @@
 package com.monac;
 
+import com.monac.lexer.Lexer;
+import com.monac.lexer.Token;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        System.out.println("Hello Monac");
+        String input = Files.readString(Path.of("./src/main/resources/src/main.m"));
+
+        Lexer lexer = new Lexer(input);
+        List<Token> tokens = lexer.tokenize();
+
+        for (Token token : tokens) {
+            System.out.println(token.getType());
+        }
 
     }
 
