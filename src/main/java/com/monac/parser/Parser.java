@@ -4,6 +4,9 @@ import com.monac.lexer.Token;
 import com.monac.lexer.TokenType;
 import com.monac.parser.ast.ASTNode;
 import com.monac.parser.ast.nodes.Identifier;
+import com.monac.parser.ast.nodes.JumpStatement;
+import com.monac.parser.ast.nodes.UnaryOperator;
+
 import java.util.List;
 
 public class Parser {
@@ -31,6 +34,29 @@ public class Parser {
     }
 
     /**
+     * Peeks at the next token without advancing the cursor.
+     * <p>
+     * If there are no more tokens, it returns {@code null}.
+     * </p>
+     *
+     * @return The next {@code Token} in the list, or {@code null} if at the end.
+     */
+    private Token peek() {
+        return cursor < tokens.size() ? tokens.get(cursor) : null;
+    }
+
+    /**
+     * Generates a detailed error message with line and column info.
+     *
+     * @param message The error description.
+     * @param token   The token causing the error.
+     * @return A formatted error message with line and column numbers.
+     */
+    private String errorMessage(String message, Token token) {
+        return message + " (Line: " + token.getLine() + ", Column: " + token.getColumn() + ")";
+    }
+
+    /**
      * Parses an identifier.
      * <p>
      * An identifier must be a valid token of type {@code IDENTIFIER}.
@@ -42,21 +68,80 @@ public class Parser {
      */
     private ASTNode identifier() {
         var token = nextToken();
-        if (token == null || token.getType() != TokenType.IDENTIFIER) {
-            throw new RuntimeException("Identifier expected");
+        if (token == null) {
+            throw new RuntimeException("Unexpected end of input: Identifier expected.");
+        }
+        if (token.getType() != TokenType.IDENTIFIER) {
+            throw new RuntimeException(errorMessage("Identifier expected, but found '" + token.getLexeme() + "'.", token));
         }
         return new Identifier(token.getLexeme());
     }
 
-    // <jump-statement> ::= goto <identifier> ;
-    //                    | continue ;
-    //                    | break ;
-    //                    | return {<expression>}? ;
+    /**
+     * Parses a jump statement.
+     *
+     * <p>Grammar:</p>
+     * <pre>
+     * &lt;jump-statement&gt; ::= goto &lt;identifier&gt; ;
+     *                        | continue ;
+     *                        | break ;
+     *                        | return {&lt;expression&gt;}? ;
+     * </pre>
+     *
+     * <p>Handles different jump statements such as:</p>
+     * <ul>
+     *   <li><code>goto</code> followed by an identifier and a semicolon.</li>
+     *   <li><code>continue</code> as a standalone statement.</li>
+     *   <li><code>break</code> as a standalone statement.</li>
+     *   <li><code>return</code> optionally followed by an expression.</li>
+     * </ul>
+     *
+     * @return An {@code ASTNode} representing the parsed jump statement.
+     * @throws RuntimeException if the syntax is invalid (e.g., missing semicolon).
+     */
     private ASTNode jumpStatement() {
+        var token = nextToken();
+        if (token == null) {
+            throw new RuntimeException("Unexpected end of input while parsing jump statement.");
+        }
+        switch (token.getType()) {
+            case KEYWORD_GOTO -> {
+                // Expect an identifier after 'goto'
+                var identifier = identifier();
+                var semi = nextToken();
+                if (semi == null || semi.getType() != TokenType.SEMICOLON) {
+                    throw new RuntimeException(errorMessage("Semicolon expected after 'goto' statement.", token));
+                }
+                return new JumpStatement(token.getLexeme(), identifier);
+            }
+            case KEYWORD_CONTINUE, KEYWORD_BREAK -> {
+                // Continue and break must be followed by a semicolon
+                var semi = nextToken();
+                if (semi == null || semi.getType() != TokenType.SEMICOLON) {
+                    throw new RuntimeException(errorMessage("Semicolon expected after '" + token.getLexeme() + "' statement.", token));
+                }
+                return new JumpStatement(token.getLexeme());
+            }
+            case KEYWORD_RETURN -> {
+                // Return statement may be followed by an optional expression
+                Token next = peek();
+                ASTNode expression = null;
 
-        return null;
+                if (next != null && next.getType() != TokenType.SEMICOLON) {
+                    expression = expression(); // Parse the expression
+                }
+
+                // Ensure the return statement ends with a semicolon
+                var semi = nextToken();
+                if (semi == null || semi.getType() != TokenType.SEMICOLON) {
+                    throw new RuntimeException(errorMessage("Semicolon expected after 'return' statement.", token));
+                }
+
+                return new JumpStatement(token.getLexeme(), expression);
+            }
+            default -> throw new RuntimeException(errorMessage("Unexpected token in jump statement: " + token.getLexeme(), token));
+        }
     }
-
 
     // <iteration-statement> ::= while ( <expression> ) <statement>
     //| do <statement> while ( <expression> ) ;
@@ -126,14 +211,44 @@ public class Parser {
 
     // <type-name> ::= {<specifier-qualifier>}+ {<abstract-declarator>}?
 
-    // <unary-operator> ::= &
-    //| *
-    //| +
-    //| -
-    //| ~
-    //| !
+    /**
+     * Parses a unary operator.
+     *
+     * <p>Grammar:</p>
+     * <pre>
+     * &lt;unary-operator&gt; ::= &amp;  // Address-of
+     *                       | *    // Dereference
+     *                       | +    // Unary plus
+     *                       | -    // Unary minus
+     *                       | ~    // Bitwise NOT
+     *                       | !    // Logical NOT
+     * </pre>
+     *
+     * <p>This method will return an AST node representing the unary operator.</p>
+     *
+     * @return An {@code UnaryOperatorNode} representing the parsed unary operator.
+     * @throws RuntimeException if the token is not a valid unary operator.
+     */
     private ASTNode unaryOperator() {
-        return null;
+        Token token = nextToken();
+
+        switch (token.getType()) {
+            case BITWISE_NOT: // ~
+                return new UnaryOperator("~");
+            case DEREFERENCE: // *
+                return new UnaryOperator("*");
+            case ADDRESS_OF: // &
+                return new UnaryOperator("&");
+            case PLUS: // +
+                return new UnaryOperator("+");
+            case MINUS: // -
+                return new UnaryOperator("-");
+            case LOGICAL_NOT: // !
+                return new UnaryOperator("!");
+            default:
+                // If the token is not a valid unary operator, throw an error
+                throw new RuntimeException(errorMessage("Unexpected token for unary operator: " + token.getLexeme(), token));
+        }
     }
 
     // <assignment-operator> ::= =
@@ -153,9 +268,43 @@ public class Parser {
 
     // <assignment-expression> ::= <conditional-expression>
     //| <unary-expression> <assignment-operator> <assignment-expression>
+    private ASTNode assignmentExpression() {
+        return null;
+    }
 
-    // <expression> ::= <assignment-expression>
-    //| <expression> , <assignment-expression>
+    /**
+     * Parses an expression.
+     *
+     * <p>Grammar:</p>
+     * <pre>
+     * &lt;expression&gt; ::= &lt;assignment-expression&gt;
+     *                 | &lt;expression&gt; , &lt;assignment-expression&gt;
+     * </pre>
+     *
+     * <p>An expression is either a single assignment expression or a comma-separated list
+     * of assignment expressions.</p>
+     *
+     * @return An {@code ASTNode} representing the parsed expression.
+     * @throws RuntimeException if the expression syntax is invalid.
+     */
+    private ASTNode expression() {
+        // Parse the first assignment expression (base case)
+        ASTNode left = assignmentExpression();
+        if (left == null) {
+            throw new RuntimeException("Expected an assignment expression");
+        }
+
+//        // Check for comma, indicating a sequence of expressions
+//        while (peek() != null && peek().getType() == TokenType.COMMA) {
+//            nextToken(); // Consume the comma
+//            ASTNode right = assignmentExpression();
+//            if (right == null) {
+//                throw new RuntimeException(errorMessage("Expected an assignment expression after ','"));
+//            }
+//            left = new BinaryExpressionNode(TokenType.COMMA, left, right);
+//        }
+        return left;
+    }
 
     // <constant> ::= <integer-constant>
     //| <character-constant>

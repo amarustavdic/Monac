@@ -52,6 +52,8 @@ public enum TokenType {
     LOGICAL_NOT,        // !
     LEFT_SHIFT,         // <<
     RIGHT_SHIFT,        // >>
+    DEREFERENCE,        // *
+    ADDRESS_OF,         // &
 
     // Delimiters
     SEMICOLON,          // ;
