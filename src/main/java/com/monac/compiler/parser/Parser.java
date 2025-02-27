@@ -123,7 +123,24 @@ public class Parser {
      * }</pre>
      */
     public Node shiftExpression() throws ParseException {
-        return null;
+        Node left = additiveExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+
+            // TODO: Lexer is not tokenizing shift right, thinks that it is less then...
+
+            if (token.getType() == TokenType.LEFT_SHIFT || token.getType() == TokenType.RIGHT_SHIFT) {
+                cursor++;
+                Node right = additiveExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.SHIFT_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -135,28 +152,21 @@ public class Parser {
      */
     public Node additiveExpression() throws ParseException {
         Node left = multiplicativeExpression();
-
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
-
             if (token.getType() == TokenType.PLUS || token.getType() == TokenType.MINUS) {
                 cursor++;
-
                 Node right = multiplicativeExpression();
-
                 List<Node> children = new ArrayList<>();
                 children.add(left);
                 children.add(right);
-
                 left = new Node(NodeType.ADDITIVE_EXPRESSION, children, token.getLexeme());
             } else {
                 break;
             }
         }
-
         return left;
     }
-
 
     /**
      * <pre>{@code
@@ -168,28 +178,21 @@ public class Parser {
      */
     public Node multiplicativeExpression() throws ParseException {
         Node left = unaryExpression();
-
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
-
             if (token.getType() == TokenType.MULTIPLY ||
                     token.getType() == TokenType.DIVIDE ||
                     token.getType() == TokenType.MODULO) {
-
                 cursor++;
-
                 Node right = unaryExpression();
-
                 List<Node> children = new ArrayList<>();
                 children.add(left);
                 children.add(right);
-
                 left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, children, token.getLexeme());
             } else {
-                break; // Exit if no more multiplicative operators
+                break;
             }
         }
-
         return left;
     }
 
@@ -284,7 +287,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return additiveExpression();
+        return shiftExpression();
     }
 
 }
