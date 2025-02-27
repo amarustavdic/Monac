@@ -559,10 +559,6 @@ public class Parser {
         }
 
         // Try parsing identifier
-        Node identifierNode = identifier();
-        if (identifierNode != null) {
-            return identifierNode;
-        }
 
         // Try parsing constant
         Node constantNode = constant();
@@ -1024,7 +1020,7 @@ public class Parser {
         // GOTO <identifier> ;
         if (token.getType() == TokenType.GOTO) {
             cursor++; // Consume "goto"
-            Node label = identifier();
+            // Node label = identifier();
 
             // Ensure a semicolon follows
             if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
@@ -1032,7 +1028,7 @@ public class Parser {
             }
             cursor++; // Consume ";"
 
-            return new Node(NodeType.JUMP_STATEMENT, List.of(label), "goto");
+            return new Node(NodeType.JUMP_STATEMENT, null, "goto");
         }
 
         // CONTINUE ;
@@ -1100,18 +1096,24 @@ public class Parser {
     }
 
     /**
-     * Attempts to parse an identifier token. If successful, creates a new Node
-     * with the identifier token’s lexeme. Throws a parse error if the token is
-     * not an identifier.
+     * Parses an identifier token. If successful, creates a {@link Node} with the identifier's lexeme.
+     * Throws a {@link ParserException} if the token is not an identifier.
      *
-     * @return A Node representing the identifier token.
+     * @return A {@link Node} representing the identifier token.
+     * @throws ParserException If the current token is not an identifier.
      */
-    public Node identifier() throws ParseException {
-        Token token = peek();
-        if (match(TokenType.IDENTIFIER)) {
+    public Node identifier() throws ParserException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.IDENTIFIER) {
+            cursor++;
             return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
         }
-        throw new ParseException("Expected an identifier token", cursor);
+        throw new ParserException(
+                TokenType.IDENTIFIER.toString(),
+                token.getType().toString(),
+                token.getLine(),
+                token.getColumn()
+        );
     }
 
 
@@ -1234,8 +1236,8 @@ public class Parser {
 
     // -----------------------------------------------------------------------------------------
 
-    public Node parse() throws ParseException {
-        return primaryExpression();
+    public Node parse() throws ParserException {
+        return identifier();
     }
 
 }

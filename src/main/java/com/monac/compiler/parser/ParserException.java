@@ -7,8 +7,7 @@ public class ParserException extends Exception {
     private final String expected;
     private final String found;
 
-    public ParserException(String message, String expected, String found, int line, int column) {
-        super(message);
+    public ParserException(String expected, String found, int line, int column) {
         this.line = line;
         this.column = column;
         this.expected = expected;
@@ -33,7 +32,7 @@ public class ParserException extends Exception {
 
     @Override
     public String getMessage() {
-        return super.getMessage() + " (at [" + line + ":" + column + "]): Expected " + expected + " but found " + found + ".";
+        return "Expected " + expected + " but found " + found + " at [" + line + ":" + column + "]";
     }
 
 }

@@ -4,17 +4,17 @@ import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.parser.Node;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.visitors.Printer;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws IOException, ParserException {
 
         String input = Files.readString(Path.of("./src/main/resources/src/main.c"));
 
