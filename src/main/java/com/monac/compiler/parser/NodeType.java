@@ -9,8 +9,14 @@ public enum NodeType {
     PRIMARY_EXPRESSION,
     POSTFIX_EXPRESSION,
     UNARY_EXPRESSION,
+    ASSIGNMENT_EXPRESSION,
 
     INTEGER_CONSTANT,           // Representing int actual number
     CONSTANT,
+
+    // Assignment operators
+    EQUALS,
+
+
 
 }

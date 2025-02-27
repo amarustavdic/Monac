@@ -4,6 +4,7 @@ import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -15,6 +16,148 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    /**
+     * <pre>{@code
+     * <assignment-expression> ::= <conditional-expression>
+     *      | <unary-expression> <assignment-operator> <assignment-expression>
+     * }</pre>
+     */
+    public Node assignmentExpression() throws ParseException {
+        // TODO: Handle conditionals later...
+        List<Node> children = new ArrayList<>();
+        children.add(unaryExpression());
+
+
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <conditional-expression> ::= <logical-or-expression>
+     *      | <logical-or-expression> ? <expression> : <conditional-expression>
+     * }</pre>
+     */
+    public Node conditionalExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <logical-or-expression> ::= <logical-and-expression>
+     *          | <logical-or-expression> || <logical-and-expression>
+     * }</pre>
+     */
+    public Node logicalOrExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <logical-and-expression> ::= <inclusive-or-expression>
+     *      | <logical-and-expression> && <inclusive-or-expression>
+     * }</pre>
+     */
+    public Node logicalAndExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <inclusive-or-expression> ::= <exclusive-or-expression>
+     *     | <inclusive-or-expression> | <exclusive-or-expression>
+     * }</pre>
+     */
+    public Node inclusiveOrExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <exclusive-or-expression> ::= <and-expression>
+     *      | <exclusive-or-expression> ^ <and-expression>
+     * }</pre>
+     */
+    public Node exclusiveOrExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <and-expression> ::= <equality-expression>
+     *      | <and-expression> & <equality-expression>
+     * }</pre>
+     */
+    public Node andExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <equality-expression> ::= <relational-expression>
+     * | <equality-expression> == <relational-expression>
+     * | <equality-expression> != <relational-expression>
+     * }</pre>
+     */
+    public Node equalityExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <relational-expression> ::= <shift-expression>
+     * | <relational-expression> < <shift-expression>
+     * | <relational-expression> > <shift-expression>
+     * | <relational-expression> <= <shift-expression>
+     * | <relational-expression> >= <shift-expression>
+     * }</pre>
+     */
+    public Node relationalExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <shift-expression> ::= <additive-expression>
+     * | <shift-expression> << <additive-expression>
+     * | <shift-expression> >> <additive-expression>
+     * }</pre>
+     */
+    public Node shiftExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <additive-expression> ::= <multiplicative-expression>
+     * | <additive-expression> + <multiplicative-expression>
+     * | <additive-expression> - <multiplicative-expression>
+     * }</pre>
+     */
+    public Node additiveExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <multiplicative-expression> ::= <cast-expression>
+     * | <multiplicative-expression> * <cast-expression>
+     * | <multiplicative-expression> / <cast-expression>
+     * | <multiplicative-expression> % <cast-expression>
+     * }</pre>
+     */
+    public Node multiplicativeExpression() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <cast-expression> ::= <unary-expression>
+     *      | ( <type-name> ) <cast-expression>
+     * }</pre>
+     */
+    public Node castExpression() throws ParseException {
+        return null;
+    }
 
     public Node unaryExpression() throws ParseException {
         return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression()), null);
@@ -48,6 +191,24 @@ public class Parser {
         }
 
         return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
+    }
+
+    /**
+     * <pre>{@code
+     * <assignment-operator> ::= = | *= | /= | %= | += | -= | <<= | >>= | &= | ^= | |=
+     * }</pre>
+     */
+    public Node assignmentOperator() throws ParseException {
+
+        // TODO: Ain't going to be handling all for now, just '=' for now
+
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.EQUALS) {
+            cursor++;
+            return new Node(NodeType.EQUALS, null, token.getLexeme());
+        } else {
+            throw new ParseException("Expected an EQUALS, but found: " + token.getType(), cursor);
+        }
     }
 
     public Node constant() throws ParseException {
