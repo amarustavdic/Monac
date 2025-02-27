@@ -836,7 +836,12 @@ public class Parser {
      * }</pre>
      */
     public Node compoundStatement() throws ParseException {
-        return null;
+        expect(TokenType.LEFT_BRACE, "Expecting left brace <compound-statement>");
+        List<Node> children = new ArrayList<>();
+        children.add(declaration());
+        children.add(statement());
+        expect(TokenType.RIGHT_BRACE, "Expecting right brace <compound-statement>");
+        return new Node(NodeType.COMPOUND_STATEMENT, children, null);
     }
 
     /**
@@ -850,7 +855,17 @@ public class Parser {
      * }</pre>
      */
     public Node statement() throws ParseException {
-        return new Node(NodeType.STATEMENT, List.of(jumpStatement()), null);
+
+        Node child =
+
+                // TODO: to be continued here
+
+        children.add(declaration());
+        if (children.size() == 1) {
+            return new Node(NodeType.STATEMENT, children, null);
+        }
+
+
     }
 
     /**

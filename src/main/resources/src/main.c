@@ -1,1 +1,3 @@
-while ( 3 < 2 ) break;
+while ( 3 < 2 ) {
+    break;
+}
