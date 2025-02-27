@@ -5,6 +5,7 @@ import com.monac.compiler.lexer.TokenType;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Parser {
@@ -893,28 +894,107 @@ public class Parser {
         return null;
     }
 
-    public Node integerConstant() throws ParseException {
+    /**
+     * <pre>{@code
+     * <jump-statement> ::= goto <identifier> ;
+     *                    | continue ;
+     *                    | break ;
+     *                    | return {<expression>}? ;
+     * }</pre>
+     */
+    public Node jumpStatement() throws ParseException {
         Token token = tokens.get(cursor);
-        if (token.getType() == TokenType.INTEGER_LITERAL) {
-            cursor++;
-            return new Node(NodeType.INTEGER_CONSTANT, null, token.getLexeme());
-        } else {
+
+        // GOTO <identifier> ;
+        if (token.getType() == TokenType.GOTO) {
+            cursor++; // Consume "goto"
+            Node label = identifier();
+
+            // Ensure a semicolon follows
+            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                throw new ParseException("Expected ';' after 'goto' statement", cursor);
+            }
+            cursor++; // Consume ";"
+
+            return new Node(NodeType.JUMP_STATEMENT, List.of(label), "goto");
+        }
+
+        // CONTINUE ;
+        if (token.getType() == TokenType.CONTINUE) {
+            cursor++; // Consume "continue"
+
+            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                throw new ParseException("Expected ';' after 'continue' statement", cursor);
+            }
+            cursor++; // Consume ";"
+
+            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "continue");
+        }
+
+        // BREAK ;
+        if (token.getType() == TokenType.BREAK) {
+            cursor++; // Consume "break"
+
+            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                throw new ParseException("Expected ';' after 'break' statement", cursor);
+            }
+            cursor++; // Consume ";"
+
+            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "break");
+        }
+
+        // RETURN {<expression>}? ;
+        if (token.getType() == TokenType.RETURN) {
+            cursor++; // Consume "return"
+            Node expression = null;
+
+            if (cursor < tokens.size() && tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                expression = expression();
+            }
+
+            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                throw new ParseException("Expected ';' after 'return' statement", cursor);
+            }
+            cursor++; // Consume ";"
+
+            return new Node(NodeType.JUMP_STATEMENT,
+                    expression == null ? Collections.emptyList() : List.of(expression),
+                    "return");
+        }
+
+        throw new ParseException("Expected a jump statement (goto, continue, break, or return)", cursor);
+    }
+
+    public Node integerConstant() throws ParseException {
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input. Expected an integer constant.", cursor);
+        }
+
+        Token token = tokens.get(cursor);
+        if (token.getType() != TokenType.INTEGER_LITERAL) {
             throw new ParseException("Expected an integer constant, but found: " + token.getType(), cursor);
         }
+
+        cursor++; // Consume integer literal
+        return new Node(NodeType.INTEGER_CONSTANT, Collections.emptyList(), token.getLexeme());
     }
 
     public Node identifier() throws ParseException {
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input. Expected an identifier.", cursor);
+        }
+
         Token token = tokens.get(cursor);
-        if (token.getType() == TokenType.IDENTIFIER) {
-            cursor++;
-            return new Node(NodeType.IDENTIFIER, null, token.getLexeme());
-        } else {
+        if (token.getType() != TokenType.IDENTIFIER) {
             throw new ParseException("Expected an identifier, but found: " + token.getType(), cursor);
         }
+
+        cursor++; // Consume identifier
+        return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
     }
 
     public Node parse() throws ParseException {
-         return expression();
+         return jumpStatement();
     }
 
 }

@@ -36,4 +36,6 @@ public enum NodeType {
     TYPE_QUALIFIER,
     POINTER,
 
+    JUMP_STATEMENT,
+
 }
