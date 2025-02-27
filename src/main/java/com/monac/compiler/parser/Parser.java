@@ -67,6 +67,9 @@ public class Parser {
     }
 
     public Node parse() throws ParseException {
+
+        // TODO: Here might also want to handle case when there is more tokens, but should not be
+
         return primaryExpression();
     }
 
