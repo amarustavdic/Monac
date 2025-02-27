@@ -735,30 +735,24 @@ public class Parser {
         return null;
     }
 
-
-
-
-
-    public Node integerConstant() throws ParseException {
-        Token token = tokens.get(cursor);
-        if (token.getType() == TokenType.INTEGER_LITERAL) {
-            cursor++;
-            return new Node(NodeType.INTEGER_CONSTANT, null, token.getLexeme());
-        } else {
-            throw new ParseException("Expected an integer constant, but found: " + token.getType(), cursor);
-        }
+    /**
+     * <pre>{@code
+     * <enumerator> ::= <identifier>
+     *                | <identifier> = <constant-expression>
+     * }</pre>
+     */
+    public Node enumerator() throws ParseException {
+        return null;
     }
 
-    public Node identifier() throws ParseException {
-        Token token = tokens.get(cursor);
-        if (token.getType() == TokenType.IDENTIFIER) {
-            cursor++;
-            return new Node(NodeType.IDENTIFIER, null, token.getLexeme());
-        } else {
-            throw new ParseException("Expected an identifier, but found: " + token.getType(), cursor);
-        }
+    /**
+     * <pre>{@code
+     * <typedef-name> ::= <identifier>
+     * }</pre>
+     */
+    public Node typedefName() throws ParseException {
+        return null;
     }
-
 
     /**
      * <pre>{@code
@@ -766,8 +760,6 @@ public class Parser {
      * }</pre>
      */
     public Node declaration() throws ParseException {
-
-
         return null;
     }
 
@@ -780,16 +772,11 @@ public class Parser {
         return null;
     }
 
-
-
-    // TODO: Those two bellow, initializer and initializer-list hast to be tested
-    // ------------------------------------------------------------------------------------------
-
     /**
      * <pre>{@code
      * <initializer> ::= <assignment-expression>
-     * | { <initializer-list> }
-     * | { <initializer-list> , }
+     *                 | { <initializer-list> }
+     *                 | { <initializer-list> , }
      * }</pre>
      */
     public Node initializer() throws ParseException {
@@ -823,7 +810,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <initializer-list> ::= <initializer>
-     * | <initializer-list> , <initializer>
+     *                      | <initializer-list> , <initializer>
      * }</pre>
      */
     public Node initializerList() throws ParseException {
@@ -841,12 +828,92 @@ public class Parser {
         return new Node(NodeType.INITIALIZER_LIST, children, null);
     }
 
-    // ------------------------------------------------------------------------------------------
+    /**
+     * <pre>{@code
+     * <compound-statement> ::= { {<declaration>}* {<statement>}* }
+     * }</pre>
+     */
+    public Node compoundStatement() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <statement> ::= <labeled-statement>
+     *               | <expression-statement>
+     *               | <compound-statement>
+     *               | <selection-statement>
+     *               | <iteration-statement>
+     *               | <jump-statement>
+     * }</pre>
+     */
+    public Node statement() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <labeled-statement> ::= <identifier> : <statement>
+     *                       | case <constant-expression> : <statement>
+     *                       | default : <statement>
+     * }</pre>
+     */
+    public Node labeledStatement() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <expression-statement> ::= {<expression>}? ;
+     * }</pre>
+     */
+    public Node expressionStatement() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <selection-statement> ::= if ( <expression> ) <statement>
+     *                         | if ( <expression> ) <statement> else <statement>
+     *                         | switch ( <expression> ) <statement>
+     * }</pre>
+     */
+    public Node selectionStatement() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <iteration-statement> ::= while ( <expression> ) <statement>
+     *                         | do <statement> while ( <expression> ) ;
+     *                         | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
+     * }</pre>
+     */
+    public Node iterationStatement() throws ParseException {
+        return null;
+    }
+
+    public Node integerConstant() throws ParseException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.INTEGER_LITERAL) {
+            cursor++;
+            return new Node(NodeType.INTEGER_CONSTANT, null, token.getLexeme());
+        } else {
+            throw new ParseException("Expected an integer constant, but found: " + token.getType(), cursor);
+        }
+    }
+
+    public Node identifier() throws ParseException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.IDENTIFIER) {
+            cursor++;
+            return new Node(NodeType.IDENTIFIER, null, token.getLexeme());
+        } else {
+            throw new ParseException("Expected an identifier, but found: " + token.getType(), cursor);
+        }
+    }
 
     public Node parse() throws ParseException {
-
-        // TODO: Here might also want to handle case when there is more tokens, but should not be
-
          return expression();
     }
 
