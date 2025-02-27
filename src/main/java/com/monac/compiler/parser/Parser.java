@@ -1087,12 +1087,25 @@ public class Parser {
         throw error(token, "Expected string literal");
     }
 
-    public Node integerConstant() {
-        Token token = peek();
-        if (match(TokenType.INTEGER_LITERAL)) {
+    /**
+     * Parses an integer constant token. If successful, creates a {@link Node} with the integer constant's lexeme.
+     * Throws a {@link ParserException} if the token is not an integer literal.
+     *
+     * @return A {@link Node} representing the integer constant token.
+     * @throws ParserException If the current token is not an integer literal.
+     */
+    public Node integerConstant() throws ParserException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.INTEGER_LITERAL) {
+            cursor++;
             return new Node(NodeType.INTEGER_CONSTANT, Collections.emptyList(), token.getLexeme());
         }
-        throw error(token, "Expected an integer literal");
+        throw new ParserException(
+                TokenType.INTEGER_LITERAL.toString(),
+                token.getType().toString(),
+                token.getLine(),
+                token.getColumn()
+        );
     }
 
     /**
@@ -1115,7 +1128,6 @@ public class Parser {
                 token.getColumn()
         );
     }
-
 
     // -----------------------------------------------------------------------------------------
     //                                 HELPER METHODS
