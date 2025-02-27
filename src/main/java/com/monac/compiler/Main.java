@@ -1,8 +1,8 @@
-package com.monac;
+package com.monac.compiler;
 
-import com.monac.lexer.Lexer;
-import com.monac.lexer.Token;
-import com.monac.parser.Parser;
+import com.monac.compiler.lexer.Lexer;
+import com.monac.compiler.lexer.Token;
+import com.monac.compiler.parser.Parser;
 
 import java.io.*;
 import java.nio.file.Files;

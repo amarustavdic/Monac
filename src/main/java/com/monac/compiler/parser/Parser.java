@@ -1,7 +1,7 @@
-package com.monac.parser;
+package com.monac.compiler.parser;
 
-import com.monac.lexer.Token;
-import com.monac.parser.ast.ASTNode;
+import com.monac.compiler.lexer.Token;
+import com.monac.compiler.parser.ast.ASTNode;
 
 import java.util.List;
 

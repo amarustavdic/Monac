@@ -1,4 +1,4 @@
-package com.monac.lexer;
+package com.monac.compiler.lexer;
 
 public class Token {
 
