@@ -6,10 +6,6 @@ import java.util.List;
 
 public class Node {
 
-    public enum Type {
-        PLUS, MINUS, MUL, DIV
-    }
-
     private final Type type;
     private final List<Node> children;
 
@@ -19,7 +15,7 @@ public class Node {
     }
 
     public void accept(Visitor visitor) {
-
+        visitor.visit(this);
     }
 
     public Type getType() {
