@@ -19,6 +19,66 @@ public class Parser {
 
     /**
      * <pre>{@code
+     * <declarator> ::= {<pointer>}? <direct-declarator>
+     * }</pre>
+     */
+    public Node declarator() throws ParseException {
+        return null;
+    }
+
+
+
+    /**
+     * <pointer> ::= * {<type-qualifier>}* {<pointer>}?
+     */
+    public Node pointer() throws ParseException {
+        if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.STAR) {
+            throw new ParseException("Expected '*' for pointer declaration", cursor);
+        }
+        cursor++;
+
+        List<Node> qualifiers = new ArrayList<>();
+        while (cursor < tokens.size() &&
+                (tokens.get(cursor).getType() == TokenType.CONST || tokens.get(cursor).getType() == TokenType.VOLATILE)) {
+            qualifiers.add(typeQualifier());
+        }
+
+        // Optionally parse (nested pointers)
+        Node nestedPointer = null;
+        if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.STAR) {
+            nestedPointer = pointer();
+        }
+
+        List<Node> children = new ArrayList<>(qualifiers);
+        if (nestedPointer != null) {
+            children.add(nestedPointer);
+        }
+        return new Node(NodeType.POINTER, children, "*");
+    }
+
+    // -------------------- probably will be no use ---------------------------------------------
+
+    /**
+     * <pre>{@code
+     * <type-qualifier> ::= const | volatile
+     * }</pre>
+     */
+    public Node typeQualifier() throws ParseException {
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input while parsing type-qualifier", cursor);
+        }
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.CONST || token.getType() == TokenType.VOLATILE) {
+            cursor++;
+            return new Node(NodeType.TYPE_QUALIFIER, null, token.getLexeme());
+        }
+        throw new ParseException("Expected 'const' or 'volatile' for type-qualifier", cursor);
+    }
+
+    // ------------------------------------------------------------------------------------------
+
+    /**
+     * <pre>{@code
      * <expression> ::= <assignment-expression>
      *      | <expression> , <assignment-expression>
      * }</pre>
@@ -333,7 +393,7 @@ public class Parser {
         Node left = unaryExpression();
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
-            if (token.getType() == TokenType.MULTIPLY ||
+            if (token.getType() == TokenType.STAR ||
                     token.getType() == TokenType.DIVIDE ||
                     token.getType() == TokenType.MODULO) {
                 cursor++;
@@ -437,6 +497,28 @@ public class Parser {
     }
 
 
+    /**
+     * <pre>{@code
+     * <declaration> ::= {<declaration-specifier>}+ {<init-declarator>}* ;
+     * }</pre>
+     */
+    public Node declaration() throws ParseException {
+
+
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <init-declarator> ::= <declarator> | <declarator> = <initializer>
+     * }</pre>
+     */
+    public Node initDeclarator() throws ParseException {
+        return null;
+    }
+
+
+
     // TODO: Those two bellow, initializer and initializer-list hast to be tested
     // ------------------------------------------------------------------------------------------
 
@@ -502,7 +584,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return expression();
+         return expression();
     }
 
 }

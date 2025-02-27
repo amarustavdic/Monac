@@ -28,7 +28,7 @@ public enum TokenType {
 
     PLUS,               // +
     MINUS,              // -
-    MULTIPLY,           // *
+    STAR,           // *
     DIVIDE,             // /
     MODULO,             // %
     EQUALS,             // =
@@ -73,5 +73,11 @@ public enum TokenType {
     WHITESPACE,         // Spaces, tabs, newlines
     COMMENT,            // // Single-line or /* multi-line */
     EOF,                // End of file
-    UNKNOWN             // Unrecognized token
+    UNKNOWN,             // Unrecognized token
+
+
+
+    CONST,
+    VOLATILE,
+
 }

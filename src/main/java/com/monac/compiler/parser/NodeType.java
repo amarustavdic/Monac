@@ -33,5 +33,7 @@ public enum NodeType {
     INITIALIZER,
     INITIALIZER_LIST,
 
+    TYPE_QUALIFIER,
+    POINTER,
 
 }

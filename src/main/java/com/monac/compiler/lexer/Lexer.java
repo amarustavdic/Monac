@@ -52,7 +52,7 @@ public class Lexer {
         // Single character operators
         tokenPatterns.put(TokenType.PLUS, Pattern.compile("\\+"));
         tokenPatterns.put(TokenType.MINUS, Pattern.compile("-"));
-        tokenPatterns.put(TokenType.MULTIPLY, Pattern.compile("\\*"));
+        tokenPatterns.put(TokenType.STAR, Pattern.compile("\\*"));
         tokenPatterns.put(TokenType.DIVIDE, Pattern.compile("/"));
         tokenPatterns.put(TokenType.MODULO, Pattern.compile("%"));
         tokenPatterns.put(TokenType.EQUALS, Pattern.compile("="));
