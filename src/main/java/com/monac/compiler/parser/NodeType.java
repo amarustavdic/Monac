@@ -16,6 +16,7 @@ public enum NodeType {
     SHIFT_EXPRESSION,
     RELATIONAL_EXPRESSION,
     EQUALITY_EXPRESSION,
+    AND_EXPRESSION,
 
     INTEGER_CONSTANT,           // Representing int actual number
     CONSTANT,

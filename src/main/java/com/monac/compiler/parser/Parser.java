@@ -88,7 +88,21 @@ public class Parser {
      * }</pre>
      */
     public Node andExpression() throws ParseException {
-        return null;
+        Node left = equalityExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.BITWISE_AND) {
+                cursor++;
+                Node right = equalityExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.AND_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -318,7 +332,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return equalityExpression();
+        return andExpression();
     }
 
 }
