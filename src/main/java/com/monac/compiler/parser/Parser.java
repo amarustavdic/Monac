@@ -156,7 +156,8 @@ public class Parser {
      * }</pre>
      */
     public Node castExpression() throws ParseException {
-        return null;
+        // TODO: Handle cast (but probably wont be needed)
+        return new Node(NodeType.CAST_EXPRESSION, List.of(unaryExpression()), null);
     }
 
     public Node unaryExpression() throws ParseException {
@@ -239,7 +240,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return unaryExpression();
+        return castExpression();
     }
 
 }

@@ -10,6 +10,7 @@ public enum NodeType {
     POSTFIX_EXPRESSION,
     UNARY_EXPRESSION,
     ASSIGNMENT_EXPRESSION,
+    CAST_EXPRESSION,
 
     INTEGER_CONSTANT,           // Representing int actual number
     CONSTANT,
