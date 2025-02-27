@@ -24,6 +24,8 @@ public enum TokenType {
     STRING_LITERAL,     // "Hello"
 
     //  Operators
+    QUESTION_MARK,      // ?
+
     PLUS,               // +
     MINUS,              // -
     MULTIPLY,           // *

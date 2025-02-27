@@ -31,6 +31,12 @@ public class Parser {
         return null;
     }
 
+
+    // TODO: expression and then test ternary ?
+    public Node expression() throws ParseException {
+        return null;
+    }
+
     /**
      * <pre>{@code
      * <conditional-expression> ::= <logical-or-expression>
@@ -38,7 +44,26 @@ public class Parser {
      * }</pre>
      */
     public Node conditionalExpression() throws ParseException {
-        return null;
+        Node condition = logicalOrExpression();
+        if (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.QUESTION_MARK) {
+                cursor++;
+                Node trueExpression = expression();
+                if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.COLON) {
+                    cursor++;
+                    Node falseExpression = conditionalExpression();
+                    List<Node> children = new ArrayList<>();
+                    children.add(condition);
+                    children.add(trueExpression);
+                    children.add(falseExpression);
+                    return new Node(NodeType.CONDITIONAL_EXPRESSION, children, token.getLexeme());
+                } else {
+                    throw new ParseException("Expected ':' after '?'", cursor);
+                }
+            }
+        }
+        return condition;
     }
 
     /**
@@ -48,7 +73,21 @@ public class Parser {
      * }</pre>
      */
     public Node logicalOrExpression() throws ParseException {
-        return null;
+        Node left = logicalAndExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.LOGICAL_OR) {
+                cursor++;
+                Node right = logicalAndExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.LOGICAL_OR_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -374,7 +413,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return logicalAndExpression();
+        return conditionalExpression();
     }
 
 }
