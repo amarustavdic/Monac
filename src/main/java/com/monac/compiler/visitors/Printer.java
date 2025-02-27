@@ -5,41 +5,29 @@ import java.util.List;
 
 public class Printer implements Visitor {
 
-    private int indentation = 0;
-
     @Override
     public void visit(Node node) {
-        visitNode(node, true);
+        visitNode(node, "", true);
     }
 
-    private void visitNode(Node node, boolean isLast) {
-        if (node == null) {
-            return;
-        }
+    private void visitNode(Node node, String currentPrefix, boolean isLast) {
+        if (node == null) return;
 
-        printIndentation(isLast);
-        System.out.println(node);
+        System.out.println(currentPrefix + (isLast ? "└── " : "├── ") + formatNode(node));
 
-        indentation++;
+        String childPrefix = currentPrefix + (isLast ? "    " : "│   ");
 
         List<Node> children = node.getChildren();
         if (children != null && !children.isEmpty()) {
             int size = children.size();
             for (int i = 0; i < size; i++) {
-                visitNode(children.get(i), i == size - 1);
+                visitNode(children.get(i), childPrefix, i == size - 1);
             }
         }
-
-        indentation--;
     }
 
-    private void printIndentation(boolean isLast) {
-        for (int i = 0; i < indentation - 1; i++) {
-            System.out.print("    ");
-        }
-        if (indentation > 0) {
-            System.out.print(isLast ? "└── " : "├── ");
-        }
+    private String formatNode(Node node) {
+        return node.getType() + (node.getValue() != null ? ": " + node.getValue() : "");
     }
 
 }
