@@ -134,8 +134,29 @@ public class Parser {
      * }</pre>
      */
     public Node additiveExpression() throws ParseException {
-        return null;
+        Node left = multiplicativeExpression();
+
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+
+            if (token.getType() == TokenType.PLUS || token.getType() == TokenType.MINUS) {
+                cursor++;
+
+                Node right = multiplicativeExpression();
+
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+
+                left = new Node(NodeType.ADDITIVE_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+
+        return left;
     }
+
 
     /**
      * <pre>{@code
@@ -148,7 +169,6 @@ public class Parser {
     public Node multiplicativeExpression() throws ParseException {
         Node left = unaryExpression();
 
-        // Loop to handle multiple multiplicative operations
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
 
@@ -156,13 +176,10 @@ public class Parser {
                     token.getType() == TokenType.DIVIDE ||
                     token.getType() == TokenType.MODULO) {
 
-                // Consume the operator
                 cursor++;
 
-                // Parse the next unary expression
                 Node right = unaryExpression();
 
-                // Create a new node combining left and right
                 List<Node> children = new ArrayList<>();
                 children.add(left);
                 children.add(right);
@@ -267,7 +284,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return multiplicativeExpression();
+        return additiveExpression();
     }
 
 }
