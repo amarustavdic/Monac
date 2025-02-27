@@ -4,6 +4,7 @@ import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
@@ -16,6 +17,33 @@ public class Parser {
     }
 
 
+    public Node primaryExpression() throws ParseException {
+        Node child = null;
+
+        try {
+            child = identifier();
+        } catch (ParseException e) {
+            System.err.println("Error parsing identifier: " + e.getMessage());
+        }
+
+        if (child == null) {
+            try {
+                child = constant();
+            } catch (ParseException e) {
+                System.err.println("Error parsing constant: " + e.getMessage());
+            }
+        }
+
+        if (child == null) {
+            throw new ParseException("Expected <primary-expression>", cursor);
+        }
+
+        return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
+    }
+
+    public Node constant() throws ParseException {
+        return null;
+    }
 
     public Node identifier() throws ParseException {
         Token token = tokens.get(cursor);
@@ -28,7 +56,7 @@ public class Parser {
     }
 
     public Node parse() throws ParseException {
-        return identifier();
+        return primaryExpression();
     }
 
 }
