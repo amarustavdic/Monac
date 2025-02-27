@@ -146,7 +146,34 @@ public class Parser {
      * }</pre>
      */
     public Node multiplicativeExpression() throws ParseException {
-        return null;
+        Node left = unaryExpression();
+
+        // Loop to handle multiple multiplicative operations
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+
+            if (token.getType() == TokenType.MULTIPLY ||
+                    token.getType() == TokenType.DIVIDE ||
+                    token.getType() == TokenType.MODULO) {
+
+                // Consume the operator
+                cursor++;
+
+                // Parse the next unary expression
+                Node right = unaryExpression();
+
+                // Create a new node combining left and right
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+
+                left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, children, token.getLexeme());
+            } else {
+                break; // Exit if no more multiplicative operators
+            }
+        }
+
+        return left;
     }
 
     /**
@@ -183,7 +210,7 @@ public class Parser {
             try {
                 child = constant();
             } catch (ParseException e) {
-               // System.err.println("Error parsing constant: " + e.getMessage());
+                // System.err.println("Error parsing constant: " + e.getMessage());
             }
         }
 
@@ -240,7 +267,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return castExpression();
+        return multiplicativeExpression();
     }
 
 }
