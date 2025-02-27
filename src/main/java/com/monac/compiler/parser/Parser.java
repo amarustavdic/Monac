@@ -551,25 +551,25 @@ public class Parser {
     public Node primaryExpression() throws ParseException {
         Node child = null;
 
-        // TODO: Figure out how to handle exceptions properly
-
-        try {
-            child = identifier();
-        } catch (ParseException e) {
-            // System.err.println("Error parsing identifier: " + e.getMessage());
-        }
-
-        if (child == null) {
-            try {
-                child = constant();
-            } catch (ParseException e) {
-                // System.err.println("Error parsing constant: " + e.getMessage());
-            }
-        }
-
-        if (child != null) {
-            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
-        }
+//        // TODO: Figure out how to handle exceptions properly
+//
+//        try {
+//            child = identifier();
+//        } catch (ParseException e) {
+//            // System.err.println("Error parsing identifier: " + e.getMessage());
+//        }
+//
+//        if (child == null) {
+//            try {
+//                child = constant();
+//            } catch (ParseException e) {
+//                // System.err.println("Error parsing constant: " + e.getMessage());
+//            }
+//        }
+//
+//        if (child != null) {
+//            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
+//        }
 
         return null;
     }
@@ -913,7 +913,7 @@ public class Parser {
      * }</pre>
      */
     public Node expressionStatement() throws ParseException {
-        if (Objects.requireNonNull(peek(0)).getType() == TokenType.SEMICOLON) {
+        if (Objects.requireNonNull(peek()).getType() == TokenType.SEMICOLON) {
             cursor++; // Consume ';'
             return new Node(NodeType.EXPRESSION_STATEMENT, null, null);
         }
@@ -1089,24 +1089,32 @@ public class Parser {
         return new Node(NodeType.INTEGER_CONSTANT, Collections.emptyList(), token.getLexeme());
     }
 
-    public Node identifier() throws ParseException {
-        if (cursor >= tokens.size()) {
-            throw new ParseException("Unexpected end of input. Expected an identifier.", cursor);
-        }
-
-        Token token = tokens.get(cursor);
-        if (token.getType() != TokenType.IDENTIFIER) {
-            throw new ParseException("Expected an identifier, but found: " + token.getType(), cursor);
-        }
-
-        cursor++; // Consume identifier
-        return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
+    /**
+     * Attempts to parse an identifier token. If successful, creates a new Node
+     * with the identifier token’s lexeme. Throws a parse error if the token is
+     * not an identifier.
+     *
+     * @return A Node representing the identifier token.
+     */
+    public Node identifier() {
+        Token token = peek();
+        if (match(TokenType.IDENTIFIER)) return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
+        throw error(token, "Expected an identifier token");
     }
 
     // -----------------------------------------------------------------------------------------
     //                                 HELPER METHODS
     // -----------------------------------------------------------------------------------------
 
+    /**
+     * Checks if the current token matches the expected type. If not, throws a
+     * ParseException with the given error message. Advances the cursor if the
+     * token matches.
+     *
+     * @param expectedType The expected token type.
+     * @param errorMessage The error message to include if the token type doesn't match.
+     * @throws ParseException If the current token doesn't match the expected type.
+     */
     private void expect(TokenType expectedType, String errorMessage) throws ParseException {
         if (cursor >= tokens.size()) {
             throw new ParseException("Unexpected end of input. " + errorMessage, cursor);
@@ -1118,15 +1126,103 @@ public class Parser {
         cursor++;
     }
 
-    private Token peek(int offset) {
-        int index = cursor + offset;
-        return (index < tokens.size()) ? tokens.get(index) : null;
+    /**
+     * Checks if the current token matches any of the provided token types.
+     * Advances the cursor if a match is found and returns true. Otherwise,
+     * returns false.
+     *
+     * @param types The token types to check.
+     * @return True if the current token matches one of the provided types, otherwise false.
+     */
+    private boolean match(TokenType... types) {
+        for (TokenType type : types) {
+            if (check(type)) {
+                advance();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the current token matches the given type without advancing the cursor.
+     *
+     * @param type The token type to check.
+     * @return True if the current token matches the given type, otherwise false.
+     */
+    private boolean check(TokenType type) {
+        if (isAtEnd()) return false;
+        return peek().getType() == type;
+    }
+
+    /**
+     * Advances the cursor and returns the current token.
+     * If the cursor is at the end, no change happens.
+     *
+     * @return The current token after advancing the cursor.
+     */
+    private Token advance() {
+        if (!isAtEnd()) cursor++;
+        return previous();
+    }
+
+    /**
+     * Checks if the cursor is at the end of the token list (i.e., the token is of type EOF).
+     *
+     * @return True if the cursor is at the end, otherwise false.
+     */
+    private boolean isAtEnd() {
+        return peek().getType() == TokenType.EOF;
+    }
+
+    /**
+     * Returns the current token without advancing the cursor.
+     *
+     * @return The current token.
+     */
+    private Token peek() {
+        return tokens.get(cursor);
+    }
+
+    /**
+     * Returns the previous token (one token before the current token).
+     *
+     * @return The previous token.
+     */
+    private Token previous() {
+        return tokens.get(cursor - 1);
+    }
+
+    /**
+     * Advances the cursor and returns the current token if it matches the given type.
+     * If not, throws a parse error with the provided message.
+     *
+     * @param type The expected token type.
+     * @param message The error message to use if the token doesn't match the expected type.
+     * @return The current token if it matches the type.
+     * @throws ParseException If the current token doesn't match the expected type.
+     */
+    private Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+        throw error(peek(), message);
+    }
+
+    /**
+     * Logs the error with the provided token and message, then returns a ParseError.
+     *
+     * @param token The token that caused the error.
+     * @param message The error message.
+     * @return A new ParseError instance.
+     */
+    public ParseError error(Token token, String message) {
+        System.out.println(token + " " + message);
+        return new ParseError();
     }
 
     // -----------------------------------------------------------------------------------------
 
     public Node parse() throws ParseException {
-         return iterationStatement();
+         return identifier();
     }
 
 }
