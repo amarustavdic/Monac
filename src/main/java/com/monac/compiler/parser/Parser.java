@@ -436,6 +436,68 @@ public class Parser {
         }
     }
 
+
+    // TODO: Those two bellow, initializer and initializer-list hast to be tested
+    // ------------------------------------------------------------------------------------------
+
+    /**
+     * <pre>{@code
+     * <initializer> ::= <assignment-expression>
+     * | { <initializer-list> }
+     * | { <initializer-list> , }
+     * }</pre>
+     */
+    public Node initializer() throws ParseException {
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input while parsing initializer", cursor);
+        }
+        Token token = tokens.get(cursor);
+
+        // Case: { <initializer-list> } or { <initializer-list> , }
+        if (token.getType() == TokenType.LEFT_BRACE) {
+            cursor++; // Consume '{'
+
+            Node initializerListNode = initializerList();
+            List<Node> children = initializerListNode.getChildren();
+
+            // Check for optional trailing comma
+            if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.COMMA) {
+                cursor++; // Consume ','
+            }
+
+            // Expect closing '}'
+            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.RIGHT_BRACE) {
+                throw new ParseException("Expected '}' after initializer-list", cursor);
+            }
+            cursor++; // Consume '}'
+            return new Node(NodeType.INITIALIZER, children, null);
+        }
+        return assignmentExpression();
+    }
+
+    /**
+     * <pre>{@code
+     * <initializer-list> ::= <initializer>
+     * | <initializer-list> , <initializer>
+     * }</pre>
+     */
+    public Node initializerList() throws ParseException {
+        List<Node> children = new ArrayList<>();
+        children.add(initializer());
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.COMMA) {
+                cursor++; // Consume ','
+                children.add(initializer());
+            } else {
+                break;
+            }
+        }
+        return new Node(NodeType.INITIALIZER_LIST, children, null);
+    }
+
+    // ------------------------------------------------------------------------------------------
+
     public Node parse() throws ParseException {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be

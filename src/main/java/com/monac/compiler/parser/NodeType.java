@@ -30,6 +30,8 @@ public enum NodeType {
     // Assignment operators
     EQUALS,
 
+    INITIALIZER,
+    INITIALIZER_LIST,
 
 
 }
