@@ -26,6 +26,7 @@ public enum NodeType {
 
     INTEGER_CONSTANT,           // Representing int actual number
     CONSTANT,
+    STRING,
 
     // Assignment operators
     EQUALS,

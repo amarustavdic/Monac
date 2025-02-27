@@ -549,29 +549,35 @@ public class Parser {
      * }</pre>
      */
     public Node primaryExpression() throws ParseException {
-        Node child = null;
 
-//        // TODO: Figure out how to handle exceptions properly
-//
-//        try {
-//            child = identifier();
-//        } catch (ParseException e) {
-//            // System.err.println("Error parsing identifier: " + e.getMessage());
-//        }
-//
-//        if (child == null) {
-//            try {
-//                child = constant();
-//            } catch (ParseException e) {
-//                // System.err.println("Error parsing constant: " + e.getMessage());
-//            }
-//        }
-//
-//        if (child != null) {
-//            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
-//        }
+        // Attempt to parse parenthesized expression
+        if (check(TokenType.LEFT_PAREN)) {
+            match(TokenType.LEFT_PAREN);
+            Node expression = expression();
+            match(TokenType.RIGHT_PAREN);
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(expression), null);
+        }
 
-        return null;
+        // Try parsing identifier
+        Node identifierNode = identifier();
+        if (identifierNode != null) {
+            return identifierNode;
+        }
+
+        // Try parsing constant
+        Node constantNode = constant();
+        if (constantNode != null) {
+            return constantNode;
+        }
+
+        // Try parsing string
+        Node stringNode = string();
+        if (stringNode != null) {
+            return stringNode;
+        }
+
+        // If none of the cases succeeded, throw an error
+        throw new ParseException("Expected primary expression but found: " + peek(), cursor);
     }
 
 
@@ -583,7 +589,7 @@ public class Parser {
      *              | <enumeration-constant>
      * }</pre>
      */
-    public Node constant() throws ParseException {
+    public Node constant() {
         return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
     }
 
@@ -1075,18 +1081,22 @@ public class Parser {
         throw new ParseException("Expected a jump statement (goto, continue, break, or return)", cursor);
     }
 
-    public Node integerConstant() throws ParseException {
-        if (cursor >= tokens.size()) {
-            throw new ParseException("Unexpected end of input. Expected an integer constant.", cursor);
-        }
+    // -------------------------------------------------------------------------------
 
-        Token token = tokens.get(cursor);
-        if (token.getType() != TokenType.INTEGER_LITERAL) {
-            throw new ParseException("Expected an integer constant, but found: " + token.getType(), cursor);
+    public Node string() {
+        Token token = peek();
+        if (match(TokenType.STRING_LITERAL)) {
+            return new Node(NodeType.STRING, Collections.emptyList(), token.getLexeme());
         }
+        throw error(token, "Expected string literal");
+    }
 
-        cursor++; // Consume integer literal
-        return new Node(NodeType.INTEGER_CONSTANT, Collections.emptyList(), token.getLexeme());
+    public Node integerConstant() {
+        Token token = peek();
+        if (match(TokenType.INTEGER_LITERAL)) {
+            return new Node(NodeType.INTEGER_CONSTANT, Collections.emptyList(), token.getLexeme());
+        }
+        throw error(token, "Expected an integer literal");
     }
 
     /**
@@ -1096,11 +1106,14 @@ public class Parser {
      *
      * @return A Node representing the identifier token.
      */
-    public Node identifier() {
+    public Node identifier() throws ParseException {
         Token token = peek();
-        if (match(TokenType.IDENTIFIER)) return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
-        throw error(token, "Expected an identifier token");
+        if (match(TokenType.IDENTIFIER)) {
+            return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
+        }
+        throw new ParseException("Expected an identifier token", cursor);
     }
+
 
     // -----------------------------------------------------------------------------------------
     //                                 HELPER METHODS
@@ -1197,7 +1210,7 @@ public class Parser {
      * Advances the cursor and returns the current token if it matches the given type.
      * If not, throws a parse error with the provided message.
      *
-     * @param type The expected token type.
+     * @param type    The expected token type.
      * @param message The error message to use if the token doesn't match the expected type.
      * @return The current token if it matches the type.
      * @throws ParseException If the current token doesn't match the expected type.
@@ -1210,7 +1223,7 @@ public class Parser {
     /**
      * Logs the error with the provided token and message, then returns a ParseError.
      *
-     * @param token The token that caused the error.
+     * @param token   The token that caused the error.
      * @param message The error message.
      * @return A new ParseError instance.
      */
@@ -1222,7 +1235,7 @@ public class Parser {
     // -----------------------------------------------------------------------------------------
 
     public Node parse() throws ParseException {
-         return identifier();
+        return primaryExpression();
     }
 
 }
