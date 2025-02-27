@@ -16,6 +16,14 @@ public class Parser {
     }
 
 
+    public Node unaryExpression() throws ParseException {
+        return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression()), null);
+    }
+
+    public Node postfixExpression() throws ParseException {
+        return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression()), null);
+    }
+
     public Node primaryExpression() throws ParseException {
         Node child = null;
 
@@ -43,7 +51,7 @@ public class Parser {
     }
 
     public Node constant() throws ParseException {
-        return integerConstant();
+        return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
     }
 
     public Node integerConstant() throws ParseException {
@@ -70,7 +78,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return primaryExpression();
+        return unaryExpression();
     }
 
 }
