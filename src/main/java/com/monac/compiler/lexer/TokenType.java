@@ -9,11 +9,13 @@ public enum TokenType {
     RETURN,     // return
     KEYWORD_IF,         // if
     KEYWORD_ELSE,       // else
-    KEYWORD_WHILE,      // while
-    KEYWORD_FOR,        // for
+    WHILE,      // while
+    FOR,        // for
     BREAK,      // break
     CONTINUE,   // continue
     GOTO,       // goto
+
+    DO,
 
     // Identifiers
     IDENTIFIER,         // Any user-defined name

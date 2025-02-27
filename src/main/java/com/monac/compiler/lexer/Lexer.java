@@ -23,8 +23,8 @@ public class Lexer {
         tokenPatterns.put(TokenType.RETURN, Pattern.compile("return\\b"));
         tokenPatterns.put(TokenType.KEYWORD_IF, Pattern.compile("if\\b"));
         tokenPatterns.put(TokenType.KEYWORD_ELSE, Pattern.compile("else\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_WHILE, Pattern.compile("while\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_FOR, Pattern.compile("for\\b"));
+        tokenPatterns.put(TokenType.WHILE, Pattern.compile("while\\b"));
+        tokenPatterns.put(TokenType.FOR, Pattern.compile("for\\b"));
         tokenPatterns.put(TokenType.BREAK, Pattern.compile("break\\b"));
         tokenPatterns.put(TokenType.CONTINUE, Pattern.compile("continue\\b"));
         tokenPatterns.put(TokenType.GOTO, Pattern.compile("goto\\b"));

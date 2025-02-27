@@ -891,7 +891,67 @@ public class Parser {
      * }</pre>
      */
     public Node iterationStatement() throws ParseException {
-        return null;
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input. Expected an iteration statement.", cursor);
+        }
+
+        Token token = tokens.get(cursor);
+
+        if (token.getType() == TokenType.WHILE) {
+            cursor++; // Consume 'while'
+            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while'");
+            Node condition = expression();
+            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'while' statement");
+            Node body = statement();
+            return new Node(NodeType.ITERATION_STATEMENT, List.of(condition, body), "while");
+        }
+
+        if (token.getType() == TokenType.DO) {
+            cursor++; // Consume 'do'
+            Node body = statement();
+            expect(TokenType.WHILE, "Expected 'while' after 'do' statement");
+            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while' in do-while loop");
+            Node condition = expression();
+            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'do-while' statement");
+            expect(TokenType.SEMICOLON, "Expected ';' after 'do-while' statement");
+            return new Node(NodeType.ITERATION_STATEMENT, List.of(body, condition), "do-while");
+        }
+
+        if (token.getType() == TokenType.FOR) {
+            cursor++; // Consume 'for'
+            expect(TokenType.LEFT_PAREN, "Expected '(' after 'for'");
+            Node init = null, condition = null, increment = null;
+
+            // First expression (optional)
+            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                init = expression();
+            }
+            expect(TokenType.SEMICOLON, "Expected ';' after initialization in 'for' loop");
+
+            // Second expression (optional)
+            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+                condition = expression();
+            }
+            expect(TokenType.SEMICOLON, "Expected ';' after condition in 'for' loop");
+
+            // Third expression (optional)
+            if (tokens.get(cursor).getType() != TokenType.RIGHT_PAREN) {
+                increment = expression();
+            }
+            expect(TokenType.RIGHT_PAREN, "Expected ')' after increment in 'for' loop");
+
+            Node body = statement();
+
+            List<Node> children = new ArrayList<>();
+            if (init != null) children.add(init);
+            if (condition != null) children.add(condition);
+            if (increment != null) children.add(increment);
+            children.add(body);
+
+            return new Node(NodeType.ITERATION_STATEMENT, children, "for");
+        }
+
+        throw new ParseException("Expected an iteration statement (while, do-while, or for)", cursor);
     }
 
     /**
@@ -993,8 +1053,25 @@ public class Parser {
         return new Node(NodeType.IDENTIFIER, Collections.emptyList(), token.getLexeme());
     }
 
+    // -----------------------------------------------------------------------------------------
+    //                                 HELPER METHODS
+    // -----------------------------------------------------------------------------------------
+
+    private void expect(TokenType expectedType, String errorMessage) throws ParseException {
+        if (cursor >= tokens.size()) {
+            throw new ParseException("Unexpected end of input. " + errorMessage, cursor);
+        }
+        Token token = tokens.get(cursor);
+        if (token.getType() != expectedType) {
+            throw new ParseException(errorMessage + " Found: " + token.getType(), cursor);
+        }
+        cursor++;
+    }
+
+    // -----------------------------------------------------------------------------------------
+
     public Node parse() throws ParseException {
-         return jumpStatement();
+         return iterationStatement();
     }
 
 }

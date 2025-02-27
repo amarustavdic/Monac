@@ -37,5 +37,6 @@ public enum NodeType {
     POINTER,
 
     JUMP_STATEMENT,
+    ITERATION_STATEMENT,
 
 }
