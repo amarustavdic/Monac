@@ -1,9 +1,9 @@
 ```BNF
 <translation-unit> ::= {<function-definition>}*
 
-<function-definition> ::= <type-specifier> <identifier> "(" ")" <compound-statement>
+<function-definition> ::= <nodeType-specifier> <identifier> "(" ")" <compound-statement>
 
-<type-specifier> ::= "void" | "char" | "int"
+<nodeType-specifier> ::= "void" | "char" | "int"
 
 <compound-statement> ::= "{" {<statement>}* "}"
 

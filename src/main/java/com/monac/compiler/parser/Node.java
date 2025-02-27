@@ -6,24 +6,30 @@ import java.util.List;
 
 public class Node {
 
-    private final Type type;
+    private final NodeType type;
     private final List<Node> children;
+    private final String value;
 
-    public Node(Type type, List<Node> children) {
+    public Node(NodeType type, List<Node> children, String value) {
         this.type = type;
         this.children = children;
+        this.value = value;
     }
 
     public void accept(Visitor visitor) {
         visitor.visit(this);
     }
 
-    public Type getType() {
+    public NodeType getType() {
         return type;
     }
 
     public List<Node> getChildren() {
         return children;
+    }
+
+    public String getValue() {
+        return value;
     }
 
 }
