@@ -18,7 +18,7 @@ public class Printer implements Visitor {
         }
 
         printIndentation(isLast);
-        System.out.println(node.getType());
+        System.out.println(node);
 
         indentation++;
 

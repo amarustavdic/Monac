@@ -32,4 +32,9 @@ public class Node {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return type + (value != null ? ": " + value : "");
+    }
+
 }
