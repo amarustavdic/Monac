@@ -531,7 +531,13 @@ public class Parser {
      * }</pre>
      */
     public Node postfixExpression() throws ParseException {
-        return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression()), null);
+
+        Node child = primaryExpression();
+        if (child != null) {
+            return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression()), null);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -561,12 +567,13 @@ public class Parser {
             }
         }
 
-        if (child == null) {
-            throw new ParseException("Expected <primary-expression>", cursor);
+        if (child != null) {
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
         }
 
-        return new Node(NodeType.PRIMARY_EXPRESSION, List.of(child), null);
+        return null;
     }
+
 
     /**
      * <pre>{@code
@@ -856,16 +863,37 @@ public class Parser {
      */
     public Node statement() throws ParseException {
 
-        Node child =
-
-                // TODO: to be continued here
-
-        children.add(declaration());
-        if (children.size() == 1) {
-            return new Node(NodeType.STATEMENT, children, null);
+        Node child = labeledStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
         }
 
+        child = expressionStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
+        }
 
+        child = compoundStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
+        }
+
+        child = selectionStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
+        }
+
+        child = iterationStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
+        }
+
+        child = jumpStatement();
+        if (child != null) {
+            return new Node(NodeType.STATEMENT, List.of(child), null);
+        }
+
+        throw new ParseException("Expected a valid statement, but none found", cursor);
     }
 
     /**
