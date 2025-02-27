@@ -35,7 +35,7 @@ public class Printer implements Visitor {
 
     private void printIndentation(boolean isLast) {
         for (int i = 0; i < indentation - 1; i++) {
-            System.out.print("│   ");
+            System.out.print("    ");
         }
         if (indentation > 0) {
             System.out.print(isLast ? "└── " : "├── ");
