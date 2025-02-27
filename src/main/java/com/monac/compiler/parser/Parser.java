@@ -214,27 +214,72 @@ public class Parser {
      * <conditional-expression> ::= <logical-or-expression>
      *                            | <logical-or-expression> ? <expression> : <conditional-expression>
      * }</pre>
+     *
+     * Parses a conditional expression (ternary operator).
+     *
+     * @return A Node representing the parsed conditional expression.
+     * @throws ParserException If the expression is not valid.
      */
-    public Node conditionalExpression() throws ParseException {
-        Node condition = logicalOrExpression();
+    public Node conditionalExpression() throws ParserException {
+        Node condition;
+
+        try {
+            condition = logicalOrExpression(); // Parse logical OR expression
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid conditional expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         if (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.QUESTION_MARK) {
-                cursor++;
-                Node trueExpression = expression();
+                cursor++; // Consume '?'
+                Node trueExpression;
+
+                try {
+                    trueExpression = expression(); // Parse the true branch
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected an expression after '?' but got: " + tokens.get(cursor).getType(),
+                            "expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
                 if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.COLON) {
-                    cursor++;
-                    Node falseExpression = conditionalExpression();
-                    List<Node> children = new ArrayList<>();
-                    children.add(condition);
-                    children.add(trueExpression);
-                    children.add(falseExpression);
-                    return new Node(NodeType.CONDITIONAL_EXPRESSION, children, token.getLexeme());
+                    cursor++; // Consume ':'
+                    Node falseExpression;
+
+                    try {
+                        falseExpression = conditionalExpression(); // Parse the false branch
+                    } catch (ParserException e) {
+                        throw new ParserException(
+                                "Expected an expression after ':' but got: " + tokens.get(cursor).getType(),
+                                "expression",
+                                tokens.get(cursor).getLine(),
+                                tokens.get(cursor).getColumn()
+                        );
+                    }
+
+                    return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(condition, trueExpression, falseExpression), token.getLexeme());
                 } else {
-                    throw new ParseException("Expected ':' after '?'", cursor);
+                    Token unexpected = cursor < tokens.size() ? tokens.get(cursor) : null;
+                    throw new ParserException(
+                            "Expected ':' after '?' but found: " + (unexpected != null ? unexpected.getType() : "EOF"),
+                            ":",
+                            unexpected != null ? unexpected.getLine() : -1,
+                            unexpected != null ? unexpected.getColumn() : -1
+                    );
                 }
             }
         }
+
         return condition;
     }
 
@@ -243,22 +288,50 @@ public class Parser {
      * <logical-or-expression> ::= <logical-and-expression>
      *                           | <logical-or-expression> || <logical-and-expression>
      * }</pre>
+     *
+     * Parses a logical OR expression, handling multiple '||' chained operations.
+     *
+     * @return A Node representing the parsed logical OR expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node logicalOrExpression() throws ParseException {
-        Node left = logicalAndExpression();
+    public Node logicalOrExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = logicalAndExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid logical OR expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.LOGICAL_OR) {
-                cursor++;
-                Node right = logicalAndExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.LOGICAL_OR_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '||'
+                Node right;
+
+                try {
+                    right = logicalAndExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected expression after '||', but found: " + tokens.get(cursor).getType(),
+                            "logical-and-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -267,22 +340,50 @@ public class Parser {
      * <logical-and-expression> ::= <inclusive-or-expression>
      *                            | <logical-and-expression> && <inclusive-or-expression>
      * }</pre>
+     *
+     * Parses a logical AND expression, handling multiple '&&' chained operations.
+     *
+     * @return A Node representing the parsed logical AND expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node logicalAndExpression() throws ParseException {
-        Node left = inclusiveOrExpression();
+    public Node logicalAndExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = inclusiveOrExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid logical AND expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.LOGICAL_AND) {
-                cursor++;
-                Node right = inclusiveOrExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.LOGICAL_AND_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '&&'
+                Node right;
+
+                try {
+                    right = inclusiveOrExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected expression after '&&', but found: " + tokens.get(cursor).getType(),
+                            "inclusive-or-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -291,22 +392,50 @@ public class Parser {
      * <inclusive-or-expression> ::= <exclusive-or-expression>
      *                             | <inclusive-or-expression> | <exclusive-or-expression>
      * }</pre>
+     *
+     * Parses an inclusive OR expression, handling multiple '|' operations.
+     *
+     * @return A Node representing the parsed inclusive OR expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node inclusiveOrExpression() throws ParseException {
-        Node left = exclusiveOrExpression();
+    public Node inclusiveOrExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = exclusiveOrExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid inclusive OR expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.BITWISE_OR) {
-                cursor++;
-                Node right = exclusiveOrExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '|'
+                Node right;
+
+                try {
+                    right = exclusiveOrExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected expression after '|', but found: " + tokens.get(cursor).getType(),
+                            "exclusive-or-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -315,22 +444,50 @@ public class Parser {
      * <exclusive-or-expression> ::= <and-expression>
      *                             | <exclusive-or-expression> ^ <and-expression>
      * }</pre>
+     *
+     * Parses an exclusive OR expression, handling multiple '^' operations.
+     *
+     * @return A Node representing the parsed exclusive OR expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node exclusiveOrExpression() throws ParseException {
-        Node left = andExpression();
+    public Node exclusiveOrExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = andExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid exclusive OR expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.BITWISE_XOR) {
-                cursor++;
-                Node right = andExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '^'
+                Node right;
+
+                try {
+                    right = andExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected expression after '^', but found: " + tokens.get(cursor).getType(),
+                            "and-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -339,22 +496,50 @@ public class Parser {
      * <and-expression> ::= <equality-expression>
      *                    | <and-expression> & <equality-expression>
      * }</pre>
+     *
+     * Parses a bitwise AND expression, allowing multiple '&' operations.
+     *
+     * @return A Node representing the parsed AND expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node andExpression() throws ParseException {
-        Node left = equalityExpression();
+    public Node andExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = equalityExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid bitwise AND expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
             if (token.getType() == TokenType.BITWISE_AND) {
-                cursor++;
-                Node right = equalityExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.AND_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '&'
+                Node right;
+
+                try {
+                    right = equalityExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected expression after '&', but found: " + tokens.get(cursor).getType(),
+                            "equality-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -364,22 +549,51 @@ public class Parser {
      *                         | <equality-expression> == <relational-expression>
      *                         | <equality-expression> != <relational-expression>
      * }</pre>
+     *
+     * Parses equality expressions, supporting both `==` and `!=` operators.
+     *
+     * @return A Node representing the parsed equality expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node equalityExpression() throws ParseException {
-        Node left = relationalExpression();
+    public Node equalityExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = relationalExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid equality expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
+            // Check for equality operators (== or !=)
             if (token.getType() == TokenType.EQUALS_EQUALS || token.getType() == TokenType.NOT_EQUALS) {
-                cursor++;
-                Node right = relationalExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.EQUALITY_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume '==' or '!='
+                Node right;
+
+                try {
+                    right = relationalExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected relational expression after '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "relational-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -391,25 +605,54 @@ public class Parser {
      *                           | <relational-expression> <= <shift-expression>
      *                           | <relational-expression> >= <shift-expression>
      * }</pre>
+     *
+     * Parses relational expressions, supporting operators like `<`, `>`, `<=`, and `>=`.
+     *
+     * @return A Node representing the parsed relational expression.
+     * @throws ParserException If parsing fails due to unexpected tokens.
      */
-    public Node relationalExpression() throws ParseException {
-        Node left = shiftExpression();
+    public Node relationalExpression() throws ParserException {
+        Node left;
+        try {
+            left = shiftExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid relational expression: " + e.getMessage(),
+                    e.getFound(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
+            // Check for relational operators (<, >, <=, >=)
             if (token.getType() == TokenType.LESS_THAN ||
                     token.getType() == TokenType.GREATER_THAN ||
                     token.getType() == TokenType.LESS_EQUALS ||
                     token.getType() == TokenType.GREATER_EQUALS) {
-                cursor++;
-                Node right = shiftExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.RELATIONAL_EXPRESSION, children, token.getLexeme());
+
+                cursor++; // Consume the relational operator
+
+                Node right;
+                try {
+                    right = shiftExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected shift expression after relational operator '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "shift-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
                 break;
             }
         }
+
         return left;
     }
 
@@ -419,25 +662,51 @@ public class Parser {
      *                      | <shift-expression> << <additive-expression>
      *                      | <shift-expression> >> <additive-expression>
      * }</pre>
+     *
+     * Parses shift expressions involving left and right shifts (`<<`, `>>`) applied to additive expressions.
+     *
+     * @return A Node representing the parsed shift expression.
+     * @throws ParserException If an error occurs while parsing the shift expression.
      */
-    public Node shiftExpression() throws ParseException {
-        Node left = additiveExpression();
+    public Node shiftExpression() throws ParserException {
+        Node left;
+        try {
+            left = additiveExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid shift expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
 
-            // TODO: Lexer is not tokenizing shift right, thinks that it is less then...
-
+            // Handle the shift operators (<< and >>)
             if (token.getType() == TokenType.LEFT_SHIFT || token.getType() == TokenType.RIGHT_SHIFT) {
-                cursor++;
-                Node right = additiveExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                left = new Node(NodeType.SHIFT_EXPRESSION, children, token.getLexeme());
+                cursor++; // Consume the shift operator
+
+                Node right;
+                try {
+                    right = additiveExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected an additive expression after shift operator '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "additive-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                // Create a node for the shift expression and continue parsing
+                left = new Node(NodeType.SHIFT_EXPRESSION, List.of(left, right), token.getLexeme());
             } else {
-                break;
+                break; // Exit loop if no shift operators are found
             }
         }
+
         return left;
     }
 
@@ -448,13 +717,28 @@ public class Parser {
      *                         | <additive-expression> - <multiplicative-expression>
      * }</pre>
      */
-    public Node additiveExpression() throws ParseException {
+    public Node additiveExpression() throws ParserException {
         Node left = multiplicativeExpression();
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
+            // Check if the token is a "+" or "-" operator
             if (token.getType() == TokenType.PLUS || token.getType() == TokenType.MINUS) {
-                cursor++;
-                Node right = multiplicativeExpression();
+                cursor++; // Consume the operator token
+
+                Node right;
+                try {
+                    right = multiplicativeExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected a multiplicative expression after operator '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "multiplicative-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
                 List<Node> children = new ArrayList<>();
                 children.add(left);
                 children.add(right);
@@ -463,6 +747,7 @@ public class Parser {
                 break;
             }
         }
+
         return left;
     }
 
@@ -474,15 +759,32 @@ public class Parser {
      *                               | <multiplicative-expression> % <cast-expression>
      * }</pre>
      */
-    public Node multiplicativeExpression() throws ParseException {
-        Node left = unaryExpression();
+    public Node multiplicativeExpression() throws ParserException {
+        Node left = castExpression();
+
         while (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
+            // Check if the token is a "*", "/", or "%" operator
             if (token.getType() == TokenType.STAR ||
                     token.getType() == TokenType.DIVIDE ||
                     token.getType() == TokenType.MODULO) {
-                cursor++;
-                Node right = unaryExpression();
+
+                cursor++; // Consume the operator token
+
+                Node right;
+                try {
+                    right = castExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected a cast expression after operator '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "cast-expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                // Create a new node for this multiplicative expression
                 List<Node> children = new ArrayList<>();
                 children.add(left);
                 children.add(right);
@@ -491,6 +793,7 @@ public class Parser {
                 break;
             }
         }
+
         return left;
     }
 
@@ -500,7 +803,7 @@ public class Parser {
      *                     | ( <type-name> ) <cast-expression>
      * }</pre>
      */
-    public Node castExpression() throws ParseException {
+    public Node castExpression() throws ParserException {
         // TODO: Handle cast (but probably wont be needed)
         return new Node(NodeType.CAST_EXPRESSION, List.of(unaryExpression()), null);
     }
@@ -515,7 +818,7 @@ public class Parser {
      *                      | sizeof <type-name>
      * }</pre>
      */
-    public Node unaryExpression() throws ParseException {
+    public Node unaryExpression() throws ParserException {
         return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression()), null);
     }
 
@@ -530,7 +833,7 @@ public class Parser {
      *                        | <postfix-expression> --
      * }</pre>
      */
-    public Node postfixExpression() throws ParseException {
+    public Node postfixExpression() throws ParserException {
 
         Node child = primaryExpression();
         if (child != null) {
@@ -548,34 +851,54 @@ public class Parser {
      *                        | ( <expression> )
      * }</pre>
      */
-    public Node primaryExpression() throws ParseException {
+    public Node primaryExpression() throws ParserException {
 
-        // Attempt to parse parenthesized expression
-        if (check(TokenType.LEFT_PAREN)) {
-            match(TokenType.LEFT_PAREN);
-            Node expression = expression();
-            match(TokenType.RIGHT_PAREN);
-            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(expression), null);
+        try {
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(identifier()), null);
+        } catch (ParserException e) {
+            // This one is expected, try next
         }
 
-        // Try parsing identifier
-
-        // Try parsing constant
-        Node constantNode = constant();
-        if (constantNode != null) {
-            return constantNode;
+        try {
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(constant()), null);
+        } catch (ParserException e) {
+            // This one is expected, try next
         }
 
-        // Try parsing string
-        Node stringNode = string();
-        if (stringNode != null) {
-            return stringNode;
+        try {
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(string()), null);
+        } catch (ParserException e) {
+            // This one is expected, try next
         }
 
-        // If none of the cases succeeded, throw an error
-        throw new ParseException("Expected primary expression but found: " + peek(), cursor);
+        try {
+            Token leftParen = tokens.get(cursor);
+            if (leftParen.getType() == TokenType.LEFT_PAREN) {
+
+                Node expression = expression();
+
+                Token rightParen = tokens.get(cursor);
+                if (rightParen.getType() == TokenType.RIGHT_PAREN) {
+
+                    return new Node(NodeType.PRIMARY_EXPRESSION, List.of(expression), null);
+
+                } else {
+                    throw new ParserException(null, null, 0, 0);
+                }
+            } else {
+                throw new ParserException(null, null, 0, 0);
+            }
+        } catch (ParserException e) {
+            // This one is expected, try next
+        }
+
+        throw new ParserException(
+                "Expected an identifier, constant, or string, but found something else.",
+                "none",
+                tokens.get(cursor).getLine(),
+                tokens.get(cursor).getColumn()
+        );
     }
-
 
     /**
      * <pre>{@code
@@ -585,7 +908,7 @@ public class Parser {
      *              | <enumeration-constant>
      * }</pre>
      */
-    public Node constant() {
+    public Node constant() throws ParserException {
         return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
     }
 
@@ -594,21 +917,51 @@ public class Parser {
      * <expression> ::= <assignment-expression>
      *                | <expression> , <assignment-expression>
      * }</pre>
+     *
+     * Parses an expression, which can be a single assignment-expression
+     * or a sequence of assignment-expressions separated by commas.
+     *
+     * @return A Node representing the parsed expression.
+     * @throws ParserException If an invalid expression is encountered.
      */
-    public Node expression() throws ParseException {
-        Node left = assignmentExpression();
+    public Node expression() throws ParserException {
         List<Node> children = new ArrayList<>();
-        children.add(left);
-        while (cursor < tokens.size()) {
-            Token token = tokens.get(cursor);
-            if (token.getType() == TokenType.COMMA) {
-                cursor++;
-                Node right = assignmentExpression();
-                children.add(right);
-            } else {
-                break;
+
+        try {
+            Node left = assignmentExpression();
+            children.add(left);
+
+            while (cursor < tokens.size()) {
+                Token token = tokens.get(cursor);
+
+                if (token.getType() == TokenType.COMMA) {
+                    cursor++; // Consume the comma
+
+                    try {
+                        Node right = assignmentExpression();
+                        children.add(right);
+                    } catch (ParserException e) {
+                        throw new ParserException(
+                                "Expected an assignment expression after ',' but got: " + tokens.get(cursor).getType(),
+                                tokens.get(cursor).getType().toString(),
+                                tokens.get(cursor).getLine(),
+                                tokens.get(cursor).getColumn()
+                        );
+                    }
+
+                } else {
+                    break; // Stop parsing if no more commas
+                }
             }
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
         }
+
         return new Node(NodeType.EXPRESSION, children, null);
     }
 
@@ -617,22 +970,54 @@ public class Parser {
      * <assignment-expression> ::= <conditional-expression>
      *                           | <unary-expression> <assignment-operator> <assignment-expression>
      * }</pre>
+     *
+     * Parses an assignment expression, which can be either:
+     *  - A conditional expression
+     *  - A unary expression followed by an assignment operator and another assignment expression.
+     *
+     * @return A Node representing the parsed assignment expression.
+     * @throws ParserException If an invalid assignment expression is encountered.
      */
-    public Node assignmentExpression() throws ParseException {
-        Node left = conditionalExpression();
+    public Node assignmentExpression() throws ParserException {
+        Node left;
+
+        try {
+            left = conditionalExpression();
+        } catch (ParserException e) {
+            throw new ParserException(
+                    "Invalid assignment expression: " + e.getMessage(),
+                    e.getExpected(),
+                    e.getLine(),
+                    e.getColumn()
+            );
+        }
+
         if (cursor < tokens.size()) {
             Token token = tokens.get(cursor);
+
+            // Check if the current token is an assignment operator
             if (token.getType() == TokenType.EQUALS || token.getType() == TokenType.PLUS_ASSIGN ||
                     token.getType() == TokenType.MINUS_ASSIGN || token.getType() == TokenType.MUL_ASSIGN ||
                     token.getType() == TokenType.DIV_ASSIGN || token.getType() == TokenType.MOD_ASSIGN) {
-                cursor++;
-                Node right = assignmentExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                return new Node(NodeType.ASSIGNMENT_EXPRESSION, children, token.getLexeme());
+
+                cursor++; // Consume the assignment operator
+
+                Node right;
+                try {
+                    right = assignmentExpression();
+                } catch (ParserException e) {
+                    throw new ParserException(
+                            "Expected an expression after assignment operator '" + token.getLexeme() + "', but found: " + tokens.get(cursor).getType(),
+                            "assignment expression",
+                            tokens.get(cursor).getLine(),
+                            tokens.get(cursor).getColumn()
+                    );
+                }
+
+                return new Node(NodeType.ASSIGNMENT_EXPRESSION, List.of(left, right), token.getLexeme());
             }
         }
+
         return left;
     }
 
@@ -790,32 +1175,33 @@ public class Parser {
      *                 | { <initializer-list> , }
      * }</pre>
      */
-    public Node initializer() throws ParseException {
-        if (cursor >= tokens.size()) {
-            throw new ParseException("Unexpected end of input while parsing initializer", cursor);
-        }
-        Token token = tokens.get(cursor);
-
-        // Case: { <initializer-list> } or { <initializer-list> , }
-        if (token.getType() == TokenType.LEFT_BRACE) {
-            cursor++; // Consume '{'
-
-            Node initializerListNode = initializerList();
-            List<Node> children = initializerListNode.getChildren();
-
-            // Check for optional trailing comma
-            if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.COMMA) {
-                cursor++; // Consume ','
-            }
-
-            // Expect closing '}'
-            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.RIGHT_BRACE) {
-                throw new ParseException("Expected '}' after initializer-list", cursor);
-            }
-            cursor++; // Consume '}'
-            return new Node(NodeType.INITIALIZER, children, null);
-        }
-        return assignmentExpression();
+    public Node initializer() throws ParserException {
+//        if (cursor >= tokens.size()) {
+//            throw new ParseException("Unexpected end of input while parsing initializer", cursor);
+//        }
+//        Token token = tokens.get(cursor);
+//
+//        // Case: { <initializer-list> } or { <initializer-list> , }
+//        if (token.getType() == TokenType.LEFT_BRACE) {
+//            cursor++; // Consume '{'
+//
+//            Node initializerListNode = initializerList();
+//            List<Node> children = initializerListNode.getChildren();
+//
+//            // Check for optional trailing comma
+//            if (cursor < tokens.size() && tokens.get(cursor).getType() == TokenType.COMMA) {
+//                cursor++; // Consume ','
+//            }
+//
+//            // Expect closing '}'
+//            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.RIGHT_BRACE) {
+//                throw new ParseException("Expected '}' after initializer-list", cursor);
+//            }
+//            cursor++; // Consume '}'
+//            return new Node(NodeType.INITIALIZER, children, null);
+//        }
+//        return assignmentExpression();
+        return null;
     }
 
     /**
@@ -824,7 +1210,7 @@ public class Parser {
      *                      | <initializer-list> , <initializer>
      * }</pre>
      */
-    public Node initializerList() throws ParseException {
+    public Node initializerList() throws ParserException {
         List<Node> children = new ArrayList<>();
         children.add(initializer());
         while (cursor < tokens.size()) {
@@ -844,13 +1230,14 @@ public class Parser {
      * <compound-statement> ::= { {<declaration>}* {<statement>}* }
      * }</pre>
      */
-    public Node compoundStatement() throws ParseException {
-        expect(TokenType.LEFT_BRACE, "Expecting left brace <compound-statement>");
-        List<Node> children = new ArrayList<>();
-        children.add(declaration());
-        children.add(statement());
-        expect(TokenType.RIGHT_BRACE, "Expecting right brace <compound-statement>");
-        return new Node(NodeType.COMPOUND_STATEMENT, children, null);
+    public Node compoundStatement() throws ParserException {
+//        expect(TokenType.LEFT_BRACE, "Expecting left brace <compound-statement>");
+//        List<Node> children = new ArrayList<>();
+//        children.add(declaration());
+//        children.add(statement());
+//        expect(TokenType.RIGHT_BRACE, "Expecting right brace <compound-statement>");
+//        return new Node(NodeType.COMPOUND_STATEMENT, children, null);
+        return null;
     }
 
     /**
@@ -863,39 +1250,40 @@ public class Parser {
      *               | <jump-statement>
      * }</pre>
      */
-    public Node statement() throws ParseException {
-
-        Node child = labeledStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        child = expressionStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        child = compoundStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        child = selectionStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        child = iterationStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        child = jumpStatement();
-        if (child != null) {
-            return new Node(NodeType.STATEMENT, List.of(child), null);
-        }
-
-        throw new ParseException("Expected a valid statement, but none found", cursor);
+    public Node statement() throws ParserException {
+//
+//        Node child = labeledStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        child = expressionStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        child = compoundStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        child = selectionStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        child = iterationStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        child = jumpStatement();
+//        if (child != null) {
+//            return new Node(NodeType.STATEMENT, List.of(child), null);
+//        }
+//
+//        throw new ParseException("Expected a valid statement, but none found", cursor);
+        return null;
     }
 
     /**
@@ -905,7 +1293,7 @@ public class Parser {
      *                       | default : <statement>
      * }</pre>
      */
-    public Node labeledStatement() throws ParseException {
+    public Node labeledStatement() throws ParserException {
         return null;
     }
 
@@ -914,13 +1302,13 @@ public class Parser {
      * <expression-statement> ::= {<expression>}? ;
      * }</pre>
      */
-    public Node expressionStatement() throws ParseException {
+    public Node expressionStatement() throws ParserException {
         if (Objects.requireNonNull(peek()).getType() == TokenType.SEMICOLON) {
             cursor++; // Consume ';'
             return new Node(NodeType.EXPRESSION_STATEMENT, null, null);
         }
         Node expr = expression();
-        expect(TokenType.SEMICOLON, "Expected ';' after expression");
+        // expect(TokenType.SEMICOLON, "Expected ';' after expression");
         return new Node(NodeType.EXPRESSION_STATEMENT, List.of(expr), null);
     }
 
@@ -942,68 +1330,69 @@ public class Parser {
      *                         | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
      * }</pre>
      */
-    public Node iterationStatement() throws ParseException {
-        if (cursor >= tokens.size()) {
-            throw new ParseException("Unexpected end of input. Expected an iteration statement.", cursor);
-        }
-
-        Token token = tokens.get(cursor);
-
-        if (token.getType() == TokenType.WHILE) {
-            cursor++; // Consume 'while'
-            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while'");
-            Node condition = expression();
-            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'while' statement");
-            Node body = statement();
-            return new Node(NodeType.ITERATION_STATEMENT, List.of(condition, body), "while");
-        }
-
-        if (token.getType() == TokenType.DO) {
-            cursor++; // Consume 'do'
-            Node body = statement();
-            expect(TokenType.WHILE, "Expected 'while' after 'do' statement");
-            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while' in do-while loop");
-            Node condition = expression();
-            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'do-while' statement");
-            expect(TokenType.SEMICOLON, "Expected ';' after 'do-while' statement");
-            return new Node(NodeType.ITERATION_STATEMENT, List.of(body, condition), "do-while");
-        }
-
-        if (token.getType() == TokenType.FOR) {
-            cursor++; // Consume 'for'
-            expect(TokenType.LEFT_PAREN, "Expected '(' after 'for'");
-            Node init = null, condition = null, increment = null;
-
-            // First expression (optional)
-            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                init = expression();
-            }
-            expect(TokenType.SEMICOLON, "Expected ';' after initialization in 'for' loop");
-
-            // Second expression (optional)
-            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                condition = expression();
-            }
-            expect(TokenType.SEMICOLON, "Expected ';' after condition in 'for' loop");
-
-            // Third expression (optional)
-            if (tokens.get(cursor).getType() != TokenType.RIGHT_PAREN) {
-                increment = expression();
-            }
-            expect(TokenType.RIGHT_PAREN, "Expected ')' after increment in 'for' loop");
-
-            Node body = statement();
-
-            List<Node> children = new ArrayList<>();
-            if (init != null) children.add(init);
-            if (condition != null) children.add(condition);
-            if (increment != null) children.add(increment);
-            children.add(body);
-
-            return new Node(NodeType.ITERATION_STATEMENT, children, "for");
-        }
-
-        throw new ParseException("Expected an iteration statement (while, do-while, or for)", cursor);
+    public Node iterationStatement() throws ParserException {
+//        if (cursor >= tokens.size()) {
+//            throw new ParserException("Unexpected end of input. Expected an iteration statement.", );
+//        }
+//
+//        Token token = tokens.get(cursor);
+//
+//        if (token.getType() == TokenType.WHILE) {
+//            cursor++; // Consume 'while'
+//            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while'");
+//            Node condition = expression();
+//            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'while' statement");
+//            Node body = statement();
+//            return new Node(NodeType.ITERATION_STATEMENT, List.of(condition, body), "while");
+//        }
+//
+//        if (token.getType() == TokenType.DO) {
+//            cursor++; // Consume 'do'
+//            Node body = statement();
+//            expect(TokenType.WHILE, "Expected 'while' after 'do' statement");
+//            expect(TokenType.LEFT_PAREN, "Expected '(' after 'while' in do-while loop");
+//            Node condition = expression();
+//            expect(TokenType.RIGHT_PAREN, "Expected ')' after condition in 'do-while' statement");
+//            expect(TokenType.SEMICOLON, "Expected ';' after 'do-while' statement");
+//            return new Node(NodeType.ITERATION_STATEMENT, List.of(body, condition), "do-while");
+//        }
+//
+//        if (token.getType() == TokenType.FOR) {
+//            cursor++; // Consume 'for'
+//            expect(TokenType.LEFT_PAREN, "Expected '(' after 'for'");
+//            Node init = null, condition = null, increment = null;
+//
+//            // First expression (optional)
+//            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                init = expression();
+//            }
+//            expect(TokenType.SEMICOLON, "Expected ';' after initialization in 'for' loop");
+//
+//            // Second expression (optional)
+//            if (tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                condition = expression();
+//            }
+//            expect(TokenType.SEMICOLON, "Expected ';' after condition in 'for' loop");
+//
+//            // Third expression (optional)
+//            if (tokens.get(cursor).getType() != TokenType.RIGHT_PAREN) {
+//                increment = expression();
+//            }
+//            expect(TokenType.RIGHT_PAREN, "Expected ')' after increment in 'for' loop");
+//
+//            Node body = statement();
+//
+//            List<Node> children = new ArrayList<>();
+//            if (init != null) children.add(init);
+//            if (condition != null) children.add(condition);
+//            if (increment != null) children.add(increment);
+//            children.add(body);
+//
+//            return new Node(NodeType.ITERATION_STATEMENT, children, "for");
+//        }
+//
+//        throw new ParseException("Expected an iteration statement (while, do-while, or for)", cursor);
+        return null;
     }
 
     /**
@@ -1014,67 +1403,68 @@ public class Parser {
      *                    | return {<expression>}? ;
      * }</pre>
      */
-    public Node jumpStatement() throws ParseException {
-        Token token = tokens.get(cursor);
-
-        // GOTO <identifier> ;
-        if (token.getType() == TokenType.GOTO) {
-            cursor++; // Consume "goto"
-            // Node label = identifier();
-
-            // Ensure a semicolon follows
-            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                throw new ParseException("Expected ';' after 'goto' statement", cursor);
-            }
-            cursor++; // Consume ";"
-
-            return new Node(NodeType.JUMP_STATEMENT, null, "goto");
-        }
-
-        // CONTINUE ;
-        if (token.getType() == TokenType.CONTINUE) {
-            cursor++; // Consume "continue"
-
-            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                throw new ParseException("Expected ';' after 'continue' statement", cursor);
-            }
-            cursor++; // Consume ";"
-
-            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "continue");
-        }
-
-        // BREAK ;
-        if (token.getType() == TokenType.BREAK) {
-            cursor++; // Consume "break"
-
-            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                throw new ParseException("Expected ';' after 'break' statement", cursor);
-            }
-            cursor++; // Consume ";"
-
-            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "break");
-        }
-
-        // RETURN {<expression>}? ;
-        if (token.getType() == TokenType.RETURN) {
-            cursor++; // Consume "return"
-            Node expression = null;
-
-            if (cursor < tokens.size() && tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                expression = expression();
-            }
-
-            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
-                throw new ParseException("Expected ';' after 'return' statement", cursor);
-            }
-            cursor++; // Consume ";"
-
-            return new Node(NodeType.JUMP_STATEMENT,
-                    expression == null ? Collections.emptyList() : List.of(expression),
-                    "return");
-        }
-
-        throw new ParseException("Expected a jump statement (goto, continue, break, or return)", cursor);
+    public Node jumpStatement() throws ParserException {
+//        Token token = tokens.get(cursor);
+//
+//        // GOTO <identifier> ;
+//        if (token.getType() == TokenType.GOTO) {
+//            cursor++; // Consume "goto"
+//            // Node label = identifier();
+//
+//            // Ensure a semicolon follows
+//            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                throw new ParseException("Expected ';' after 'goto' statement", cursor);
+//            }
+//            cursor++; // Consume ";"
+//
+//            return new Node(NodeType.JUMP_STATEMENT, null, "goto");
+//        }
+//
+//        // CONTINUE ;
+//        if (token.getType() == TokenType.CONTINUE) {
+//            cursor++; // Consume "continue"
+//
+//            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                throw new ParseException("Expected ';' after 'continue' statement", cursor);
+//            }
+//            cursor++; // Consume ";"
+//
+//            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "continue");
+//        }
+//
+//        // BREAK ;
+//        if (token.getType() == TokenType.BREAK) {
+//            cursor++; // Consume "break"
+//
+//            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                throw new ParseException("Expected ';' after 'break' statement", cursor);
+//            }
+//            cursor++; // Consume ";"
+//
+//            return new Node(NodeType.JUMP_STATEMENT, Collections.emptyList(), "break");
+//        }
+//
+//        // RETURN {<expression>}? ;
+//        if (token.getType() == TokenType.RETURN) {
+//            cursor++; // Consume "return"
+//            Node expression = null;
+//
+//            if (cursor < tokens.size() && tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                expression = expression();
+//            }
+//
+//            if (cursor >= tokens.size() || tokens.get(cursor).getType() != TokenType.SEMICOLON) {
+//                throw new ParseException("Expected ';' after 'return' statement", cursor);
+//            }
+//            cursor++; // Consume ";"
+//
+//            return new Node(NodeType.JUMP_STATEMENT,
+//                    expression == null ? Collections.emptyList() : List.of(expression),
+//                    "return");
+//        }
+//
+//        throw new ParseException("Expected a jump statement (goto, continue, break, or return)", cursor);
+        return null;
     }
 
     // -------------------------------------------------------------------------------
@@ -1262,7 +1652,7 @@ public class Parser {
     // -----------------------------------------------------------------------------------------
 
     public Node parse() throws ParserException {
-        return identifier();
+        return expression();
     }
 
 }
