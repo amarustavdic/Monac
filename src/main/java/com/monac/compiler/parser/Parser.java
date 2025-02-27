@@ -19,17 +19,19 @@ public class Parser {
     public Node primaryExpression() throws ParseException {
         Node child = null;
 
+        // TODO: Figure out how to handle exceptions properly
+
         try {
             child = identifier();
         } catch (ParseException e) {
-            System.err.println("Error parsing identifier: " + e.getMessage());
+            // System.err.println("Error parsing identifier: " + e.getMessage());
         }
 
         if (child == null) {
             try {
                 child = constant();
             } catch (ParseException e) {
-                System.err.println("Error parsing constant: " + e.getMessage());
+               // System.err.println("Error parsing constant: " + e.getMessage());
             }
         }
 
@@ -41,7 +43,17 @@ public class Parser {
     }
 
     public Node constant() throws ParseException {
-        return null;
+        return integerConstant();
+    }
+
+    public Node integerConstant() throws ParseException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.INTEGER_LITERAL) {
+            cursor++;
+            return new Node(NodeType.INTEGER_CONSTANT, null, token.getLexeme());
+        } else {
+            throw new ParseException("Expected an integer constant, but found: " + token.getType(), cursor);
+        }
     }
 
     public Node identifier() throws ParseException {
