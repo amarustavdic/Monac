@@ -1,7 +1,6 @@
 package com.monac.compiler.parser;
 
 import com.monac.compiler.lexer.Token;
-import com.monac.compiler.parser.ast.ASTNode;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public ASTNode parse() {
+    public Node parse() {
         return null;
     }
 

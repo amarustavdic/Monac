@@ -2,6 +2,7 @@ package com.monac.compiler;
 
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
+import com.monac.compiler.parser.Node;
 import com.monac.compiler.parser.Parser;
 
 import java.io.*;
@@ -13,17 +14,18 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        String input = Files.readString(Path.of("./src/main/resources/src/main.m"));
+//        String input = Files.readString(Path.of("./src/main/resources/src/main.m"));
+//
+//        Lexer lexer = new Lexer(input);
+//        List<Token> tokens = lexer.tokenize();
+//
+//        for (Token token : tokens) {
+//            System.out.println(token.getType());
+//        }
+//
+//        Parser parser = new Parser(tokens);
+//        parser.parse();
 
-        Lexer lexer = new Lexer(input);
-        List<Token> tokens = lexer.tokenize();
-
-        for (Token token : tokens) {
-            System.out.println(token.getType());
-        }
-
-        Parser parser = new Parser(tokens);
-        parser.parse();
 
     }
 
