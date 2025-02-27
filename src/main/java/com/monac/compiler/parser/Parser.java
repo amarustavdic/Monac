@@ -16,6 +16,7 @@ public class Parser {
         this.tokens = tokens;
     }
 
+
     /**
      * <pre>{@code
      * <assignment-expression> ::= <conditional-expression>
@@ -23,14 +24,22 @@ public class Parser {
      * }</pre>
      */
     public Node assignmentExpression() throws ParseException {
-        // TODO: Handle conditionals later...
-        List<Node> children = new ArrayList<>();
-        children.add(unaryExpression());
-
-
-        return null;
+        Node left = conditionalExpression();
+        if (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.EQUALS || token.getType() == TokenType.PLUS_ASSIGN ||
+                    token.getType() == TokenType.MINUS_ASSIGN || token.getType() == TokenType.MUL_ASSIGN ||
+                    token.getType() == TokenType.DIV_ASSIGN || token.getType() == TokenType.MOD_ASSIGN) {
+                cursor++;
+                Node right = assignmentExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                return new Node(NodeType.ASSIGNMENT_EXPRESSION, children, token.getLexeme());
+            }
+        }
+        return left;
     }
-
 
     // TODO: expression and then test ternary ?
     public Node expression() throws ParseException {
@@ -413,7 +422,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return conditionalExpression();
+        return assignmentExpression();
     }
 
 }
