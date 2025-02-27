@@ -21,7 +21,7 @@ public class Lexer {
         tokenPatterns.put(TokenType.KEYWORD_INT, Pattern.compile("int\\b"));
         tokenPatterns.put(TokenType.KEYWORD_VOID, Pattern.compile("void\\b"));
         tokenPatterns.put(TokenType.RETURN, Pattern.compile("return\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_IF, Pattern.compile("if\\b"));
+        tokenPatterns.put(TokenType.IF, Pattern.compile("if\\b"));
         tokenPatterns.put(TokenType.KEYWORD_ELSE, Pattern.compile("else\\b"));
         tokenPatterns.put(TokenType.WHILE, Pattern.compile("while\\b"));
         tokenPatterns.put(TokenType.FOR, Pattern.compile("for\\b"));

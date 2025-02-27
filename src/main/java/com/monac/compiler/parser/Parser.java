@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Parser {
 
@@ -849,7 +850,7 @@ public class Parser {
      * }</pre>
      */
     public Node statement() throws ParseException {
-        return null;
+        return new Node(NodeType.STATEMENT, List.of(jumpStatement()), null);
     }
 
     /**
@@ -869,7 +870,13 @@ public class Parser {
      * }</pre>
      */
     public Node expressionStatement() throws ParseException {
-        return null;
+        if (Objects.requireNonNull(peek(0)).getType() == TokenType.SEMICOLON) {
+            cursor++; // Consume ';'
+            return new Node(NodeType.EXPRESSION_STATEMENT, null, null);
+        }
+        Node expr = expression();
+        expect(TokenType.SEMICOLON, "Expected ';' after expression");
+        return new Node(NodeType.EXPRESSION_STATEMENT, List.of(expr), null);
     }
 
     /**
@@ -1066,6 +1073,11 @@ public class Parser {
             throw new ParseException(errorMessage + " Found: " + token.getType(), cursor);
         }
         cursor++;
+    }
+
+    private Token peek(int offset) {
+        int index = cursor + offset;
+        return (index < tokens.size()) ? tokens.get(index) : null;
     }
 
     // -----------------------------------------------------------------------------------------

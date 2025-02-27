@@ -7,14 +7,14 @@ public enum TokenType {
     KEYWORD_CHAR,       // char
     KEYWORD_INT,        // int
     RETURN,     // return
-    KEYWORD_IF,         // if
+    IF,         // if
     KEYWORD_ELSE,       // else
     WHILE,      // while
     FOR,        // for
     BREAK,      // break
     CONTINUE,   // continue
     GOTO,       // goto
-
+    SWITCH,
     DO,
 
     // Identifiers
