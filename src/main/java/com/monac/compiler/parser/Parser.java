@@ -1079,12 +1079,25 @@ public class Parser {
 
     // -------------------------------------------------------------------------------
 
-    public Node string() {
-        Token token = peek();
-        if (match(TokenType.STRING_LITERAL)) {
+    /**
+     * Parses a string literal token. If successful, creates a {@link Node} with the string literal's lexeme.
+     * Throws a {@link ParserException} if the token is not a string literal.
+     *
+     * @return A {@link Node} representing the string literal token.
+     * @throws ParserException If the current token is not a string literal.
+     */
+    public Node string() throws ParserException {
+        Token token = tokens.get(cursor);
+        if (token.getType() == TokenType.STRING_LITERAL) {
+            cursor++;
             return new Node(NodeType.STRING, Collections.emptyList(), token.getLexeme());
         }
-        throw error(token, "Expected string literal");
+        throw new ParserException(
+                TokenType.STRING_LITERAL.toString(),
+                token.getType().toString(),
+                token.getLine(),
+                token.getColumn()
+        );
     }
 
     /**
