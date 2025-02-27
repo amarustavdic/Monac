@@ -2,7 +2,9 @@ package com.monac.compiler;
 
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
+import com.monac.compiler.parser.Node;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.visitors.Printer;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -24,7 +26,11 @@ public class Main {
         }
 
         Parser parser = new Parser(tokens);
-        parser.parse();
+        Node ast = parser.parse();
+
+        System.out.println();
+
+        ast.accept(new Printer());
 
     }
 
