@@ -99,7 +99,21 @@ public class Parser {
      * }</pre>
      */
     public Node equalityExpression() throws ParseException {
-        return null;
+        Node left = relationalExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.EQUALS_EQUALS || token.getType() == TokenType.NOT_EQUALS) {
+                cursor++;
+                Node right = relationalExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.EQUALITY_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -304,7 +318,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return relationalExpression();
+        return equalityExpression();
     }
 
 }
