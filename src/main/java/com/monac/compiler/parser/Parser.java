@@ -19,6 +19,29 @@ public class Parser {
 
     /**
      * <pre>{@code
+     * <expression> ::= <assignment-expression>
+     *      | <expression> , <assignment-expression>
+     * }</pre>
+     */
+    public Node expression() throws ParseException {
+        Node left = assignmentExpression();
+        List<Node> children = new ArrayList<>();
+        children.add(left);
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.COMMA) {
+                cursor++;
+                Node right = assignmentExpression();
+                children.add(right);
+            } else {
+                break;
+            }
+        }
+        return new Node(NodeType.EXPRESSION, children, null);
+    }
+
+    /**
+     * <pre>{@code
      * <assignment-expression> ::= <conditional-expression>
      *      | <unary-expression> <assignment-operator> <assignment-expression>
      * }</pre>
@@ -39,11 +62,6 @@ public class Parser {
             }
         }
         return left;
-    }
-
-    // TODO: expression and then test ternary ?
-    public Node expression() throws ParseException {
-        return null;
     }
 
     /**
@@ -422,7 +440,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return assignmentExpression();
+        return expression();
     }
 
 }

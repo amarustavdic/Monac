@@ -22,6 +22,7 @@ public enum NodeType {
     LOGICAL_AND_EXPRESSION,
     LOGICAL_OR_EXPRESSION,
     CONDITIONAL_EXPRESSION,
+    EXPRESSION,
 
     INTEGER_CONSTANT,           // Representing int actual number
     CONSTANT,
