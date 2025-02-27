@@ -112,7 +112,24 @@ public class Parser {
      * }</pre>
      */
     public Node relationalExpression() throws ParseException {
-        return null;
+        Node left = shiftExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.LESS_THAN ||
+                    token.getType() == TokenType.GREATER_THAN ||
+                    token.getType() == TokenType.LESS_EQUALS ||
+                    token.getType() == TokenType.GREATER_EQUALS) {
+                cursor++;
+                Node right = shiftExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.RELATIONAL_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -287,7 +304,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return shiftExpression();
+        return relationalExpression();
     }
 
 }
