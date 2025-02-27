@@ -19,14 +19,128 @@ public class Parser {
 
     /**
      * <pre>{@code
+     * <translation-unit> ::= {<external-declaration>}*
+     * }</pre>
+     */
+    public Node translationUnit() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <external-declaration> ::= <function-definition> | <declaration>
+     * }</pre>
+     */
+    public Node externalDeclaration() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <function-definition> ::= {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement>
+     * }</pre>
+     */
+    public Node functionDefinition() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <declaration-specifier> ::= <storage-class-specifier>
+     *                           | <type-specifier>
+     *                           | <type-qualifier>
+     * }</pre>
+     */
+    public Node declarationSpecifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <storage-class-specifier> ::= auto | register | static | extern | typedef
+     * }</pre>
+     */
+    public Node storageClassSpecifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <type-specifier> ::= void | char | short | int | long | float | double | signed | unsigned
+     *                    | <struct-or-union-specifier> | <enum-specifier> | <typedef-name>
+     * }</pre>
+     */
+    public Node typeSpecifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
+     *                               | <struct-or-union> { {<struct-declaration>}+ }
+     *                               | <struct-or-union> <identifier>
+     * }</pre>
+     */
+    public Node structOrUnionSpecifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <struct-or-union> ::= struct | union
+     * }</pre>
+     */
+    public Node unionOrStruct() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <struct-declaration> ::= {<specifier-qualifier>}* <struct-declarator-list>
+     * }</pre>
+     */
+    public Node structDeclaration() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <specifier-qualifier> ::= <type-specifier> | <type-qualifier>
+     * }</pre>
+     */
+    public Node specifierQualifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <struct-declarator-list> ::= <struct-declarator>
+     *                            | <struct-declarator-list> , <struct-declarator>
+     * }</pre>
+     */
+    public Node structDeclaratorList() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <struct-declarator> ::= <declarator>
+     *                       | <declarator> : <constant-expression>
+     *                       | : <constant-expression>
+     * }</pre>
+     */
+    public Node structDeclarator() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
      * <declarator> ::= {<pointer>}? <direct-declarator>
      * }</pre>
      */
     public Node declarator() throws ParseException {
         return null;
     }
-
-
 
     /**
      * <pointer> ::= * {<type-qualifier>}* {<pointer>}?
@@ -56,8 +170,6 @@ public class Parser {
         return new Node(NodeType.POINTER, children, "*");
     }
 
-    // -------------------- probably will be no use ---------------------------------------------
-
     /**
      * <pre>{@code
      * <type-qualifier> ::= const | volatile
@@ -75,59 +187,30 @@ public class Parser {
         throw new ParseException("Expected 'const' or 'volatile' for type-qualifier", cursor);
     }
 
-    // ------------------------------------------------------------------------------------------
-
     /**
      * <pre>{@code
-     * <expression> ::= <assignment-expression>
-     *      | <expression> , <assignment-expression>
+     * <struct-declarator> ::= <declarator>
+     *                       | <declarator> : <constant-expression>
+     *                       | : <constant-expression>
      * }</pre>
      */
-    public Node expression() throws ParseException {
-        Node left = assignmentExpression();
-        List<Node> children = new ArrayList<>();
-        children.add(left);
-        while (cursor < tokens.size()) {
-            Token token = tokens.get(cursor);
-            if (token.getType() == TokenType.COMMA) {
-                cursor++;
-                Node right = assignmentExpression();
-                children.add(right);
-            } else {
-                break;
-            }
-        }
-        return new Node(NodeType.EXPRESSION, children, null);
+    public Node directDeclarator() throws ParseException {
+        return null;
     }
 
     /**
      * <pre>{@code
-     * <assignment-expression> ::= <conditional-expression>
-     *      | <unary-expression> <assignment-operator> <assignment-expression>
+     * <constant-expression> ::= <conditional-expression>
      * }</pre>
      */
-    public Node assignmentExpression() throws ParseException {
-        Node left = conditionalExpression();
-        if (cursor < tokens.size()) {
-            Token token = tokens.get(cursor);
-            if (token.getType() == TokenType.EQUALS || token.getType() == TokenType.PLUS_ASSIGN ||
-                    token.getType() == TokenType.MINUS_ASSIGN || token.getType() == TokenType.MUL_ASSIGN ||
-                    token.getType() == TokenType.DIV_ASSIGN || token.getType() == TokenType.MOD_ASSIGN) {
-                cursor++;
-                Node right = assignmentExpression();
-                List<Node> children = new ArrayList<>();
-                children.add(left);
-                children.add(right);
-                return new Node(NodeType.ASSIGNMENT_EXPRESSION, children, token.getLexeme());
-            }
-        }
-        return left;
+    public Node constantExpression() throws ParseException {
+        return null;
     }
 
     /**
      * <pre>{@code
      * <conditional-expression> ::= <logical-or-expression>
-     *      | <logical-or-expression> ? <expression> : <conditional-expression>
+     *                            | <logical-or-expression> ? <expression> : <conditional-expression>
      * }</pre>
      */
     public Node conditionalExpression() throws ParseException {
@@ -156,7 +239,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <logical-or-expression> ::= <logical-and-expression>
-     *          | <logical-or-expression> || <logical-and-expression>
+     *                           | <logical-or-expression> || <logical-and-expression>
      * }</pre>
      */
     public Node logicalOrExpression() throws ParseException {
@@ -180,7 +263,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <logical-and-expression> ::= <inclusive-or-expression>
-     *      | <logical-and-expression> && <inclusive-or-expression>
+     *                            | <logical-and-expression> && <inclusive-or-expression>
      * }</pre>
      */
     public Node logicalAndExpression() throws ParseException {
@@ -204,7 +287,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <inclusive-or-expression> ::= <exclusive-or-expression>
-     *     | <inclusive-or-expression> | <exclusive-or-expression>
+     *                             | <inclusive-or-expression> | <exclusive-or-expression>
      * }</pre>
      */
     public Node inclusiveOrExpression() throws ParseException {
@@ -228,7 +311,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <exclusive-or-expression> ::= <and-expression>
-     *      | <exclusive-or-expression> ^ <and-expression>
+     *                             | <exclusive-or-expression> ^ <and-expression>
      * }</pre>
      */
     public Node exclusiveOrExpression() throws ParseException {
@@ -252,7 +335,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <and-expression> ::= <equality-expression>
-     *      | <and-expression> & <equality-expression>
+     *                    | <and-expression> & <equality-expression>
      * }</pre>
      */
     public Node andExpression() throws ParseException {
@@ -276,8 +359,8 @@ public class Parser {
     /**
      * <pre>{@code
      * <equality-expression> ::= <relational-expression>
-     * | <equality-expression> == <relational-expression>
-     * | <equality-expression> != <relational-expression>
+     *                         | <equality-expression> == <relational-expression>
+     *                         | <equality-expression> != <relational-expression>
      * }</pre>
      */
     public Node equalityExpression() throws ParseException {
@@ -301,10 +384,10 @@ public class Parser {
     /**
      * <pre>{@code
      * <relational-expression> ::= <shift-expression>
-     * | <relational-expression> < <shift-expression>
-     * | <relational-expression> > <shift-expression>
-     * | <relational-expression> <= <shift-expression>
-     * | <relational-expression> >= <shift-expression>
+     *                           | <relational-expression> < <shift-expression>
+     *                           | <relational-expression> > <shift-expression>
+     *                           | <relational-expression> <= <shift-expression>
+     *                           | <relational-expression> >= <shift-expression>
      * }</pre>
      */
     public Node relationalExpression() throws ParseException {
@@ -331,8 +414,8 @@ public class Parser {
     /**
      * <pre>{@code
      * <shift-expression> ::= <additive-expression>
-     * | <shift-expression> << <additive-expression>
-     * | <shift-expression> >> <additive-expression>
+     *                      | <shift-expression> << <additive-expression>
+     *                      | <shift-expression> >> <additive-expression>
      * }</pre>
      */
     public Node shiftExpression() throws ParseException {
@@ -359,8 +442,8 @@ public class Parser {
     /**
      * <pre>{@code
      * <additive-expression> ::= <multiplicative-expression>
-     * | <additive-expression> + <multiplicative-expression>
-     * | <additive-expression> - <multiplicative-expression>
+     *                         | <additive-expression> + <multiplicative-expression>
+     *                         | <additive-expression> - <multiplicative-expression>
      * }</pre>
      */
     public Node additiveExpression() throws ParseException {
@@ -384,9 +467,9 @@ public class Parser {
     /**
      * <pre>{@code
      * <multiplicative-expression> ::= <cast-expression>
-     * | <multiplicative-expression> * <cast-expression>
-     * | <multiplicative-expression> / <cast-expression>
-     * | <multiplicative-expression> % <cast-expression>
+     *                               | <multiplicative-expression> * <cast-expression>
+     *                               | <multiplicative-expression> / <cast-expression>
+     *                               | <multiplicative-expression> % <cast-expression>
      * }</pre>
      */
     public Node multiplicativeExpression() throws ParseException {
@@ -412,7 +495,7 @@ public class Parser {
     /**
      * <pre>{@code
      * <cast-expression> ::= <unary-expression>
-     *      | ( <type-name> ) <cast-expression>
+     *                     | ( <type-name> ) <cast-expression>
      * }</pre>
      */
     public Node castExpression() throws ParseException {
@@ -420,14 +503,43 @@ public class Parser {
         return new Node(NodeType.CAST_EXPRESSION, List.of(unaryExpression()), null);
     }
 
+    /**
+     * <pre>{@code
+     * <unary-expression> ::= <postfix-expression>
+     *                      | ++ <unary-expression>
+     *                      | -- <unary-expression>
+     *                      | <unary-operator> <cast-expression>
+     *                      | sizeof <unary-expression>
+     *                      | sizeof <type-name>
+     * }</pre>
+     */
     public Node unaryExpression() throws ParseException {
         return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression()), null);
     }
 
+    /**
+     * <pre>{@code
+     * <postfix-expression> ::= <primary-expression>
+     *                        | <postfix-expression> [ <expression> ]
+     *                        | <postfix-expression> ( {<assignment-expression>}* )
+     *                        | <postfix-expression> . <identifier>
+     *                        | <postfix-expression> -> <identifier>
+     *                        | <postfix-expression> ++
+     *                        | <postfix-expression> --
+     * }</pre>
+     */
     public Node postfixExpression() throws ParseException {
         return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression()), null);
     }
 
+    /**
+     * <pre>{@code
+     * <primary-expression> ::= <identifier>
+     *                        | <constant>
+     *                        | <string>
+     *                        | ( <expression> )
+     * }</pre>
+     */
     public Node primaryExpression() throws ParseException {
         Node child = null;
 
@@ -456,6 +568,65 @@ public class Parser {
 
     /**
      * <pre>{@code
+     * <constant> ::= <integer-constant>
+     *              | <character-constant>
+     *              | <floating-constant>
+     *              | <enumeration-constant>
+     * }</pre>
+     */
+    public Node constant() throws ParseException {
+        return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
+    }
+
+    /**
+     * <pre>{@code
+     * <expression> ::= <assignment-expression>
+     *                | <expression> , <assignment-expression>
+     * }</pre>
+     */
+    public Node expression() throws ParseException {
+        Node left = assignmentExpression();
+        List<Node> children = new ArrayList<>();
+        children.add(left);
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.COMMA) {
+                cursor++;
+                Node right = assignmentExpression();
+                children.add(right);
+            } else {
+                break;
+            }
+        }
+        return new Node(NodeType.EXPRESSION, children, null);
+    }
+
+    /**
+     * <pre>{@code
+     * <assignment-expression> ::= <conditional-expression>
+     *                           | <unary-expression> <assignment-operator> <assignment-expression>
+     * }</pre>
+     */
+    public Node assignmentExpression() throws ParseException {
+        Node left = conditionalExpression();
+        if (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.EQUALS || token.getType() == TokenType.PLUS_ASSIGN ||
+                    token.getType() == TokenType.MINUS_ASSIGN || token.getType() == TokenType.MUL_ASSIGN ||
+                    token.getType() == TokenType.DIV_ASSIGN || token.getType() == TokenType.MOD_ASSIGN) {
+                cursor++;
+                Node right = assignmentExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                return new Node(NodeType.ASSIGNMENT_EXPRESSION, children, token.getLexeme());
+            }
+        }
+        return left;
+    }
+
+    /**
+     * <pre>{@code
      * <assignment-operator> ::= = | *= | /= | %= | += | -= | <<= | >>= | &= | ^= | |=
      * }</pre>
      */
@@ -472,9 +643,101 @@ public class Parser {
         }
     }
 
-    public Node constant() throws ParseException {
-        return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
+    /**
+     * <pre>{@code
+     * <unary-operator> ::= & | * | + | - | ~ | !
+     * }</pre>
+     */
+    public Node unaryOperator() throws ParseException {
+        return null;
     }
+
+    /**
+     * <pre>{@code
+     * <type-name> ::= {<specifier-qualifier>}+ {<abstract-declarator>}?
+     * }</pre>
+     */
+    public Node typeName() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <parameter-type-list> ::= <parameter-list>
+     *                         | <parameter-list> , ...
+     * }</pre>
+     */
+    public Node parameterTypeList() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <parameter-list> ::= <parameter-declaration>
+     *                    | <parameter-list> , <parameter-declaration>
+     * }</pre>
+     */
+    public Node parameterList() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <parameter-declaration> ::= {<declaration-specifier>}+ <declarator>
+     *                           | {<declaration-specifier>}+ <abstract-declarator>
+     *                           | {<declaration-specifier>}+
+     * }</pre>
+     */
+    public Node parameterDeclaration() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <abstract-declarator> ::= <pointer>
+     *                         | <pointer> <direct-abstract-declarator>
+     *                         | <direct-abstract-declarator>
+     * }</pre>
+     */
+    public Node abstractDeclarator() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <direct-abstract-declarator> ::= ( <abstract-declarator> )
+     *                                | {<direct-abstract-declarator>}? [ {<constant-expression>}? ]
+     *                                | {<direct-abstract-declarator>}? ( {<parameter-type-list>}? )
+     * }</pre>
+     */
+    public Node directAbstractDeclarator() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <enum-specifier> ::= enum <identifier> { <enumerator-list> }
+     *                    | enum { <enumerator-list> }
+     *                    | enum <identifier>
+     * }</pre>
+     */
+    public Node enumSpecifier() throws ParseException {
+        return null;
+    }
+
+    /**
+     * <pre>{@code
+     * <enumerator-list> ::= <enumerator>
+     *                     | <enumerator-list> , <enumerator>
+     * }</pre>
+     */
+    public Node enumeratorList() throws ParseException {
+        return null;
+    }
+
+
+
+
 
     public Node integerConstant() throws ParseException {
         Token token = tokens.get(cursor);
