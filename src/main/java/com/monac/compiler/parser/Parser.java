@@ -58,7 +58,21 @@ public class Parser {
      * }</pre>
      */
     public Node logicalAndExpression() throws ParseException {
-        return null;
+        Node left = inclusiveOrExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.LOGICAL_AND) {
+                cursor++;
+                Node right = inclusiveOrExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.LOGICAL_AND_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -68,7 +82,21 @@ public class Parser {
      * }</pre>
      */
     public Node inclusiveOrExpression() throws ParseException {
-        return null;
+        Node left = exclusiveOrExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.BITWISE_OR) {
+                cursor++;
+                Node right = exclusiveOrExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -78,7 +106,21 @@ public class Parser {
      * }</pre>
      */
     public Node exclusiveOrExpression() throws ParseException {
-        return null;
+        Node left = andExpression();
+        while (cursor < tokens.size()) {
+            Token token = tokens.get(cursor);
+            if (token.getType() == TokenType.BITWISE_XOR) {
+                cursor++;
+                Node right = andExpression();
+                List<Node> children = new ArrayList<>();
+                children.add(left);
+                children.add(right);
+                left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, children, token.getLexeme());
+            } else {
+                break;
+            }
+        }
+        return left;
     }
 
     /**
@@ -332,7 +374,7 @@ public class Parser {
 
         // TODO: Here might also want to handle case when there is more tokens, but should not be
 
-        return andExpression();
+        return logicalAndExpression();
     }
 
 }
