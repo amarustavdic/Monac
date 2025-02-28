@@ -5,6 +5,8 @@ import com.monac.parser.Node;
 public class CodeGenerator implements Visitor {
 
     private final StringBuilder code = new StringBuilder();
+    private int labelCounter = 0; // Counter for generating unique labels
+
 
     public CodeGenerator() {
         code.append("MOV SP, 0x0FFF")
@@ -16,12 +18,77 @@ public class CodeGenerator implements Visitor {
     public void visit(Node node) {
 
         switch (node.getType()) {
+            case RELATIONAL_EXPRESSION -> generateRelationalExpression(node);
             case SHIFT_EXPRESSION -> generateShiftExpression(node);
             case ADDITIVE_EXPRESSION -> generateAdditiveExpression(node);
             case MULTIPLICATIVE_EXPRESSION -> generateMultiplicativeExpression(node);
             case CONSTANT -> generateConstant(node);
         }
 
+    }
+
+    private void generateRelationalExpression(Node node) {
+        Node left = node.getChildren().get(0);
+        Node right = node.getChildren().get(1);
+
+        visit(left);
+        visit(right);
+
+        code.append("POP A").append('\n'); // right
+        code.append("POP B").append('\n'); // left
+
+        String operator = node.getValue(); // "<", ">", "<=", ">="
+        String trueLabel = "true" + labelCounter++;
+        String endLabel = "end" + labelCounter++;
+
+
+        switch (operator) {
+            case "<":
+                code.append("CMP A, B").append('\n'); // Compare A with B (A < B)
+                code.append("JB ")
+                        .append(trueLabel)
+                        .append("   ; < comparison")
+                        .append('\n'); // Jump to TRUE if A < B
+                break;
+
+            case ">":
+                code.append("CMP A, B").append('\n'); // Compare A with B (A > B)
+                code.append("JA ")
+                        .append(trueLabel)
+                        .append("   ; > comparison")
+                        .append('\n'); // Jump to TRUE if A > B
+                break;
+
+            case "<=":
+                code.append("CMP A, B").append('\n'); // Compare A with B (A <= B)
+                code.append("JBE ")
+                        .append(trueLabel)
+                        .append("   ; <= comparison")
+                        .append('\n'); // Jump to TRUE if A <= B
+                break;
+
+            case ">=":
+                code.append("CMP A, B").append('\n'); // Compare A with B (A >= B)
+                code.append("JAE ")
+                        .append(trueLabel)
+                        .append("   ; >= comparison")
+                        .append('\n'); // Jump to TRUE if A >= B
+                break;
+
+            default:
+                System.out.println("Unsupported relational operator: " + operator);
+        }
+
+        // Code for the false case (push 0 if comparison fails)
+        code.append("PUSH 0").append('\n');
+        code.append("JMP ").append(endLabel).append('\n'); // Jump to end to avoid overwriting the result
+
+        // true case: push 1 if comparison is true
+        code.append(trueLabel).append(": ").append('\n');
+        code.append("PUSH 1").append('\n');
+
+        // end
+        code.append(endLabel).append(": ").append('\n');
     }
 
     private void generateShiftExpression(Node node) {
@@ -102,7 +169,7 @@ public class CodeGenerator implements Visitor {
 
     private void generateConstant(Node node) {
         String value = node.getToken().getLexeme();
-        code.append("PUSH ").append(value).append("\n");
+        code.append("PUSH ").append(value).append('\n');
     }
 
     public String getCode() {
