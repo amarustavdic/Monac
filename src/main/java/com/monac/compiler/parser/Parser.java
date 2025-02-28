@@ -909,7 +909,8 @@ public class Parser {
      * }</pre>
      */
     public Node constant() throws ParserException {
-        return new Node(NodeType.CONSTANT, List.of(integerConstant()), null);
+        Node node = integerConstant();
+        return new Node(NodeType.CONSTANT, List.of(node), node.getValue());
     }
 
     /**
