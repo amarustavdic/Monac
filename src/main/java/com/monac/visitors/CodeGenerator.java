@@ -18,6 +18,7 @@ public class CodeGenerator implements Visitor {
     public void visit(Node node) {
 
         switch (node.getType()) {
+            case EQUALITY_EXPRESSION -> generateEqualityExpression(node);
             case RELATIONAL_EXPRESSION -> generateRelationalExpression(node);
             case SHIFT_EXPRESSION -> generateShiftExpression(node);
             case ADDITIVE_EXPRESSION -> generateAdditiveExpression(node);
@@ -27,6 +28,45 @@ public class CodeGenerator implements Visitor {
 
     }
 
+    private void generateEqualityExpression(Node node) {
+        Node left = node.getChildren().get(0);
+        Node right = node.getChildren().get(1);
+
+        visit(left);
+        visit(right);
+
+        code.append("POP A").append('\n'); // Right operand goes to A
+        code.append("POP B").append('\n'); // Left operand goes to B
+
+        String operator = node.getValue(); // The operator "==" or "!="
+        String trueLabel = "true" + labelCounter++;
+        String endLabel = "false" + labelCounter++;
+
+        switch (operator) {
+            case "==":
+                code.append("CMP B, A").append('\n'); // Compare left (B) with right (A)
+                code.append("JZ ").append(trueLabel).append("   ; == comparison").append('\n');
+                break;
+
+            case "!=":
+                code.append("CMP B, A").append('\n'); // Compare left (B) with right (A)
+                code.append("JNZ ").append(trueLabel).append("   ; != comparison").append('\n');
+                break;
+
+            default:
+                System.out.println("Unsupported equality operator: " + operator);
+        }
+
+        code.append("PUSH 0").append('\n');
+        code.append("JMP ").append(endLabel).append('\n');
+
+        code.append(trueLabel).append(":").append('\n');
+        code.append("PUSH 1").append('\n');
+
+        code.append(endLabel).append(":").append('\n');
+    }
+
+
     private void generateRelationalExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
@@ -34,12 +74,12 @@ public class CodeGenerator implements Visitor {
         visit(left);
         visit(right);
 
-        code.append("POP A").append('\n'); // right
-        code.append("POP B").append('\n'); // left
+        code.append("POP B").append('\n'); // right
+        code.append("POP A").append('\n'); // left
 
         String operator = node.getValue(); // "<", ">", "<=", ">="
         String trueLabel = "true" + labelCounter++;
-        String endLabel = "end" + labelCounter++;
+        String endLabel = "false" + labelCounter++;
 
 
         switch (operator) {
