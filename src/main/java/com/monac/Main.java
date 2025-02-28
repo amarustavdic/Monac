@@ -35,8 +35,14 @@ public class Main {
         CodeGenerator codeGenerator = new CodeGenerator();
         ast.accept(codeGenerator);
 
-        System.out.println();
-        System.out.println(codeGenerator.getCode());
+        String code = codeGenerator.getCode();
+
+        Path outputPath = Path.of("./src/main/resources/out/main.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+            writer.write(code);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
