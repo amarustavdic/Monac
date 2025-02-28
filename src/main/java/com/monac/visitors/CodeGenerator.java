@@ -7,18 +7,43 @@ public class CodeGenerator implements Visitor {
     private final StringBuilder code = new StringBuilder();
 
     public CodeGenerator() {
-        code.append("MOV SP, 0x0FFF").append('\n'); // initialize stack
+        code.append("MOV SP, 0x0FFF")
+                .append("   ; initialize stack")
+                .append('\n');
     }
 
     @Override
     public void visit(Node node) {
 
         switch (node.getType()) {
+            case SHIFT_EXPRESSION -> generateShiftExpression(node);
             case ADDITIVE_EXPRESSION -> generateAdditiveExpression(node);
             case MULTIPLICATIVE_EXPRESSION -> generateMultiplicativeExpression(node);
             case CONSTANT -> generateConstant(node);
         }
 
+    }
+
+    private void generateShiftExpression(Node node) {
+        Node left = node.getChildren().get(0);
+        Node right = node.getChildren().get(1);
+
+        visit(left);
+        visit(right);
+
+        String operator = node.getValue();
+
+        code.append("POP B").append('\n'); // right operand
+        code.append("POP A").append('\n'); // left operand
+
+        if (operator.equals("<<")) {
+            code.append("SHL A, B").append('\n');
+
+        } else if (operator.equals(">>")) {
+            code.append("SHR A, B").append('\n');
+        }
+
+        code.append("PUSH A").append('\n');
     }
 
     private void generateAdditiveExpression(Node node) {
@@ -40,7 +65,7 @@ public class CodeGenerator implements Visitor {
             code.append("SUB A, B").append('\n');
         }
 
-        code.append("PUSH A").append('\n'); // Store result back on stack
+        code.append("PUSH A").append('\n');
     }
 
     private void generateMultiplicativeExpression(Node node) {

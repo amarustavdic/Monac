@@ -1,1 +1,12 @@
-MOV SP, 0x0FFF
+MOV SP, 0x0FFF   ; initialize stack
+PUSH 3
+PUSH 1
+PUSH 2
+POP B
+POP A
+MUL B
+PUSH A
+POP B
+POP A
+SHL A, B
+PUSH A
