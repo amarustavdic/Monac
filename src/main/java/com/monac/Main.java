@@ -15,7 +15,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        String input = Files.readString(Path.of("./src/main/resources/src/main.m"));
+        String input = Files.readString(Path.of("./src/main/resources/src/main.c"));
 
         Lexer lexer = new Lexer(input);
         List<Token> tokens = lexer.tokenize();
@@ -26,6 +26,8 @@ public class Main {
 
         Parser parser = new Parser(tokens);
         Node ast = parser.parse();
+
+        System.out.println();
 
         ast.accept(new Printer());
 

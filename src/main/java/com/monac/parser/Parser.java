@@ -35,10 +35,21 @@ public class Parser {
     }
 
     private Node primaryExpression() {
+
+        if (match(TokenType.IDENTIFIER, TokenType.STRING)) {
+            return new Node(NodeType.PRIMARY_EXPRESSION, previous());
+        }
+
+        Node constant = constant();
+        if (constant != null) {
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(constant));
+        }
+
+        System.out.println("Parsing error in primary expression");
         return null;
     }
 
-
+    // For now handling an only couple of constants from c bnf grammar
     private Node constant() {
         if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
             return new Node(NodeType.CONSTANT, previous());
@@ -83,7 +94,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return constant();
+        return primaryExpression();
     }
 
 }

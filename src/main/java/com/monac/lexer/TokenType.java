@@ -5,6 +5,8 @@ public enum TokenType {
     INTEGER_CONSTANT,
     CHARACTER_CONSTANT,
 
+    IDENTIFIER,
+    STRING,
 
 
 
@@ -34,12 +36,6 @@ public enum TokenType {
     KEYWORD_BREAK,      // break
     KEYWORD_CONTINUE,   // continue
     KEYWORD_GOTO,       // goto
-
-    // Identifiers
-    IDENTIFIER,         // Any user-defined name
-
-
-    STRING_LITERAL,     // "Hello"
 
 
     //  Operators
