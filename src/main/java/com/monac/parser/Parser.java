@@ -211,16 +211,16 @@ public class Parser {
     //| <string>
     //| ( <expression> )
     private Node primaryExpression() {
-
         if (match(TokenType.IDENTIFIER, TokenType.STRING)) {
             return new Node(NodeType.PRIMARY_EXPRESSION, previous());
+        } else {
+            if (match(TokenType.LEFT_PAREN)) {
+                error(previous(), "Not implemented yet.");
+                return null;
+            } else {
+                return constant();
+            }
         }
-
-        Node constant = constant();
-        if (constant != null) return constant;
-
-        error(previous(), "Expected <primary-expression>.");
-        return null;
     }
 
     // For now handling an only couple of constants from c bnf grammar
