@@ -29,7 +29,7 @@ public class Main {
         Node ast = parser.parse();
 
         if (parser.hasErrors()) {
-            System.out.println();
+            System.err.println();
 
             // For now showing only first encountered error cuz, have not
             // implemented parser synchronization yet (would be nice)
