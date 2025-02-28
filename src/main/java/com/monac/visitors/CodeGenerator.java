@@ -18,6 +18,7 @@ public class CodeGenerator implements Visitor {
     public void visit(Node node) {
 
         switch (node.getType()) {
+            case AND_EXPRESSION -> generateAndExpression(node);
             case EQUALITY_EXPRESSION -> generateEqualityExpression(node);
             case RELATIONAL_EXPRESSION -> generateRelationalExpression(node);
             case SHIFT_EXPRESSION -> generateShiftExpression(node);
@@ -26,6 +27,10 @@ public class CodeGenerator implements Visitor {
             case CONSTANT -> generateConstant(node);
         }
 
+    }
+
+    private void generateAndExpression(Node node) {
+        // TODO: TBD how
     }
 
     private void generateEqualityExpression(Node node) {

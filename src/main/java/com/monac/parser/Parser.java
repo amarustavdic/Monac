@@ -14,6 +14,53 @@ public class Parser {
         this.tokens = tokens;
     }
 
+
+
+    private Node inclusiveOrExpression() {
+        Node left = exclusiveOrExpression();
+        if (left == null) return null;
+        while (match(TokenType.BITWISE_OR)) {
+            Token operator = previous();
+            Node right = exclusiveOrExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
+
+    private Node exclusiveOrExpression() {
+        Node left = andExpression();
+        if (left == null) return null;
+        while (match(TokenType.BITWISE_XOR)) {
+            Token operator = previous();
+            Node right = andExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
+
+    private Node andExpression() {
+        Node left = equalityExpression();
+        if (left == null) return null;
+        while (match(TokenType.BITWISE_AND)) {
+            Token operator = previous();
+            Node right = equalityExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
+
     private Node equalityExpression() {
         Node left = relationalExpression();
         if (left == null) return null;
@@ -159,7 +206,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return equalityExpression();
+        return inclusiveOrExpression();
     }
 
 }
