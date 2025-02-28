@@ -40,17 +40,12 @@ public class Parser {
 
 
     private Node constant() {
-
-        Token token = tokens.get(cursor);
-        if (token.getType() == TokenType.INTEGER_CONSTANT) {
-            cursor++;
-            return new Node(NodeType.CONSTANT, token);
-        } else if (token.getType() == TokenType.CHARACTER_CONSTANT) {
-            cursor++;
-            return new Node(NodeType.CONSTANT, token);
+        if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
+            return new Node(NodeType.CONSTANT, previous());
+        } else {
+            System.out.println("Expected <integer-constant> or <character-constant>");
+            return null;
         }
-
-        return null;
     }
 
     // ----------------- HELPER METHODS BELLOW
@@ -88,7 +83,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return null;
+        return constant();
     }
 
 }
