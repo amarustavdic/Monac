@@ -2,6 +2,26 @@ package com.monac.lexer;
 
 public enum TokenType {
 
+    INTEGER_CONSTANT,
+    CHARACTER_CONSTANT,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // -----------------------------------------------
+
+
     // Keywords
     KEYWORD_VOID,       // void
     KEYWORD_CHAR,       // char
@@ -18,10 +38,9 @@ public enum TokenType {
     // Identifiers
     IDENTIFIER,         // Any user-defined name
 
-    // Literals
-    INTEGER_LITERAL,    // 123, 0x1A, 075
-    CHAR_LITERAL,       // 'A', '\n'
+
     STRING_LITERAL,     // "Hello"
+
 
     //  Operators
     PLUS,               // +

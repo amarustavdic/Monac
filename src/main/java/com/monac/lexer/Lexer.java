@@ -33,8 +33,8 @@ public class Lexer {
         tokenPatterns.put(TokenType.IDENTIFIER, Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*"));
 
         // Literals
-        tokenPatterns.put(TokenType.INTEGER_LITERAL, Pattern.compile("\\d+"));
-        tokenPatterns.put(TokenType.CHAR_LITERAL, Pattern.compile("'([^'\\\\]|\\\\.)'"));
+        tokenPatterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
+        tokenPatterns.put(TokenType.CHARACTER_CONSTANT, Pattern.compile("'([^'\\\\]|\\\\.)'"));
         tokenPatterns.put(TokenType.STRING_LITERAL, Pattern.compile("\"(\\\\.|[^\"])*\""));
 
         // Operators
