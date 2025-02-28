@@ -26,10 +26,6 @@ public class Parser {
     }
 
 
-
-
-
-
     // ------------------------------------- FUNCTIONS FOR NON-TERMINALS
 
 
@@ -66,166 +62,242 @@ public class Parser {
         return left; // If no `?`, return the logical OR expression as-is
     }
 
+    // <logical-or-expression> ::= <logical-and-expression>
+    //| <logical-or-expression> || <logical-and-expression>
     private Node logicalOrExpression() {
         Node left = logicalAndExpression();
         if (left == null) return null;
+
         while (match(TokenType.LOGICAL_OR)) {
             Token operator = previous();
             Node right = logicalAndExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <logical-and-expression> after '||'.");
+                // synchronize(); TODO: tbd sync
+                return left;
             }
-            left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "||");
         }
+
         return left;
     }
 
+    //<logical-and-expression> ::= <inclusive-or-expression>
+    //| <logical-and-expression> && <inclusive-or-expression>
     private Node logicalAndExpression() {
         Node left = inclusiveOrExpression();
         if (left == null) return null;
+
         while (match(TokenType.LOGICAL_AND)) {
             Token operator = previous();
             Node right = inclusiveOrExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <inclusive-or-expression> after '&&'.");
+                // synchronize(); TODO: tbd sync recover from errors
+                return left;
             }
-            left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "&&");
         }
+
         return left;
     }
 
+    // <inclusive-or-expression> ::= <exclusive-or-expression>
+    // | <inclusive-or-expression> | <exclusive-or-expression>
     private Node inclusiveOrExpression() {
         Node left = exclusiveOrExpression();
         if (left == null) return null;
+
         while (match(TokenType.BITWISE_OR)) {
             Token operator = previous();
             Node right = exclusiveOrExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <exclusive-or-expression> after '|'.");
+                // synchronize(); TODO: tbd sync, waiting better times
+                return left;
             }
-            left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "|");
         }
+
         return left;
     }
 
+    // <exclusive-or-expression> ::= <and-expression>
+    //| <exclusive-or-expression> ^ <and-expression>
     private Node exclusiveOrExpression() {
         Node left = andExpression();
         if (left == null) return null;
+
         while (match(TokenType.BITWISE_XOR)) {
             Token operator = previous();
             Node right = andExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <and-expression> after '^'.");
+                // synchronize(); TODO sync
+                return left;
             }
-            left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "^");
         }
+
         return left;
     }
 
+    // <and-expression> ::= <equality-expression>
+    //| <and-expression> & <equality-expression>
     private Node andExpression() {
         Node left = equalityExpression();
         if (left == null) return null;
+
         while (match(TokenType.BITWISE_AND)) {
             Token operator = previous();
             Node right = equalityExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <equality-expression> after '&'.");
+                // synchronize(); TODO: sync
+                return left;
             }
-            left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.AND_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "&");
         }
+
         return left;
     }
 
+    // <equality-expression> ::= <relational-expression>
+    //| <equality-expression> == <relational-expression>
+    //| <equality-expression> != <relational-expression>
     private Node equalityExpression() {
         Node left = relationalExpression();
         if (left == null) return null;
+
         while (match(TokenType.EQUALS_EQUALS, TokenType.NOT_EQUALS)) {
             Token operator = previous();
             Node right = relationalExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <relational-expression> after '==' or '!='.");
+                // synchronize(); TODO: sync
+                return left;
             }
-            left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : (operator != null && operator.getType() == TokenType.EQUALS_EQUALS ? "==" : "!="));
         }
+
         return left;
     }
 
+    // <relational-expression> ::= <shift-expression>
+    //| <relational-expression> < <shift-expression>
+    //| <relational-expression> > <shift-expression>
+    //| <relational-expression> <= <shift-expression>
+    //| <relational-expression> >= <shift-expression>
     private Node relationalExpression() {
         Node left = shiftExpression();
         if (left == null) return null;
+
         while (match(TokenType.LESS_THAN, TokenType.GREATER_THAN, TokenType.LESS_EQUALS, TokenType.GREATER_EQUALS)) {
             Token operator = previous();
             Node right = shiftExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <shift-expression> after relational operator.");
+                // synchronize(); TODO: sync
+                return left;
             }
-            left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            // TODO: Potential problem with defaulting to '<'
+            left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right),
+                    operator != null ? operator.getLexeme() : "<");
         }
+
         return left;
     }
 
+    // <shift-expression> ::= <additive-expression>
+    //| <shift-expression> << <additive-expression>
+    //| <shift-expression> >> <additive-expression>
     private Node shiftExpression() {
         Node left = additiveExpression();
         if (left == null) return null;
+
         while (match(TokenType.LEFT_SHIFT, TokenType.RIGHT_SHIFT)) {
             Token operator = previous();
             Node right = additiveExpression();
+
             if (right == null) {
-                // TODO: Handle errors
-                return null;
+                error(peek(0), "Expected <additive-expression> after shift operator.");
+                // synchronize(); TODO: sync
+                return left;
             }
+
             left = new Node(NodeType.SHIFT_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
+
         return left;
     }
 
+    // <additive-expression> ::= <multiplicative-expression>
+    //| <additive-expression> + <multiplicative-expression>
+    //| <additive-expression> - <multiplicative-expression>
     private Node additiveExpression() {
         Node left = multiplicativeExpression();
         if (left == null) return null;
+
         while (match(TokenType.PLUS, TokenType.MINUS)) {
             Token operator = previous();
             Node right = multiplicativeExpression();
+
             if (right == null) {
-                // TODO: Figure out is this is okay
+                error(peek(0), "Expected <multiplicative-expression> after " + operator.getLexeme());
+                // synchronize(); TODO: sync later
+                return left;
             }
 
-            List<Node> children = null;
-            if (right != null) {
-                children = List.of(left, right);
-            } else {
-                // TODO: Figure out what to do in this case
-            }
-
-            left = new Node(NodeType.ADDITIVE_EXPRESSION, children, operator.getLexeme());
+            left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
+
         return left;
     }
 
+    // <multiplicative-expression> ::= <cast-expression>
+    //| <multiplicative-expression> * <cast-expression>
+    //| <multiplicative-expression> / <cast-expression>
+    //| <multiplicative-expression> % <cast-expression>
     private Node multiplicativeExpression() {
         Node left = castExpression();
         if (left == null) return null;
+
         while (match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO)) {
             Token operator = previous();
             Node right = castExpression();
 
-            List<Node> children = null;
-            if (right != null) {
-                children = List.of(left, right);
-            } else {
-                // TODO: Figure out what to do in this case
+            if (right == null) {
+                error(peek(0), "Expected <cast-expression> after " + operator.getLexeme());
+                // synchronize(); TODO: sync later
+                return left;
             }
 
-            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, children, operator.getLexeme());
+            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
+
         return left;
     }
+
 
     private Node castExpression() {
         return unaryExpression();
@@ -246,15 +318,26 @@ public class Parser {
     private Node primaryExpression() {
         if (match(TokenType.IDENTIFIER, TokenType.STRING)) {
             return new Node(NodeType.PRIMARY_EXPRESSION, previous());
-        } else {
-            if (match(TokenType.LEFT_PAREN)) {
-                error(previous(), "Not implemented yet.");
-                return null;
-            } else {
-                return constant();
-            }
         }
+
+        if (match(TokenType.LEFT_PAREN)) {
+            Node expression = expression();
+            if (expression == null) {
+                error(peek(0), "Expected expression inside parentheses.");
+                return null;
+            }
+
+            if (!match(TokenType.RIGHT_PAREN)) {
+                error(peek(0), "Expected closing parenthesis ')'.");
+                return null;
+            }
+
+            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(expression));
+        }
+
+        return constant();
     }
+
 
     // For now handling an only couple of constants from c bnf grammar
     // <constant> ::= <integer-constant>
@@ -327,7 +410,6 @@ public class Parser {
         // synchronize(); TODO: sync tbd
         return null;
     }
-
 
 
     // ----------------- ERROR HANDLING METHODS
