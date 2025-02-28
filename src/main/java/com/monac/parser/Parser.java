@@ -33,6 +33,39 @@ public class Parser {
     // ------------------------------------- FUNCTIONS FOR NON-TERMINALS
 
 
+    // <conditional-expression> ::= <logical-or-expression>
+    //| <logical-or-expression> ? <expression> : <conditional-expression>
+    private Node conditionalExpression() {
+        Node left = logicalOrExpression();
+        if (left == null) {
+            error(peek(0), "Expected <logical-or-expression> before '?'.");
+            return null;
+        }
+
+        if (match(TokenType.QUESTION_MARK)) {
+            Node middle = expression();
+            if (middle == null) {
+                error(peek(0), "Expected <expression> after '?'.");
+                return left;
+            }
+
+            if (!match(TokenType.COLON)) {
+                error(peek(0), "Expected ':' after <expression> in conditional expression.");
+                return left;
+            }
+
+            Node right = conditionalExpression();
+            if (right == null) {
+                error(peek(0), "Expected <conditional-expression> after ':'.");
+                return left;
+            }
+
+            return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(left, middle, right));
+        }
+
+        return left; // If no `?`, return the logical OR expression as-is
+    }
+
     private Node logicalOrExpression() {
         Node left = logicalAndExpression();
         if (left == null) return null;
@@ -241,38 +274,60 @@ public class Parser {
     // <expression> ::= <assignment-expression>
     //| <expression> , <assignment-expression>
     private Node expression() {
-        Node left = expression();
-        if (left != null) {
-            consume(TokenType.COMMA, "Expected ',' after <expression>.");
+        Node left = assignmentExpression();
+        if (left == null) return null;
+
+        while (match(TokenType.COMMA)) {
             Node right = assignmentExpression();
             if (right == null) {
                 error(peek(0), "Expected <assignment-expression> after ','.");
-                return null;
-            } else {
-                return new Node(NodeType.EXPRESSION, List.of(left, right));
+                // synchronize(); TODO: tbd sync
+                return left;
             }
-        } else {
-            return assignmentExpression();
+            left = new Node(NodeType.EXPRESSION, List.of(left, right));
         }
+        return left;
     }
 
     // <assignment-expression> ::= <conditional-expression>
     //| <unary-expression> <assignment-operator> <assignment-expression>
     private Node assignmentExpression() {
-        error(peek(0), "<assignment-expression> not implemented yet.");
-        return null;
+        Node left = conditionalExpression();
+        if (left != null) {
+            return left;
+        }
+
+        left = unaryExpression();
+        if (left == null) {
+            error(peek(0), "Expected <unary-expression> in assignment expression.");
+            return null;
+        }
+
+        Node middle = assignmentOperator();
+        if (middle == null) {
+            error(peek(0), "Expected <assignment-operator> after <unary-expression>.");
+            return null;
+        }
+
+        Node right = assignmentExpression();
+        if (right == null) {
+            error(peek(0), "Expected <assignment-expression> after <assignment-operator>.");
+            return null;
+        }
+
+        return new Node(NodeType.ASSIGNMENT_EXPRESSION, List.of(left, middle, right));
     }
 
     // <assignment-operator> ::= = | *= | /= | %= | += | -= | <<= | >>= | &= | ^= | |=
     private Node assignmentOperator() {
-        // TODO: For now only '=' is implemented
         if (match(TokenType.EQUALS)) {
             return new Node(NodeType.ASSIGNMENT_OPERATOR, previous());
-        } else {
-            error(peek(0), "Expected '=' assignment operator.");
-            return null;
         }
+        error(peek(0), "Expected '=' assignment operator.");
+        // synchronize(); TODO: sync tbd
+        return null;
     }
+
 
 
     // ----------------- ERROR HANDLING METHODS
@@ -335,7 +390,11 @@ public class Parser {
     }
 
     public Node parse() {
-        return assignmentOperator();
+        Node ast = conditionalExpression();
+        if (!peek(0).getType().equals(TokenType.EOF)) {
+            error(previous(), "Expected end of input.");
+        }
+        return ast;
     }
 
 }

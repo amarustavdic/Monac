@@ -52,6 +52,7 @@ public class Lexer {
         tokenPatterns.put(TokenType.LOGICAL_OR, Pattern.compile("\\|\\|"));
 
         // Single character operators
+        tokenPatterns.put(TokenType.QUESTION_MARK, Pattern.compile("\\?"));
         tokenPatterns.put(TokenType.PLUS, Pattern.compile("\\+"));
         tokenPatterns.put(TokenType.MINUS, Pattern.compile("-"));
         tokenPatterns.put(TokenType.MULTIPLY, Pattern.compile("\\*"));
@@ -68,6 +69,7 @@ public class Lexer {
 
         // Delimiters
         tokenPatterns.put(TokenType.SEMICOLON, Pattern.compile(";"));
+        tokenPatterns.put(TokenType.COLON, Pattern.compile(":"));
         tokenPatterns.put(TokenType.COMMA, Pattern.compile(","));
         tokenPatterns.put(TokenType.LEFT_PAREN, Pattern.compile("\\("));
         tokenPatterns.put(TokenType.RIGHT_PAREN, Pattern.compile("\\)"));
