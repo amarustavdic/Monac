@@ -30,9 +30,11 @@ public class Main {
 
         if (parser.hasErrors()) {
             System.out.println();
-            for (String error : parser.getErrors()) {
-                System.err.println(error);
-            }
+
+            // For now showing only first encountered error cuz, have not
+            // implemented parser synchronization yet (would be nice)
+            System.err.println(parser.getErrors().getFirst());
+
         } else {
             System.out.println();
             ast.accept(new Printer());

@@ -40,7 +40,7 @@ public class Parser {
             Token operator = previous();
             Node right = logicalAndExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -55,7 +55,7 @@ public class Parser {
             Token operator = previous();
             Node right = inclusiveOrExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -70,7 +70,7 @@ public class Parser {
             Token operator = previous();
             Node right = exclusiveOrExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -85,7 +85,7 @@ public class Parser {
             Token operator = previous();
             Node right = andExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -100,7 +100,7 @@ public class Parser {
             Token operator = previous();
             Node right = equalityExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -115,7 +115,7 @@ public class Parser {
             Token operator = previous();
             Node right = relationalExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -130,7 +130,7 @@ public class Parser {
             Token operator = previous();
             Node right = shiftExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -145,7 +145,7 @@ public class Parser {
             Token operator = previous();
             Node right = additiveExpression();
             if (right == null) {
-                System.out.println("Expected expression after " + operator);
+                // TODO: Handle errors
                 return null;
             }
             left = new Node(NodeType.SHIFT_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -160,13 +160,14 @@ public class Parser {
             Token operator = previous();
             Node right = multiplicativeExpression();
             if (right == null) {
-                // throw new ParseException("Expected expression after " + operator);
-                System.out.println("Expected expression after " + operator);
+                // TODO: Figure out is this is okay
             }
 
             List<Node> children = null;
             if (right != null) {
                 children = List.of(left, right);
+            } else {
+                // TODO: Figure out what to do in this case
             }
 
             left = new Node(NodeType.ADDITIVE_EXPRESSION, children, operator.getLexeme());
@@ -180,11 +181,15 @@ public class Parser {
         while (match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO)) {
             Token operator = previous();
             Node right = castExpression();
-            if (right == null) {
-                System.out.println("Expected expression after " + operator);
-                // here should handle error, panic mode probably
+
+            List<Node> children = null;
+            if (right != null) {
+                children = List.of(left, right);
+            } else {
+                // TODO: Figure out what to do in this case
             }
-            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, children, operator.getLexeme());
         }
         return left;
     }
@@ -201,6 +206,10 @@ public class Parser {
         return primaryExpression();
     }
 
+    // <primary-expression> ::= <identifier>
+    //| <constant>
+    //| <string>
+    //| ( <expression> )
     private Node primaryExpression() {
 
         if (match(TokenType.IDENTIFIER, TokenType.STRING)) {
@@ -210,7 +219,7 @@ public class Parser {
         Node constant = constant();
         if (constant != null) return constant;
 
-        System.out.println("Error in primary expression");
+        error(previous(), "Expected <primary-expression>.");
         return null;
     }
 
