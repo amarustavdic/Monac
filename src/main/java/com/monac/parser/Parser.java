@@ -14,6 +14,21 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    private Node equalityExpression() {
+        Node left = relationalExpression();
+        if (left == null) return null;
+        while (match(TokenType.EQUALS_EQUALS, TokenType.NOT_EQUALS)) {
+            Token operator = previous();
+            Node right = relationalExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
+
     private Node relationalExpression() {
         Node left = shiftExpression();
         if (left == null) return null;
@@ -144,7 +159,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return relationalExpression();
+        return equalityExpression();
     }
 
 }
