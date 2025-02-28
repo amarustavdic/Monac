@@ -3,9 +3,12 @@ package com.monac.parser;
 import com.monac.lexer.Token;
 import com.monac.lexer.TokenType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
+
+    private final List<String> errors = new ArrayList<>();
 
     private final List<Token> tokens;
     private int cursor = 0;
@@ -13,6 +16,22 @@ public class Parser {
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
+
+    public boolean hasErrors() {
+        return !errors.isEmpty();
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+
+
+
+
+
+    // ------------------------------------- FUNCTIONS FOR NON-TERMINALS
+
 
     private Node logicalOrExpression() {
         Node left = logicalAndExpression();
@@ -144,7 +163,13 @@ public class Parser {
                 // throw new ParseException("Expected expression after " + operator);
                 System.out.println("Expected expression after " + operator);
             }
-            left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
+
+            List<Node> children = null;
+            if (right != null) {
+                children = List.of(left, right);
+            }
+
+            left = new Node(NodeType.ADDITIVE_EXPRESSION, children, operator.getLexeme());
         }
         return left;
     }
@@ -190,13 +215,34 @@ public class Parser {
     }
 
     // For now handling an only couple of constants from c bnf grammar
+    // <constant> ::= <integer-constant>
+    //| <character-constant>
+    //| <floating-constant>
+    //| <enumeration-constant>
     private Node constant() {
+        Token token = peek();
         if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
-            return new Node(NodeType.CONSTANT, previous());
+            return new Node(NodeType.CONSTANT, token);
         } else {
-            System.out.println("Expected <integer-constant> or <character-constant>");
+            error(token, "Expected <integer-constant> or <character-constant>.");
             return null;
         }
+    }
+
+
+    // ----------------- ERROR HANDLING METHODS
+
+    private void error(Token token, String message) {
+        if (token.getType() == TokenType.EOF) {
+            report(token.getLine(), token.getColumn(), " at end", message);
+        } else {
+            report(token.getLine(), token.getColumn(), " at '" + token.getLexeme() + "'", message);
+        }
+    }
+
+    private void report(int line, int column, String where, String message) {
+        String error = "[" + line + ":" + column + "] Error" + where + ": " + message;
+        errors.add(error);
     }
 
     // ----------------- HELPER METHODS BELLOW

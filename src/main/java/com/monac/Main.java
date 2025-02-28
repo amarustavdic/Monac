@@ -28,20 +28,26 @@ public class Main {
         Parser parser = new Parser(tokens);
         Node ast = parser.parse();
 
-        System.out.println();
+        if (parser.hasErrors()) {
+            System.out.println();
+            for (String error : parser.getErrors()) {
+                System.err.println(error);
+            }
+        } else {
+            System.out.println();
+            ast.accept(new Printer());
 
-        ast.accept(new Printer());
+            CodeGenerator codeGenerator = new CodeGenerator();
+            ast.accept(codeGenerator);
 
-        CodeGenerator codeGenerator = new CodeGenerator();
-        ast.accept(codeGenerator);
+            String code = codeGenerator.getCode();
 
-        String code = codeGenerator.getCode();
-
-        Path outputPath = Path.of("./src/main/resources/out/main.txt");
-        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
-            writer.write(code);
-        } catch (IOException e) {
-            e.printStackTrace();
+            Path outputPath = Path.of("./src/main/resources/out/main.txt");
+            try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+                writer.write(code);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
