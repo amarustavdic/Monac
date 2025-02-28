@@ -24,6 +24,11 @@ public class Node {
         this.value = value;
     }
 
+    public Node(NodeType type, List<Node> children) {
+        this.type = type;
+        this.children = children;
+    }
+
     public NodeType getType() {
         return type;
     }

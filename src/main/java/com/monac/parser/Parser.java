@@ -229,11 +229,47 @@ public class Parser {
     //| <floating-constant>
     //| <enumeration-constant>
     private Node constant() {
-        Token token = peek();
+        Token token = peek(0);
         if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
             return new Node(NodeType.CONSTANT, token);
         } else {
             error(token, "Expected <integer-constant> or <character-constant>.");
+            return null;
+        }
+    }
+
+    // <expression> ::= <assignment-expression>
+    //| <expression> , <assignment-expression>
+    private Node expression() {
+        Node left = expression();
+        if (left != null) {
+            consume(TokenType.COMMA, "Expected ',' after <expression>.");
+            Node right = assignmentExpression();
+            if (right == null) {
+                error(peek(0), "Expected <assignment-expression> after ','.");
+                return null;
+            } else {
+                return new Node(NodeType.EXPRESSION, List.of(left, right));
+            }
+        } else {
+            return assignmentExpression();
+        }
+    }
+
+    // <assignment-expression> ::= <conditional-expression>
+    //| <unary-expression> <assignment-operator> <assignment-expression>
+    private Node assignmentExpression() {
+        error(peek(0), "<assignment-expression> not implemented yet.");
+        return null;
+    }
+
+    // <assignment-operator> ::= = | *= | /= | %= | += | -= | <<= | >>= | &= | ^= | |=
+    private Node assignmentOperator() {
+        // TODO: For now only '=' is implemented
+        if (match(TokenType.EQUALS)) {
+            return new Node(NodeType.ASSIGNMENT_OPERATOR, previous());
+        } else {
+            error(peek(0), "Expected '=' assignment operator.");
             return null;
         }
     }
@@ -256,6 +292,15 @@ public class Parser {
 
     // ----------------- HELPER METHODS BELLOW
 
+    private Token consume(TokenType type, String message) {
+        if (check(type)) {
+            return advance();
+        } else {
+            error(peek(0), message);
+            return null;
+        }
+    }
+
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
             if (check(type)) {
@@ -268,7 +313,7 @@ public class Parser {
 
     private boolean check(TokenType type) {
         if (isAtEnd()) return false;
-        return peek().getType() == type;
+        return peek(0).getType() == type;
     }
 
     private Token advance() {
@@ -277,11 +322,12 @@ public class Parser {
     }
 
     private boolean isAtEnd() {
-        return peek().getType() == TokenType.EOF;
+        return peek(0).getType() == TokenType.EOF;
     }
 
-    private Token peek() {
-        return tokens.get(cursor);
+    private Token peek(int offset) {
+        // This might be a problem, of index out of bounds later, tbd
+        return tokens.get(cursor + offset);
     }
 
     private Token previous() {
@@ -289,7 +335,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return logicalOrExpression();
+        return assignmentOperator();
     }
 
 }

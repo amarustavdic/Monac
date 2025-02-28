@@ -2,6 +2,9 @@ package com.monac.parser;
 
 public enum NodeType {
 
+
+    EXPRESSION,
+
     LOGICAL_OR_EXPRESSION,
     LOGICAL_AND_EXPRESSION,
     INCLUSIVE_OR_EXPRESSION,
@@ -18,5 +21,8 @@ public enum NodeType {
     PRIMARY_EXPRESSION,
 
     CONSTANT,
+
+    // assignment-operator
+    ASSIGNMENT_OPERATOR,
 
 }
