@@ -14,7 +14,35 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    private Node logicalOrExpression() {
+        Node left = logicalAndExpression();
+        if (left == null) return null;
+        while (match(TokenType.LOGICAL_OR)) {
+            Token operator = previous();
+            Node right = logicalAndExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
 
+    private Node logicalAndExpression() {
+        Node left = inclusiveOrExpression();
+        if (left == null) return null;
+        while (match(TokenType.LOGICAL_AND)) {
+            Token operator = previous();
+            Node right = inclusiveOrExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                return null;
+            }
+            left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), operator.getLexeme());
+        }
+        return left;
+    }
 
     private Node inclusiveOrExpression() {
         Node left = exclusiveOrExpression();
@@ -206,7 +234,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return inclusiveOrExpression();
+        return logicalOrExpression();
     }
 
 }

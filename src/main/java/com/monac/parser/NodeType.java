@@ -2,6 +2,8 @@ package com.monac.parser;
 
 public enum NodeType {
 
+    LOGICAL_OR_EXPRESSION,
+    LOGICAL_AND_EXPRESSION,
     INCLUSIVE_OR_EXPRESSION,
     EXCLUSIVE_OR_EXPRESSION,
     AND_EXPRESSION,
@@ -14,6 +16,7 @@ public enum NodeType {
     UNARY_EXPRESSION,
     POSTFIX_EXPRESSION,
     PRIMARY_EXPRESSION,
+
     CONSTANT,
 
 }
