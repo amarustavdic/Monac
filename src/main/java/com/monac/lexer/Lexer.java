@@ -38,6 +38,8 @@ public class Lexer {
         tokenPatterns.put(TokenType.STRING, Pattern.compile("\"(\\\\.|[^\"])*\""));
 
         // Operators
+        tokenPatterns.put(TokenType.LEFT_SHIFT, Pattern.compile("<<"));
+        tokenPatterns.put(TokenType.RIGHT_SHIFT, Pattern.compile(">>"));
         tokenPatterns.put(TokenType.INCREMENT, Pattern.compile("\\+\\+"));
         tokenPatterns.put(TokenType.DECREMENT, Pattern.compile("--"));
         tokenPatterns.put(TokenType.PLUS_ASSIGN, Pattern.compile("\\+="));

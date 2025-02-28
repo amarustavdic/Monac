@@ -11,6 +11,8 @@ public enum TokenType {
     MULTIPLY,           // *
     DIVIDE,             // /
     MODULO,             // %
+    LEFT_SHIFT,         // <<
+    RIGHT_SHIFT,        // >>
 
     PLUS,               // +
     MINUS,              // -
@@ -68,8 +70,7 @@ public enum TokenType {
     BITWISE_XOR,        // ^
     BITWISE_NOT,        // ~
     LOGICAL_NOT,        // !
-    LEFT_SHIFT,         // <<
-    RIGHT_SHIFT,        // >>
+
     DEREFERENCE,        // *
     ADDRESS_OF,         // &
 

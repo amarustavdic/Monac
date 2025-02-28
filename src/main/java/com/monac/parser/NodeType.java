@@ -2,6 +2,7 @@ package com.monac.parser;
 
 public enum NodeType {
 
+    SHIFT_EXPRESSION,
     ADDITIVE_EXPRESSION,
     MULTIPLICATIVE_EXPRESSION,
     CAST_EXPRESSION,
