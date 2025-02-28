@@ -11,15 +11,17 @@ public class Node {
     private final NodeType type;
     private List<Node> children;
     private Token token;
+    private String value;
 
     public Node(NodeType type, Token token) {
         this.type = type;
         this.token = token;
     }
 
-    public Node(NodeType type, List<Node> children) {
+    public Node(NodeType type, List<Node> children, String value) {
         this.type = type;
         this.children = children;
+        this.value = value;
     }
 
     public NodeType getType() {
@@ -32,6 +34,10 @@ public class Node {
 
     public Token getToken() {
         return token;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public void accept(Visitor visitor) {

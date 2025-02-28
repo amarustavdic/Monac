@@ -4,6 +4,7 @@ import com.monac.lexer.Lexer;
 import com.monac.lexer.Token;
 import com.monac.parser.Node;
 import com.monac.parser.Parser;
+import com.monac.visitors.CodeGenerator;
 import com.monac.visitors.Printer;
 
 import java.io.*;
@@ -30,6 +31,12 @@ public class Main {
         System.out.println();
 
         ast.accept(new Printer());
+
+        CodeGenerator codeGenerator = new CodeGenerator();
+        ast.accept(codeGenerator);
+
+        System.out.println();
+        System.out.println(codeGenerator.getCode());
 
     }
 

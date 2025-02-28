@@ -24,7 +24,7 @@ public class Parser {
                 // throw new ParseException("Expected expression after " + operator);
                 System.out.println("Expected expression after " + operator);
             }
-            left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right));
+            left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
         return left;
     }
@@ -39,7 +39,7 @@ public class Parser {
                 System.out.println("Expected expression after " + operator);
                 // here should handle error, panic mode probably
             }
-            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right));
+            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
         return left;
     }
