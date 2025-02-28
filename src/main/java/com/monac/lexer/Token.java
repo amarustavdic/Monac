@@ -16,12 +16,12 @@ public class Token {
 
     @Override
     public String toString() {
-        return "{"
-                + "\"type\": \"" + type + "\", "
-                + "\"lexeme\": \"" + lexeme + "\", "
-                + "\"line\": " + line + ", "
-                + "\"column\": " + column
-                + "}";
+        return "\033[1;37m{" +
+                " \033[1;32m\"type\"\033[0m: \033[1;33m\"" + type + "\"\033[0m," +
+                " \033[1;32m\"lexeme\"\033[0m: \033[1;36m\"" + lexeme + "\"\033[0m," +
+                " \033[1;32m\"line\"\033[0m: \033[1;35m" + line + "\033[0m," +
+                " \033[1;32m\"column\"\033[0m: \033[1;35m" + column + " \033[0m" +
+                "\033[1;37m}\033[0m";
     }
 
     public TokenType getType() {

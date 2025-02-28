@@ -12,6 +12,11 @@ public enum TokenType {
     DIVIDE,             // /
     MODULO,             // %
 
+    PLUS,               // +
+    MINUS,              // -
+
+
+
 
 
 
@@ -42,8 +47,6 @@ public enum TokenType {
 
 
     //  Operators
-    PLUS,               // +
-    MINUS,              // -
     EQUALS,             // =
     PLUS_ASSIGN,        // +=
     MINUS_ASSIGN,       // -=

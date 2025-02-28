@@ -45,33 +45,15 @@ public class Parser {
     }
 
     private Node castExpression() {
-        Node unaryExpression = unaryExpression();
-        if (unaryExpression != null) {
-            return new Node(NodeType.CAST_EXPRESSION, List.of(unaryExpression));
-        } else {
-            System.out.println("Error in cast expression");
-            return null;
-        }
+        return unaryExpression();
     }
 
     private Node unaryExpression() {
-        Node postfixExpression = postfixExpression();
-        if (postfixExpression != null) {
-            return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression));
-        } else {
-            System.out.println("Error in unary expression");
-            return null;
-        }
+        return postfixExpression();
     }
 
     private Node postfixExpression() {
-        Node primaryExpression = primaryExpression();
-        if (primaryExpression != null) {
-            return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression));
-        } else {
-            System.out.println("Error in postfix expression");
-            return null;
-        }
+        return primaryExpression();
     }
 
     private Node primaryExpression() {
@@ -81,9 +63,7 @@ public class Parser {
         }
 
         Node constant = constant();
-        if (constant != null) {
-            return new Node(NodeType.PRIMARY_EXPRESSION, List.of(constant));
-        }
+        if (constant != null) return constant;
 
         System.out.println("Error in primary expression");
         return null;
