@@ -8,6 +8,9 @@ public enum TokenType {
     IDENTIFIER,
     STRING,
 
+    MULTIPLY,           // *
+    DIVIDE,             // /
+    MODULO,             // %
 
 
 
@@ -41,9 +44,6 @@ public enum TokenType {
     //  Operators
     PLUS,               // +
     MINUS,              // -
-    MULTIPLY,           // *
-    DIVIDE,             // /
-    MODULO,             // %
     EQUALS,             // =
     PLUS_ASSIGN,        // +=
     MINUS_ASSIGN,       // -=

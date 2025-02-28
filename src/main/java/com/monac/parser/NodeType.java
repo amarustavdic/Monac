@@ -2,6 +2,10 @@ package com.monac.parser;
 
 public enum NodeType {
 
+    MULTIPLICATIVE_EXPRESSION,
+    CAST_EXPRESSION,
+    UNARY_EXPRESSION,
+    POSTFIX_EXPRESSION,
     PRIMARY_EXPRESSION,
     CONSTANT,
 

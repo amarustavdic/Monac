@@ -28,7 +28,7 @@ public class Printer implements Visitor {
     }
 
     private String formatNode(Node node) {
-        return node.getType() + " " + node.getToken();
+        return node.getType() + " " + ((node.getToken() != null) ? node.getToken() : "");
     }
 
 }

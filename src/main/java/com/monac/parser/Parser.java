@@ -19,19 +19,48 @@ public class Parser {
     }
 
     private Node multiplicativeExpression() {
-        return null;
+        Node left = castExpression();
+        if (left == null) return null;
+        while (match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO)) {
+            Token operator = previous();
+            Node right = castExpression();
+            if (right == null) {
+                System.out.println("Expected expression after " + operator);
+                // here should handle error, panic mode probably
+            }
+            left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right));
+        }
+        return left;
     }
 
     private Node castExpression() {
-        return null;
+        Node unaryExpression = unaryExpression();
+        if (unaryExpression != null) {
+            return new Node(NodeType.CAST_EXPRESSION, List.of(unaryExpression));
+        } else {
+            System.out.println("Error in cast expression");
+            return null;
+        }
     }
 
     private Node unaryExpression() {
-        return null;
+        Node postfixExpression = postfixExpression();
+        if (postfixExpression != null) {
+            return new Node(NodeType.UNARY_EXPRESSION, List.of(postfixExpression));
+        } else {
+            System.out.println("Error in unary expression");
+            return null;
+        }
     }
 
     private Node postfixExpression() {
-        return null;
+        Node primaryExpression = primaryExpression();
+        if (primaryExpression != null) {
+            return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression));
+        } else {
+            System.out.println("Error in postfix expression");
+            return null;
+        }
     }
 
     private Node primaryExpression() {
@@ -45,7 +74,7 @@ public class Parser {
             return new Node(NodeType.PRIMARY_EXPRESSION, List.of(constant));
         }
 
-        System.out.println("Parsing error in primary expression");
+        System.out.println("Error in primary expression");
         return null;
     }
 
@@ -94,7 +123,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return primaryExpression();
+        return multiplicativeExpression();
     }
 
 }
