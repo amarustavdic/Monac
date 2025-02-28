@@ -15,7 +15,18 @@ public class Parser {
     }
 
     private Node additiveExpression() {
-        return null;
+        Node left = multiplicativeExpression();
+        if (left == null) return null;
+        while (match(TokenType.PLUS, TokenType.MINUS)) {
+            Token operator = previous();
+            Node right = multiplicativeExpression();
+            if (right == null) {
+                // throw new ParseException("Expected expression after " + operator);
+                System.out.println("Expected expression after " + operator);
+            }
+            left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right));
+        }
+        return left;
     }
 
     private Node multiplicativeExpression() {
@@ -123,7 +134,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return multiplicativeExpression();
+        return additiveExpression();
     }
 
 }
