@@ -66,25 +66,25 @@ public class Parser {
     private Node conditionalExpression() {
         Node left = logicalOrExpression();
         if (left == null) {
-            error(peek(0), "Expected <logical-or-expression> before '?'.");
+            error(peek(), "Expected <logical-or-expression> before '?'.");
             return null;
         }
 
         if (match(TokenType.QUESTION_MARK)) {
             Node middle = expression();
             if (middle == null) {
-                error(peek(0), "Expected <expression> after '?'.");
+                error(peek(), "Expected <expression> after '?'.");
                 return left;
             }
 
             if (!match(TokenType.COLON)) {
-                error(peek(0), "Expected ':' after <expression> in conditional expression.");
+                error(peek(), "Expected ':' after <expression> in conditional expression.");
                 return left;
             }
 
             Node right = conditionalExpression();
             if (right == null) {
-                error(peek(0), "Expected <conditional-expression> after ':'.");
+                error(peek(), "Expected <conditional-expression> after ':'.");
                 return left;
             }
 
@@ -105,7 +105,7 @@ public class Parser {
             Node right = logicalAndExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <logical-and-expression> after '||'.");
+                error(peek(), "Expected <logical-and-expression> after '||'.");
                 // synchronize(); TODO: tbd sync
                 return left;
             }
@@ -128,7 +128,7 @@ public class Parser {
             Node right = inclusiveOrExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <inclusive-or-expression> after '&&'.");
+                error(peek(), "Expected <inclusive-or-expression> after '&&'.");
                 // synchronize(); TODO: tbd sync recover from errors
                 return left;
             }
@@ -151,7 +151,7 @@ public class Parser {
             Node right = exclusiveOrExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <exclusive-or-expression> after '|'.");
+                error(peek(), "Expected <exclusive-or-expression> after '|'.");
                 // synchronize(); TODO: tbd sync, waiting better times
                 return left;
             }
@@ -174,7 +174,7 @@ public class Parser {
             Node right = andExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <and-expression> after '^'.");
+                error(peek(), "Expected <and-expression> after '^'.");
                 // synchronize(); TODO sync
                 return left;
             }
@@ -197,7 +197,7 @@ public class Parser {
             Node right = equalityExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <equality-expression> after '&'.");
+                error(peek(), "Expected <equality-expression> after '&'.");
                 // synchronize(); TODO: sync
                 return left;
             }
@@ -221,7 +221,7 @@ public class Parser {
             Node right = relationalExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <relational-expression> after '==' or '!='.");
+                error(peek(), "Expected <relational-expression> after '==' or '!='.");
                 // synchronize(); TODO: sync
                 return left;
             }
@@ -247,7 +247,7 @@ public class Parser {
             Node right = shiftExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <shift-expression> after relational operator.");
+                error(peek(), "Expected <shift-expression> after relational operator.");
                 // synchronize(); TODO: sync
                 return left;
             }
@@ -272,7 +272,7 @@ public class Parser {
             Node right = additiveExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <additive-expression> after shift operator.");
+                error(peek(), "Expected <additive-expression> after shift operator.");
                 // synchronize(); TODO: sync
                 return left;
             }
@@ -295,7 +295,7 @@ public class Parser {
             Node right = multiplicativeExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <multiplicative-expression> after " + operator.getLexeme());
+                error(peek(), "Expected <multiplicative-expression> after " + operator.getLexeme());
                 // synchronize(); TODO: sync later
                 return left;
             }
@@ -319,7 +319,7 @@ public class Parser {
             Node right = castExpression();
 
             if (right == null) {
-                error(peek(0), "Expected <cast-expression> after " + operator.getLexeme());
+                error(peek(), "Expected <cast-expression> after " + operator.getLexeme());
                 // synchronize(); TODO: sync later
                 return left;
             }
@@ -373,12 +373,12 @@ public class Parser {
         if (match(TokenType.LEFT_PAREN)) {
             Node expression = expression();
             if (expression == null) {
-                error(peek(0), "Expected expression inside parentheses.");
+                error(peek(), "Expected expression inside parentheses.");
                 return null;
             }
 
             if (!match(TokenType.RIGHT_PAREN)) {
-                error(peek(0), "Expected closing parenthesis ')'.");
+                error(peek(), "Expected closing parenthesis ')'.");
                 return null;
             }
 
@@ -395,7 +395,7 @@ public class Parser {
     //| <floating-constant>
     //| <enumeration-constant>
     private Node constant() {
-        Token token = peek(0);
+        Token token = peek();
         if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
             return new Node(NodeType.CONSTANT, token);
         } else {
@@ -413,7 +413,7 @@ public class Parser {
         while (match(TokenType.COMMA)) {
             Node right = assignmentExpression();
             if (right == null) {
-                error(peek(0), "Expected <assignment-expression> after ','.");
+                error(peek(), "Expected <assignment-expression> after ','.");
                 // synchronize(); TODO: tbd sync
                 return left;
             }
@@ -432,19 +432,19 @@ public class Parser {
 
         left = unaryExpression();
         if (left == null) {
-            error(peek(0), "Expected <unary-expression> in assignment expression.");
+            error(peek(), "Expected <unary-expression> in assignment expression.");
             return null;
         }
 
         Node middle = assignmentOperator();
         if (middle == null) {
-            error(peek(0), "Expected <assignment-operator> after <unary-expression>.");
+            error(peek(), "Expected <assignment-operator> after <unary-expression>.");
             return null;
         }
 
         Node right = assignmentExpression();
         if (right == null) {
-            error(peek(0), "Expected <assignment-expression> after <assignment-operator>.");
+            error(peek(), "Expected <assignment-expression> after <assignment-operator>.");
             return null;
         }
 
@@ -456,7 +456,7 @@ public class Parser {
         if (match(TokenType.EQUALS)) {
             return new Node(NodeType.ASSIGNMENT_OPERATOR, previous());
         }
-        error(peek(0), "Expected '=' assignment operator.");
+        error(peek(), "Expected '=' assignment operator.");
         // synchronize(); TODO: sync tbd
         return null;
     }
@@ -467,9 +467,139 @@ public class Parser {
         if (match(TokenType.PLUS, TokenType.MINUS, TokenType.BITWISE_NOT, TokenType.LOGICAL_NOT)) {
             return new Node(NodeType.UNARY_OPERATOR, previous());
         } else {
-            error(peek(0), "Expected unary operator: '+', '-', '~' or '!'.");
+            error(peek(), "Expected unary operator: '+', '-', '~' or '!'.");
             return null;
         }
+    }
+
+
+
+
+
+
+
+    // <statement> ::= <labeled-statement>
+    //| <expression-statement>
+    //| <compound-statement>
+    //| <selection-statement>
+    //| <iteration-statement>
+    //| <jump-statement>
+    private Node statement() {
+
+        Node selectionStatement = selectionStatement();
+        if (selectionStatement != null) {
+            return selectionStatement;
+        }
+
+        Node jumpStatement = jumpStatement();
+        if (jumpStatement != null) {
+            return jumpStatement;
+        }
+
+        return expressionStatement();
+    }
+
+    // <labeled-statement> ::= <identifier> : <statement>
+    //| case <constant-expression> : <statement>
+    //| default : <statement>
+    private Node labeledStatement() {
+        return null;
+    }
+
+    // <expression-statement> ::= {<expression>}? ;
+    private Node expressionStatement() {
+        Node expr = null;
+        if (peek().getType() != TokenType.SEMICOLON) {
+            expr = expression();
+            if (expr == null) {
+                error(peek(), "Expected <expression>.");
+                return null;
+            }
+        }
+        consume(TokenType.SEMICOLON, "Expected ';' after expression.");
+        return expr != null ? new Node(NodeType.EXPRESSION_STATEMENT, List.of(expr)) : new Node(NodeType.EXPRESSION_STATEMENT, List.of());
+    }
+
+
+
+    // <selection-statement> ::= if ( <expression> ) <statement>
+    //| if ( <expression> ) <statement> else <statement>
+    //| switch ( <expression> ) <statement>
+    private Node selectionStatement() {
+        // Match 'if' first
+        if (match(TokenType.IF)) {
+            consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.");
+
+            Node condition = expression();
+            if (condition != null) {
+                consume(TokenType.RIGHT_PAREN, "Expected ')' after 'if' condition.");
+
+                Node trueBranch = statement();
+                if (trueBranch != null) {
+                    if (match(TokenType.ELSE)) {
+                        Node falseBranch = statement();
+                        if (falseBranch != null) {
+                            return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch, falseBranch));
+                        } else {
+                            error(peek(), "Expected <statement> after 'else'.");
+                            return null;
+                        }
+                    } else {
+                        return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch));
+                    }
+                } else {
+                    error(peek(), "Expected <statement> after 'if' condition.");
+                    return null;
+                }
+            } else {
+                error(peek(), "Expected <expression> inside 'if' parentheses.");
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // <iteration-statement> ::= while ( <expression> ) <statement>
+    //| do <statement> while ( <expression> ) ;
+    //| for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
+    private Node iterationStatement() {
+        return null;
+    }
+
+
+    // <jump-statement> ::= goto <identifier> ;
+    //| continue ;
+    //| break ;
+    //| return {<expression>}? ;
+    private Node jumpStatement() {
+
+        if (match(TokenType.GOTO)) {
+            Token identifier = consume(TokenType.IDENTIFIER, "Expected identifier after 'goto'.");
+            consume(TokenType.SEMICOLON, "Expected ';' after 'goto'.");
+            return new Node(NodeType.JUMP_STATEMENT, identifier);
+        }
+
+        if (match(TokenType.CONTINUE)) {
+            consume(TokenType.SEMICOLON, "Expected ';' after 'continue'.");
+            return new Node(NodeType.JUMP_STATEMENT, List.of());
+        }
+
+        if (match(TokenType.BREAK)) {
+            consume(TokenType.SEMICOLON, "Expected ';' after 'break'.");
+            return new Node(NodeType.JUMP_STATEMENT, List.of());
+        }
+
+        if (match(TokenType.RETURN)) {
+            Node expression = null;
+            if (!check(TokenType.SEMICOLON)) {
+                expression = expression();
+            }
+            consume(TokenType.SEMICOLON, "Expected ';' after 'return'.");
+            return new Node(NodeType.JUMP_STATEMENT, expression != null ? List.of(expression) : List.of());
+        }
+
+        error(peek(), "Expected 'goto', 'continue', 'break', or 'return' statement.");
+        return null;
     }
 
 
@@ -494,7 +624,7 @@ public class Parser {
         if (check(type)) {
             return advance();
         } else {
-            error(peek(0), message);
+            error(peek(), message);
             return null;
         }
     }
@@ -511,7 +641,7 @@ public class Parser {
 
     private boolean check(TokenType type) {
         if (isAtEnd()) return false;
-        return peek(0).getType() == type;
+        return peek().getType() == type;
     }
 
     private Token advance() {
@@ -520,12 +650,11 @@ public class Parser {
     }
 
     private boolean isAtEnd() {
-        return peek(0).getType() == TokenType.EOF;
+        return peek().getType() == TokenType.EOF;
     }
 
-    private Token peek(int offset) {
-        // This might be a problem, of index out of bounds later, tbd
-        return tokens.get(cursor + offset);
+    private Token peek() {
+        return tokens.get(cursor);
     }
 
     private Token previous() {
@@ -533,8 +662,10 @@ public class Parser {
     }
 
     public Node parse() {
-        Node ast = constantExpression();
-        if (!peek(0).getType().equals(TokenType.EOF)) {
+
+        Node ast = statement();
+
+        if (!peek().getType().equals(TokenType.EOF)) {
             error(previous(), "Expected end of input.");
         }
         return ast;

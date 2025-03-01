@@ -20,14 +20,15 @@ public class Lexer {
         // Keywords
         tokenPatterns.put(TokenType.KEYWORD_INT, Pattern.compile("int\\b"));
         tokenPatterns.put(TokenType.KEYWORD_VOID, Pattern.compile("void\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_RETURN, Pattern.compile("return\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_IF, Pattern.compile("if\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_ELSE, Pattern.compile("else\\b"));
+        tokenPatterns.put(TokenType.RETURN, Pattern.compile("return\\b"));
+        tokenPatterns.put(TokenType.IF, Pattern.compile("if\\b"));
+        tokenPatterns.put(TokenType.ELSE, Pattern.compile("else\\b"));
         tokenPatterns.put(TokenType.KEYWORD_WHILE, Pattern.compile("while\\b"));
         tokenPatterns.put(TokenType.KEYWORD_FOR, Pattern.compile("for\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_BREAK, Pattern.compile("break\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_CONTINUE, Pattern.compile("continue\\b"));
-        tokenPatterns.put(TokenType.KEYWORD_GOTO, Pattern.compile("goto\\b"));
+        tokenPatterns.put(TokenType.BREAK, Pattern.compile("break\\b"));
+        tokenPatterns.put(TokenType.CONTINUE, Pattern.compile("continue\\b"));
+        tokenPatterns.put(TokenType.GOTO, Pattern.compile("goto\\b"));
+        tokenPatterns.put(TokenType.SWITCH, Pattern.compile("switch\\b"));
 
         // Identifiers (variable & function names)
         tokenPatterns.put(TokenType.IDENTIFIER, Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*"));

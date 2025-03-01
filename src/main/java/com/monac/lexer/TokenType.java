@@ -38,14 +38,15 @@ public enum TokenType {
     KEYWORD_VOID,       // void
     KEYWORD_CHAR,       // char
     KEYWORD_INT,        // int
-    KEYWORD_RETURN,     // return
-    KEYWORD_IF,         // if
-    KEYWORD_ELSE,       // else
+    RETURN,     // return
+    IF,         // if
+    ELSE,       // else
+    SWITCH,
     KEYWORD_WHILE,      // while
     KEYWORD_FOR,        // for
-    KEYWORD_BREAK,      // break
-    KEYWORD_CONTINUE,   // continue
-    KEYWORD_GOTO,       // goto
+    BREAK,      // break
+    CONTINUE,   // continue
+    GOTO,       // goto
 
 
     //  Operators
