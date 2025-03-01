@@ -25,12 +25,23 @@ public class Parser {
         return errors;
     }
 
-
-    // <translation-unit> ::= {<external-declaration>}*
+    /**
+     * Parses a translation unit, which consists of multiple external declarations.
+     * Continues parsing until no more external declarations are found.
+     *
+     * <pre>{@code
+     * <translation-unit> ::= {<external-declaration>}*
+     * }</pre>
+     *
+     * @return A Node representing the translation unit containing all parsed external declarations.
+     */
     private Node translationUnit() {
         List<Node> children = new ArrayList<>();
-        Node externalDeclaration;
-        while ((externalDeclaration = externalDeclaration()) != null) children.add(externalDeclaration);
+        Node externalDeclaration = externalDeclaration();
+        while (externalDeclaration != null) {
+            children.add(externalDeclaration);
+            externalDeclaration = externalDeclaration();
+        }
         return new Node(NodeType.TRANSLATION_UNIT, children);
     }
 
