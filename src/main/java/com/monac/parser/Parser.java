@@ -1021,8 +1021,29 @@ public class Parser {
     //| <postfix-expression> ++
     //| <postfix-expression> --
     private Node postfixExpression() {
+        // First, parse the primary expression (base case)
+        Node primaryExpression = primaryExpression();
 
+        while (match(TokenType.LEFT_BRACE)) {
+            // Parse the expression inside the brackets
+            Node expression = expression();
+
+            // TODO: Figure this out this is what is messing with the parser
+
+            // Expect the closing bracket
+            if (expression != null && match(TokenType.RIGHT_BRACE)) {
+                // Build a new node representing the postfix operation (subscript)
+                primaryExpression = new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression, expression));
+            } else {
+                // If the expression is invalid or there's no closing bracket, handle error
+                error(peek(),"Expected closing bracket ']' after expression.");
+                return null;
+            }
+        }
+
+        return primaryExpression;
     }
+
 
 
 
