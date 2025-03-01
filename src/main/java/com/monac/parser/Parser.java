@@ -29,6 +29,38 @@ public class Parser {
     // ------------------------------------- FUNCTIONS FOR NON-TERMINALS
 
 
+    // <declarator> ::= {<pointer>}? <direct-declarator>
+    private Node declarator() {
+        return null;
+    }
+
+    // <pointer> ::= * {<type-qualifier>}* {<pointer>}?
+    private Node pointer() {
+        return null;
+    }
+
+    // <type-qualifier> ::= const
+    //| volatile
+    private Node typeQualifier() {
+        // TODO: To be decided if I even need those, const and volatile
+        return null;
+    }
+
+    // <direct-declarator> ::= <identifier>
+    //| ( <declarator> )
+    //| <direct-declarator> [ {<constant-expression>}? ]
+    //| <direct-declarator> ( <parameter-type-list> )
+    //| <direct-declarator> ( {<identifier>}* )
+    private Node directDeclarator() {
+        return null;
+    }
+
+    // <constant-expression> ::= <conditional-expression>
+    private Node constantExpression() {
+        // TODO: Maybe it should be right to nest it, dont know yet we will see
+        return conditionalExpression();
+    }
+
     // <conditional-expression> ::= <logical-or-expression>
     //| <logical-or-expression> ? <expression> : <conditional-expression>
     private Node conditionalExpression() {
@@ -501,7 +533,7 @@ public class Parser {
     }
 
     public Node parse() {
-        Node ast = conditionalExpression();
+        Node ast = constantExpression();
         if (!peek(0).getType().equals(TokenType.EOF)) {
             error(previous(), "Expected end of input.");
         }

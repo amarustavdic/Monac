@@ -2,6 +2,15 @@ package com.monac.parser;
 
 public enum NodeType {
 
+    DECLARATOR,
+
+    POINTER,
+
+    TYPE_QUALIFIER,
+
+    DIRECT_DECLARATOR,
+
+    CONSTANT_EXPRESSION,
     CONDITIONAL_EXPRESSION,
     LOGICAL_OR_EXPRESSION,
     LOGICAL_AND_EXPRESSION,
