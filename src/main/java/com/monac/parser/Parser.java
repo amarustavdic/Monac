@@ -146,33 +146,48 @@ public class Parser {
         return null;
     }
 
-    // <type-specifier> ::= void
-    //| char
-    //| short
-    //| int
-    //| long
-    //| float
-    //| double
-    //| signed
-    //| unsigned
-    //| <struct-or-union-specifier>
-    //| <enum-specifier>
-    //| <typedef-name>
+    /**
+     * Parses a type specifier, which can be one of the basic types, a struct/union specifier,
+     * an enum specifier, or a typedef name.
+     *
+     * <pre>{@code
+     * <type-specifier> ::= void
+     *                    | char
+     *                    | short
+     *                    | int
+     *                    | long
+     *                    | float
+     *                    | double
+     *                    | signed
+     *                    | unsigned
+     *                    | <struct-or-union-specifier>
+     *                    | <enum-specifier>
+     *                    | <typedef-name>
+     * }</pre>
+     *
+     * @return A Node representing the type specifier, or null if no match is found.
+     */
     private Node typeSpecifier() {
-
         if (match(TokenType.VOID, TokenType.CHAR, TokenType.SHORT, TokenType.KEYWORD_INT, TokenType.LONG,
                 TokenType.FLOAT, TokenType.DOUBLE, TokenType.SIGNED, TokenType.UNSIGNED)) {
             return new Node(NodeType.TYPE_SPECIFIER, previous());
         }
 
         Node structOrUnionSpecifier = structOrUnionSpecifier();
-        if (structOrUnionSpecifier != null) return structOrUnionSpecifier;
+        if (structOrUnionSpecifier != null) {
+            return structOrUnionSpecifier;
+        }
 
-        // TODO: enum-specifier
-        // TODO: typedef-name
+        Node enumSpecifier = enumSpecifier();
+        if (enumSpecifier != null) {
+            return enumSpecifier;
+        }
 
-        return null;
+        return typedefName();
     }
+
+
+
 
     // <struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
     //| <struct-or-union> { {<struct-declaration>}+ }
