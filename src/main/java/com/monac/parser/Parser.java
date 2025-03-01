@@ -303,6 +303,12 @@ public class Parser {
         return unaryExpression();
     }
 
+    // <unary-expression> ::= <postfix-expression>
+    //| ++ <unary-expression>
+    //| -- <unary-expression>
+    //| <unary-operator> <cast-expression>
+    //| sizeof <unary-expression>
+    //| sizeof <type-name>
     private Node unaryExpression() {
         return postfixExpression();
     }
@@ -409,6 +415,17 @@ public class Parser {
         error(peek(0), "Expected '=' assignment operator.");
         // synchronize(); TODO: sync tbd
         return null;
+    }
+
+    // TODO: & and * is probably for the pointers and shit, tbd how
+    // <unary-operator> ::= & | * | + | - | ~ | !
+    private Node unaryOperator() {
+        if (match(TokenType.PLUS, TokenType.MINUS, TokenType.BITWISE_NOT, TokenType.LOGICAL_NOT)) {
+            return new Node(NodeType.UNARY_OPERATOR, previous());
+        } else {
+            error(peek(0), "Expected unary operator: '+', '-', '~' or '!'.");
+            return null;
+        }
     }
 
 

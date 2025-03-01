@@ -49,6 +49,7 @@ public enum TokenType {
 
 
     //  Operators
+    SIZEOF,             // sizeof
     EQUALS,             // =
     PLUS_ASSIGN,        // +=
     MINUS_ASSIGN,       // -=

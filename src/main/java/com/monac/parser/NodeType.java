@@ -24,5 +24,6 @@ public enum NodeType {
     ASSIGNMENT_EXPRESSION,
 
     ASSIGNMENT_OPERATOR,
+    UNARY_OPERATOR,
 
 }
