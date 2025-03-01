@@ -28,12 +28,16 @@ public class Main {
         Parser parser = new Parser(tokens);
         Node ast = parser.parse();
 
-        if (parser.hasErrors()) {
+        if (!parser.hasErrors()) {
             System.err.println();
 
             // For now showing only first encountered error cuz, have not
             // implemented parser synchronization yet (would be nice)
-            System.err.println(parser.getErrors().getFirst());
+            // System.err.println(parser.getErrors().getFirst());
+
+            for (String error : parser.getErrors()) {
+                System.err.println(error);
+            }
 
         } else {
             System.out.println();

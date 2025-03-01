@@ -2,6 +2,27 @@ package com.monac.lexer;
 
 public enum TokenType {
 
+    AUTO, REGISTER, STATIC, EXTERN, TYPEDEF,
+
+    VOID, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, SIGNED, UNSIGNED,
+
+    STRUCT, UNION,
+
+    CONST, VOLATILE,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     INTEGER_CONSTANT,
     CHARACTER_CONSTANT,
 

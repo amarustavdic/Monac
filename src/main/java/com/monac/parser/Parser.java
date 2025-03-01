@@ -26,23 +26,286 @@ public class Parser {
     }
 
 
-    // ------------------------------------- FUNCTIONS FOR NON-TERMINALS
+    // <translation-unit> ::= {<external-declaration>}*
+    private Node translationUnit() {
+        List<Node> children = new ArrayList<>();
+        Node externalDeclaration;
+        while ((externalDeclaration = externalDeclaration()) != null) children.add(externalDeclaration);
+        return new Node(NodeType.TRANSLATION_UNIT, children);
+    }
 
+    // <external-declaration> ::= <function-definition> | <declaration>
+    private Node externalDeclaration() {
+        return (functionDefinition() != null) ? functionDefinition() : declaration();
+    }
 
-    // <declarator> ::= {<pointer>}? <direct-declarator>
-    private Node declarator() {
+    //<function-definition> ::= {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement>
+    private Node functionDefinition() {
+        List<Node> children = new ArrayList<>();
+
+        Node declarationSpecifier;
+        while ((declarationSpecifier = declarationSpecifier()) != null) children.add(declarationSpecifier);
+
+        Node declarator = declarator();
+        if (declarator == null) {
+            error(peek(), "Missing declarator.");
+            return null;
+        }
+
+        Node declaration;
+        while ((declaration = declaration()) != null) children.add(declaration);
+
+        Node compoundStatement = compoundStatement();
+        if (compoundStatement == null) {
+            error(peek(), "Missing compound statement.");
+            return null;
+        }
+
+        return new Node(NodeType.FUNCTION_DEFINITION, children);
+    }
+
+    // <declaration-specifier> ::= <storage-class-specifier>
+    //| <type-specifier>
+    //| <type-qualifier>
+    private Node declarationSpecifier() {
+        return (storageClassSpecifier() != null) ? storageClassSpecifier() : (
+                (typeSpecifier() != null) ? typeSpecifier() : typeQualifier()
+        );
+    }
+
+    //<storage-class-specifier> ::= auto
+    //| register
+    //| static
+    //| extern
+    //| typedef
+    private Node storageClassSpecifier() {
+        if (match(TokenType.AUTO, TokenType.REGISTER, TokenType.STATIC, TokenType.EXTERN, TokenType.TYPEDEF)) {
+            return new Node(NodeType.STORAGE_CLASS_SPECIFIER, previous());
+        }
         return null;
+    }
+
+    // <type-specifier> ::= void
+    //| char
+    //| short
+    //| int
+    //| long
+    //| float
+    //| double
+    //| signed
+    //| unsigned
+    //| <struct-or-union-specifier>
+    //| <enum-specifier>
+    //| <typedef-name>
+    private Node typeSpecifier() {
+
+        if (match(TokenType.VOID, TokenType.CHAR, TokenType.SHORT, TokenType.KEYWORD_INT, TokenType.LONG,
+                TokenType.FLOAT, TokenType.DOUBLE, TokenType.SIGNED, TokenType.UNSIGNED)) {
+            return new Node(NodeType.TYPE_SPECIFIER, previous());
+        }
+
+        Node structOrUnionSpecifier = structOrUnionSpecifier();
+        if (structOrUnionSpecifier != null) return structOrUnionSpecifier;
+
+        // TODO: enum-specifier
+        // TODO: typedef-name
+
+        return null;
+    }
+
+    // <struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
+    //| <struct-or-union> { {<struct-declaration>}+ }
+    //| <struct-or-union> <identifier>
+    private Node structOrUnionSpecifier() {
+
+        List<Node> children = new ArrayList<>();
+
+        Node structOrUnion = structOrUnion();
+        if (structOrUnion != null) {
+            children.add(structOrUnion); // include <struct-or-union>
+
+            Node identifier = identifier();
+            if (identifier != null) {
+                children.add(identifier); // include <identifier>
+
+                Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after identifier.");
+                if (leftBrace != null) {
+
+                    Node structDeclaration = structDeclaration();
+                    if (structDeclaration != null) {
+                        do children.add(structDeclaration);
+                        while ((structDeclaration = structDeclaration()) != null);
+                        Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after structDeclaration.");
+                        if (rightBrace != null) {
+                            return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        error(peek(), "Missing struct declaration.");
+                        return null;
+                    }
+                } else {
+                    return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+                }
+
+            } else {
+                Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after struct or union.");
+                if (leftBrace != null) {
+                    Node structDeclaration = structDeclaration();
+                    if (structDeclaration != null) {
+                        do children.add(structDeclaration);
+                        while ((structDeclaration = structDeclaration()) != null);
+                        Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after structDeclaration.");
+                        if (rightBrace != null) {
+                            return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        error(peek(), "Missing struct declaration.");
+                        return null;
+                    }
+                } else {
+                    error(peek(), "Missing identifier.");
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    // <struct-or-union> ::= struct | union
+    private Node structOrUnion() {
+        if (match(TokenType.STRUCT, TokenType.UNION)) return new Node(NodeType.STRUCT_OR_UNION, previous());
+        return null;
+    }
+
+    //<struct-declaration> ::= {<specifier-qualifier>}* <struct-declarator-list>
+    private Node structDeclaration() {
+
+        List<Node> children = new ArrayList<>();
+
+        Node specifierQualifier;
+        while ((specifierQualifier = specifierQualifier()) != null) children.add(specifierQualifier);
+
+        if (children.isEmpty()) {
+            return structDeclaratorList();
+        } else {
+            Node structDeclaratorList = structDeclaratorList();
+            if (structDeclaratorList != null) {
+                children.add(structDeclaratorList);
+                return new Node(NodeType.STRUCT_DECLARATION, children);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    // <specifier-qualifier> ::= <type-specifier> | <type-qualifier>
+    private Node specifierQualifier() {
+        return (typeSpecifier() != null) ? typeSpecifier() : typeQualifier();
+    }
+
+    //<struct-declarator-list> ::= <struct-declarator>
+    // | <struct-declarator-list> , <struct-declarator>
+    private Node structDeclaratorList() {
+
+        Node structDeclarator = structDeclarator();
+
+        if (structDeclarator != null) {
+            return structDeclarator;
+        } else {
+            List<Node> children = new ArrayList<>();
+            Node structDeclaratorList = structDeclaratorList();
+            if (structDeclaratorList != null) {
+                if (match(TokenType.COMMA)) {
+                    children.add(structDeclaratorList);
+                    structDeclarator = structDeclarator();
+                    if (structDeclarator != null) {
+                        children.add(structDeclarator);
+                        return new Node(NodeType.STRUCT_DECLARATOR_LIST, children);
+                    } else {
+                        error(peek(), "Expected struct declarator.");
+                        return null;
+                    }
+                } else {
+                    error(peek(), "Missing ',' after struct declarator list.");
+                    return null;
+                }
+            } else {
+                return structDeclarator;
+            }
+        }
+    }
+
+    //<struct-declarator> ::= <declarator>
+    //| <declarator> : <constant-expression>
+    //| : <constant-expression>
+    private Node structDeclarator() {
+        if (match(TokenType.COLON)) {
+            return constantExpression(); // : <constant-expression>
+        } else {
+            Node declarator = declarator();
+            if (declarator != null) {
+                if (match(TokenType.COLON)) {
+                    // <declarator> : <constant-expression>
+                    Node constantExpression = constantExpression();
+                    if (constantExpression != null) {
+                        return new Node(NodeType.STRUCT_DECLARATOR, List.of(declarator, constantExpression));
+                    } else {
+                        error(peek(), "Expected constant expression after ':'.");
+                        return null;
+                    }
+                } else {
+                    return declarator; // <declarator>
+                }
+            } else {
+                return null;
+            }
+        }
+    }
+
+    //<declarator> ::= {<pointer>}? <direct-declarator>
+    private Node declarator() {
+
+        List<Node> children = new ArrayList<>();
+
+        Node pointer = pointer();
+        if (pointer != null) children.add(pointer);
+
+        if (children.isEmpty()) {
+            return directDeclarator();
+        } else {
+            Node directDeclarator = directDeclarator();
+            if (directDeclarator != null) {
+                children.add(directDeclarator);
+                return new Node(NodeType.DECLARATOR, children);
+            } else {
+                return null;
+            }
+        }
     }
 
     // <pointer> ::= * {<type-qualifier>}* {<pointer>}?
     private Node pointer() {
-        return null;
+        // TODO: Well * is overloaded, so figure out how to handle it
+
+        if (match(TokenType.MULTIPLY)) {
+            List<Node> children = new ArrayList<>();
+            while (typeQualifier() != null) children.add(typeQualifier());
+
+            Node pointer = pointer();
+            if (pointer != null) children.add(pointer);
+            return new Node(NodeType.POINTER, children);
+        } else {
+            return null;
+        }
     }
 
-    // <type-qualifier> ::= const
-    //| volatile
+    // <type-qualifier> ::= const | volatile
     private Node typeQualifier() {
-        // TODO: To be decided if I even need those, const and volatile
+        if (match(TokenType.CONST, TokenType.VOLATILE)) return new Node(NodeType.TYPE_QUALIFIER, previous());
         return null;
     }
 
@@ -52,51 +315,101 @@ public class Parser {
     //| <direct-declarator> ( <parameter-type-list> )
     //| <direct-declarator> ( {<identifier>}* )
     private Node directDeclarator() {
-        return null;
+        Node identifier = identifier();
+        if (identifier != null) return identifier;
+
+        if (match(TokenType.LEFT_PAREN)) {
+            Node declarator = declarator();
+            if (declarator != null) {
+                if (match(TokenType.RIGHT_PAREN)) {
+                    return declarator;
+                } else {
+                    error(peek(), "Expected ')' after declarator.");
+                    return null;
+                }
+            } else {
+                error(peek(), "Expected declarator after '('.");
+                return null;
+            }
+        }
+
+        // If we reach here, the first two cases have failed; we need a valid directDeclarator to proceed.
+        Node directDeclarator = identifier();  // Try to get an identifier first
+        if (directDeclarator == null) return null; // Avoid infinite recursion
+
+        List<Node> children = new ArrayList<>();
+        children.add(directDeclarator);
+
+        while (true) {
+            if (match(TokenType.LEFT_BRACKET)) {
+                Node constantExpression = constantExpression();
+                if (!match(TokenType.RIGHT_BRACKET)) {
+                    error(peek(), "Expected ']'.");
+                    return null;
+                }
+                if (constantExpression != null) children.add(constantExpression);
+                children.add(new Node(NodeType.DECLARATOR, children));
+
+            } else if (match(TokenType.LEFT_PAREN)) {
+                List<Node> paramChildren = new ArrayList<>();
+                while ((identifier = identifier()) != null) {
+                    paramChildren.add(identifier);
+                }
+
+                if (!match(TokenType.RIGHT_PAREN)) {
+                    error(peek(), "Expected ')'.");
+                    return null;
+                }
+
+                children.add(new Node(NodeType.DIRECT_DECLARATOR, paramChildren));
+            } else {
+                break;  // If no valid declarator, stop parsing
+            }
+        }
+
+        return new Node(NodeType.DIRECT_DECLARATOR, children);
     }
 
     // <constant-expression> ::= <conditional-expression>
     private Node constantExpression() {
-        // TODO: Maybe it should be right to nest it, dont know yet we will see
         return conditionalExpression();
     }
 
     // <conditional-expression> ::= <logical-or-expression>
     //| <logical-or-expression> ? <expression> : <conditional-expression>
     private Node conditionalExpression() {
-        Node left = logicalOrExpression();
-        if (left == null) {
-            error(peek(), "Expected <logical-or-expression> before '?'.");
-            return null;
+
+        Node logicalOrExpression = logicalOrExpression();
+        if (logicalOrExpression != null) {
+            if (match(TokenType.QUESTION_MARK)) {
+                Node expression = expression();
+                if (expression != null) {
+                    if (match(TokenType.COLON)) {
+                        Node conditionalExpression = conditionalExpression();
+                        if (conditionalExpression != null) {
+                            return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(logicalOrExpression, expression, conditionalExpression));
+                        } else {
+                            error(peek(), "Expected conditional expression.");
+                            return null;
+                        }
+                    } else {
+                        error(peek(), "Expected ':'.");
+                        return null;
+                    }
+                }
+                error(peek(), "Expected expression after '?'.");
+                return null;
+            }
+            return logicalOrExpression;
         }
-
-        if (match(TokenType.QUESTION_MARK)) {
-            Node middle = expression();
-            if (middle == null) {
-                error(peek(), "Expected <expression> after '?'.");
-                return left;
-            }
-
-            if (!match(TokenType.COLON)) {
-                error(peek(), "Expected ':' after <expression> in conditional expression.");
-                return left;
-            }
-
-            Node right = conditionalExpression();
-            if (right == null) {
-                error(peek(), "Expected <conditional-expression> after ':'.");
-                return left;
-            }
-
-            return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(left, middle, right));
-        }
-
-        return left; // If no `?`, return the logical OR expression as-is
+        return null;
     }
 
     // <logical-or-expression> ::= <logical-and-expression>
     //| <logical-or-expression> || <logical-and-expression>
     private Node logicalOrExpression() {
+
+
         Node left = logicalAndExpression();
         if (left == null) return null;
 
@@ -110,8 +423,7 @@ public class Parser {
                 return left;
             }
 
-            left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "||");
+            left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
 
         return left;
@@ -133,8 +445,7 @@ public class Parser {
                 return left;
             }
 
-            left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "&&");
+            left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
 
         return left;
@@ -156,8 +467,7 @@ public class Parser {
                 return left;
             }
 
-            left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "|");
+            left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
 
         return left;
@@ -179,8 +489,7 @@ public class Parser {
                 return left;
             }
 
-            left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "^");
+            left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
 
         return left;
@@ -202,10 +511,8 @@ public class Parser {
                 return left;
             }
 
-            left = new Node(NodeType.AND_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "&");
+            left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
@@ -225,11 +532,8 @@ public class Parser {
                 // synchronize(); TODO: sync
                 return left;
             }
-
-            left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : (operator != null && operator.getType() == TokenType.EQUALS_EQUALS ? "==" : "!="));
+            left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
@@ -253,8 +557,7 @@ public class Parser {
             }
 
             // TODO: Potential problem with defaulting to '<'
-            left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right),
-                    operator != null ? operator.getLexeme() : "<");
+            left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
 
         return left;
@@ -331,9 +634,17 @@ public class Parser {
     }
 
 
+    // <cast-expression> ::= <unary-expression>
+    //| ( <type-name> ) <cast-expression>
     private Node castExpression() {
+
+
+
         return unaryExpression();
     }
+
+
+
 
     // <unary-expression> ::= <postfix-expression>
     //| ++ <unary-expression>
@@ -357,6 +668,13 @@ public class Parser {
         }
     }
 
+    // <postfix-expression> ::= <primary-expression>
+    //| <postfix-expression> [ <expression> ]
+    //| <postfix-expression> ( {<assignment-expression>}* )
+    //| <postfix-expression> . <identifier>
+    //| <postfix-expression> -> <identifier>
+    //| <postfix-expression> ++
+    //| <postfix-expression> --
     private Node postfixExpression() {
         return primaryExpression();
     }
@@ -470,6 +788,70 @@ public class Parser {
         }
     }
 
+    // <type-name> ::= {<specifier-qualifier>}+ {<abstract-declarator>}?
+    private Node typeName() {
+        return null;
+    }
+
+    // <parameter-type-list> ::= <parameter-list>
+    //| <parameter-list> , ...
+    private Node parameterTypeList() {
+        return null;
+    }
+
+    // <parameter-list> ::= <parameter-declaration>
+    //| <parameter-list> , <parameter-declaration>
+    private Node parameterList() {
+        return null;
+    }
+
+    // <parameter-declaration> ::= {<declaration-specifier>}+ <declarator>
+    //| {<declaration-specifier>}+ <abstract-declarator>
+    //| {<declaration-specifier>}+
+    private Node parameterDeclaration() {
+        return null;
+    }
+
+    // <abstract-declarator> ::= <pointer>
+    //| <pointer> <direct-abstract-declarator>
+    //| <direct-abstract-declarator>
+    private Node abstractDeclaration() {
+        return null;
+    }
+
+    // <direct-abstract-declarator> ::= ( <abstract-declarator> )
+    //| {<direct-abstract-declarator>}? [ {<constant-expression>}? ]
+    //| {<direct-abstract-declarator>}? ( {<parameter-type-list>}? )
+    private Node directAbstractDeclarator() {
+        return null;
+    }
+
+
+    // <enum-specifier> ::= enum <identifier> { <enumerator-list> }
+    //| enum { <enumerator-list> }
+    //| enum <identifier>
+    private Node enumSpecifier() {
+        return null;
+    }
+
+    // <enumerator-list> ::= <enumerator>
+    //| <enumerator-list> , <enumerator>
+    private Node enumeratorList() {
+        return null;
+    }
+
+
+    // <enumerator> ::= <identifier>
+    //| <identifier> = <constant-expression>
+    private Node enumerator() {
+        return null;
+    }
+
+    // <typedef-name> ::= <identifier>
+    private Node typedefName() {
+        return identifier();
+    }
+
 
     // <declaration> ::=
     //{<declaration-specifier>}+ {<init-declarator>}* ;
@@ -477,22 +859,47 @@ public class Parser {
         return null;
     }
 
+    // <init-declarator> ::= <declarator>
+    //| <declarator> = <initializer>
+    private Node initDeclarator() {
+        return null;
+    }
+
+
+    // <initializer> ::= <assignment-expression>
+    //| { <initializer-list> }
+    //| { <initializer-list> , }
+    private Node initializer() {
+        return null;
+    }
+
+    // <initializer-list> ::= <initializer>
+    //| <initializer-list> , <initializer>
+    private Node initializerList() {
+        return null;
+    }
+
+
 
     // <compound-statement> ::= { {<declaration>}* {<statement>}* }
     private Node compoundStatement() {
 
-        if (!match(TokenType.LEFT_BRACE)) return null;
+        if (match(TokenType.LEFT_BRACE)) {
 
-        List<Node> children = new ArrayList<>();
+            List<Node> children = new ArrayList<>();
 
-        Node declaration;
-        while ((declaration = declaration()) != null) children.add(declaration);
+            Node declaration;
+            while ((declaration = declaration()) != null) children.add(declaration);
 
-        Node statement;
-        while ((statement = statement()) != null) children.add(statement);
+            Node statement;
+            while ((statement = statement()) != null) children.add(statement);
 
-        consume(TokenType.RIGHT_BRACE, "Expected '}' at end of compound statement.");
-        return new Node(NodeType.COMPOUND_STATEMENT, children);
+            consume(TokenType.RIGHT_BRACE, "Expected '}' at end of compound statement.");
+            return new Node(NodeType.COMPOUND_STATEMENT, children);
+
+        } else {
+            return null;
+        }
     }
 
 
@@ -528,6 +935,8 @@ public class Parser {
     private Node labeledStatement() {
         return null;
     }
+
+
 
     // <expression-statement> ::= {<expression>}? ;
     private Node expressionStatement() {
@@ -625,6 +1034,12 @@ public class Parser {
     }
 
 
+    public Node identifier() {
+        if (match(TokenType.IDENTIFIER)) return new Node(NodeType.IDENTIFIER, previous());
+        return null;
+    }
+
+
     // ----------------- ERROR HANDLING METHODS
 
     private void error(Token token, String message) {
@@ -685,7 +1100,7 @@ public class Parser {
 
     public Node parse() {
 
-        Node ast = primaryExpression();
+        Node ast = translationUnit();
 
         if (!peek().getType().equals(TokenType.EOF)) {
             error(previous(), "Expected end of input.");

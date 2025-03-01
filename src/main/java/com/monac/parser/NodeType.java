@@ -2,11 +2,33 @@ package com.monac.parser;
 
 public enum NodeType {
 
+    TRANSLATION_UNIT,
+    EXTERNAL_DECLARATION,
+    FUNCTION_DEFINITION,
+    DECLARATION_SPECIFIER,
+    STORAGE_CLASS_SPECIFIER,
+    TYPE_SPECIFIER,
+    STRUCT_OR_UNION_SPECIFIER,
+    STRUCT_OR_UNION,
+    STRUCT_DECLARATION,
+    SPECIFIER_QUALIFIER,
+    STRUCT_DECLARATOR_LIST,
+    STRUCT_DECLARATOR,
     DECLARATOR,
-
     POINTER,
-
     TYPE_QUALIFIER,
+
+
+
+
+
+
+
+    // probably move this to the end of the file
+    IDENTIFIER,
+
+
+
 
     DIRECT_DECLARATOR,
 
