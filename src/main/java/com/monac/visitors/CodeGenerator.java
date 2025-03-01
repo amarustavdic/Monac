@@ -1,6 +1,7 @@
 package com.monac.visitors;
 
 import com.monac.parser.Node;
+import com.monac.parser.NodeType;
 
 public class CodeGenerator implements Visitor {
 
@@ -33,26 +34,13 @@ public class CodeGenerator implements Visitor {
 
     private void selectionStatement(Node node) {
 
-        for (Node child : node.getChildren()) {
-            switch (child.getType()) {
-                case RELATIONAL_EXPRESSION -> relationalExpression(child);
-                case JUMP_STATEMENT -> jumpStatement(child);
-            }
+        if (node.getType() == NodeType.SELECTION_STATEMENT) {
+
+            visit(node.getChildren().get(0));
+
+
         }
 
-    }
-
-    private void jumpStatement(Node node) {
-
-        switch (node.getValue()) {
-            case "goto" -> handleGoto(node);
-        }
-
-    }
-
-    private void handleGoto(Node node) {
-        // TODO: Here should probably be checking if label is defined prior
-        code.append("JMP ").append(node.getToken().getLexeme());
     }
 
     private void andExpression(Node node) {
@@ -150,11 +138,10 @@ public class CodeGenerator implements Visitor {
                 System.out.println("Unsupported relational operator: " + operator);
         }
 
-        code.append("JMP ").append(endLabel).append('\n'); // Jump to end to avoid overwriting the result
 
+
+        code.append("JMP ").append(endLabel).append('\n');
         code.append(trueLabel).append(": ").append('\n');
-
-        // end
         code.append(endLabel).append(": ").append('\n');
     }
 
