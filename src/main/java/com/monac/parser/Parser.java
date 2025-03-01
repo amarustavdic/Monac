@@ -473,9 +473,29 @@ public class Parser {
     }
 
 
+    // <declaration> ::=
+    //{<declaration-specifier>}+ {<init-declarator>}* ;
+    private Node declaration() {
+        return null;
+    }
 
 
+    // <compound-statement> ::= { {<declaration>}* {<statement>}* }
+    private Node compoundStatement() {
 
+        if (!match(TokenType.LEFT_BRACE)) return null;
+
+        List<Node> children = new ArrayList<>();
+
+        Node declaration;
+        while ((declaration = declaration()) != null) children.add(declaration);
+
+        Node statement;
+        while ((statement = statement()) != null) children.add(statement);
+
+        consume(TokenType.RIGHT_BRACE, "Expected '}' at end of compound statement.");
+        return new Node(NodeType.COMPOUND_STATEMENT, children);
+    }
 
 
     // <statement> ::= <labeled-statement>
@@ -489,6 +509,11 @@ public class Parser {
         Node selectionStatement = selectionStatement();
         if (selectionStatement != null) {
             return selectionStatement;
+        }
+
+        Node compoundStatement = compoundStatement();
+        if (compoundStatement != null) {
+            return compoundStatement;
         }
 
         Node jumpStatement = jumpStatement();

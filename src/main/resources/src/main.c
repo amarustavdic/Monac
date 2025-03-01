@@ -1,1 +1,3 @@
-if ( 2 < 3 ) goto end;
+if ( 2 < 3 ) {
+    goto end;
+}
