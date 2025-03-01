@@ -45,9 +45,19 @@ public class Parser {
         return new Node(NodeType.TRANSLATION_UNIT, children);
     }
 
-    // <external-declaration> ::= <function-definition> | <declaration>
+    /**
+     * Parses an external declaration, which can be either a function definition or a declaration.
+     *
+     * <pre>{@code
+     * <external-declaration> ::= <function-definition> | <declaration>
+     * }</pre>
+     *
+     * @return A Node representing a function definition or a declaration, or null if neither is found.
+     */
     private Node externalDeclaration() {
-        return (functionDefinition() != null) ? functionDefinition() : declaration();
+        Node functionDef = functionDefinition();
+        if (functionDef != null) return functionDef;
+        return declaration();
     }
 
     //<function-definition> ::= {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement>
