@@ -100,20 +100,45 @@ public class Parser {
         return new Node(NodeType.FUNCTION_DEFINITION, children);
     }
 
-    // <declaration-specifier> ::= <storage-class-specifier>
-    //| <type-specifier>
-    //| <type-qualifier>
+    /**
+     * Parses a declaration specifier, which can be a storage class specifier,
+     * type specifier, or type qualifier.
+     *
+     * <pre>{@code
+     * <declaration-specifier> ::= <storage-class-specifier>
+     *                           | <type-specifier>
+     *                           | <type-qualifier>
+     * }</pre>
+     *
+     * @return A Node representing the declaration specifier, or null if parsing fails.
+     */
     private Node declarationSpecifier() {
-        return (storageClassSpecifier() != null) ? storageClassSpecifier() : (
-                (typeSpecifier() != null) ? typeSpecifier() : typeQualifier()
-        );
+        Node storageClass = storageClassSpecifier();
+        if (storageClass != null) {
+            return storageClass;
+        }
+
+        Node typeSpec = typeSpecifier();
+        if (typeSpec != null) {
+            return typeSpec;
+        }
+
+        return typeQualifier();
     }
 
-    //<storage-class-specifier> ::= auto
-    //| register
-    //| static
-    //| extern
-    //| typedef
+    /**
+     * Parses a storage class specifier, which can be one of: auto, register, static, extern, or typedef.
+     *
+     * <pre>{@code
+     * <storage-class-specifier> ::= auto
+     *                             | register
+     *                             | static
+     *                             | extern
+     *                             | typedef
+     * }</pre>
+     *
+     * @return A Node representing the storage class specifier, or null if no match is found.
+     */
     private Node storageClassSpecifier() {
         if (match(TokenType.AUTO, TokenType.REGISTER, TokenType.STATIC, TokenType.EXTERN, TokenType.TYPEDEF)) {
             return new Node(NodeType.STORAGE_CLASS_SPECIFIER, previous());
