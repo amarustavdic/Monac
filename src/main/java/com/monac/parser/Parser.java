@@ -1020,28 +1020,42 @@ public class Parser {
     //| <postfix-expression> -> <identifier>
     //| <postfix-expression> ++
     //| <postfix-expression> --
+
+    // Bellow is the equivalent but with eliminated left recursion
+
+    //<postfix-expression> ::= <primary-expression> <postfix-expression'>
+    //
+    //<postfix-expression'> ::=
+    //      [ <expression> ] <postfix-expression'>
+    //    | ( {<assignment-expression>}* ) <postfix-expression'>
+    //    | . <identifier> <postfix-expression'>
+    //    | -> <identifier> <postfix-expression'>
+    //    | ++ <postfix-expression'>
+    //    | -- <postfix-expression'>
+    //    | ε
+
     private Node postfixExpression() {
-        // First, parse the primary expression (base case)
-        Node primaryExpression = primaryExpression();
+       return new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression(), postfixExpressionPrime()));
+    }
 
-        while (match(TokenType.LEFT_BRACE)) {
-            // Parse the expression inside the brackets
+    private Node postfixExpressionPrime() {
+        List<Node> children = new ArrayList<>();
+
+        if (match(TokenType.LEFT_BRACKET)) {
             Node expression = expression();
-
-            // TODO: Figure this out this is what is messing with the parser
-
-            // Expect the closing bracket
-            if (expression != null && match(TokenType.RIGHT_BRACE)) {
-                // Build a new node representing the postfix operation (subscript)
-                primaryExpression = new Node(NodeType.POSTFIX_EXPRESSION, List.of(primaryExpression, expression));
-            } else {
-                // If the expression is invalid or there's no closing bracket, handle error
-                error(peek(),"Expected closing bracket ']' after expression.");
-                return null;
-            }
+            consume(TokenType.RIGHT_BRACKET, "Expected right bracket.");
+            return new Node(NodeType.POSTFIX_EXPRESSION, List.of(expression, postfixExpressionPrime()));
         }
 
-        return primaryExpression;
+        if (match(TokenType.LEFT_PAREN)) {
+            while (assignmentExpression() != null) children.add(assignmentExpression());
+            consume(TokenType.RIGHT_PAREN, "Expected ')' after optional assignment expressions.");
+            children.add(postfixExpressionPrime());
+            return new Node(NodeType.POSTFIX_EXPRESSION, children);
+        }
+
+
+        return null;
     }
 
 
