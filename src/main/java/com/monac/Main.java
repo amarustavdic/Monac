@@ -28,7 +28,7 @@ public class Main {
         Parser parser = new Parser(tokens);
         Node ast = parser.parse();
 
-        if (!parser.hasErrors()) {
+        if (parser.hasErrors()) {
             System.err.println();
 
             // For now showing only first encountered error cuz, have not

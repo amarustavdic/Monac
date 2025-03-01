@@ -16,6 +16,10 @@ public class Token {
 
     @Override
     public String toString() {
+        return "Token{type: " + type + ", lexeme: " + lexeme + ", [" + line + ":" + column + "]}";
+    }
+
+    public String toJson() {
         return "\033[1;37m{" +
                 " \033[1;32m\"type\"\033[0m: \033[1;33m\"" + type + "\"\033[0m," +
                 " \033[1;32m\"lexeme\"\033[0m: \033[1;36m\"" + lexeme + "\"\033[0m," +

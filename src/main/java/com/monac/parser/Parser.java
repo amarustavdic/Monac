@@ -389,19 +389,17 @@ public class Parser {
     }
 
 
-    // For now handling an only couple of constants from c bnf grammar
-    // <constant> ::= <integer-constant>
-    //| <character-constant>
-    //| <floating-constant>
-    //| <enumeration-constant>
+    /**
+     * <pre>{@code
+     *  <constant> ::= <integer-constant> | <character-constant>
+     * }</pre>
+     */
     private Node constant() {
-        Token token = peek();
         if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
-            return new Node(NodeType.CONSTANT, token);
-        } else {
-            error(token, "Expected <integer-constant> or <character-constant>.");
-            return null;
+            return new Node(NodeType.CONSTANT, previous());
         }
+        error(peek(), "Expected <integer-constant> or <character-constant>.");
+        return null;
     }
 
     // <expression> ::= <assignment-expression>
@@ -546,7 +544,6 @@ public class Parser {
     }
 
 
-
     // <selection-statement> ::= if ( <expression> ) <statement>
     //| if ( <expression> ) <statement> else <statement>
     //| switch ( <expression> ) <statement>
@@ -688,7 +685,7 @@ public class Parser {
 
     public Node parse() {
 
-        Node ast = statement();
+        Node ast = primaryExpression();
 
         if (!peek().getType().equals(TokenType.EOF)) {
             error(previous(), "Expected end of input.");
