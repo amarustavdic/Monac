@@ -60,27 +60,42 @@ public class Parser {
         return declaration();
     }
 
-    //<function-definition> ::= {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement>
+    /**
+     * Parses a function definition.
+     *
+     * <pre>{@code
+     * <function-definition> ::=
+     *      {<declaration-specifier>}* <declarator> {<declaration>}* <compound-statement>
+     * }</pre>
+     *
+     * @return A Node representing the function definition, or null if parsing fails.
+     */
     private Node functionDefinition() {
         List<Node> children = new ArrayList<>();
 
         Node declarationSpecifier;
-        while ((declarationSpecifier = declarationSpecifier()) != null) children.add(declarationSpecifier);
+        while ((declarationSpecifier = declarationSpecifier()) != null) {
+            children.add(declarationSpecifier);
+        }
 
         Node declarator = declarator();
         if (declarator == null) {
             error(peek(), "Missing declarator.");
             return null;
         }
+        children.add(declarator);
 
         Node declaration;
-        while ((declaration = declaration()) != null) children.add(declaration);
+        while ((declaration = declaration()) != null) {
+            children.add(declaration);
+        }
 
         Node compoundStatement = compoundStatement();
         if (compoundStatement == null) {
             error(peek(), "Missing compound statement.");
             return null;
         }
+        children.add(compoundStatement);
 
         return new Node(NodeType.FUNCTION_DEFINITION, children);
     }
