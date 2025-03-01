@@ -310,7 +310,19 @@ public class Parser {
     //| sizeof <unary-expression>
     //| sizeof <type-name>
     private Node unaryExpression() {
-        return postfixExpression();
+
+        if (match(TokenType.INCREMENT, TokenType.DECREMENT)) {
+            Token operator = previous();
+            Node right = unaryExpression();
+            if (right != null) {
+                return new Node(NodeType.UNARY_EXPRESSION, List.of(right), operator.getLexeme());
+            } else {
+                error(operator, "Expected <unary-expression> after '++' or '--'.");
+                return null;
+            }
+        } else {
+            return postfixExpression();
+        }
     }
 
     private Node postfixExpression() {
