@@ -19,12 +19,13 @@ public enum TokenType {
 
 
 
-
-
-
-
     INTEGER_CONSTANT,
     CHARACTER_CONSTANT,
+    FLOATING_CONSTANT,
+    ENUMERATION_CONSTANT,
+
+
+
 
     IDENTIFIER,
     STRING,

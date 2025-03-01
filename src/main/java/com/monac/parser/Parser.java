@@ -1090,18 +1090,62 @@ public class Parser {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //<constant> ::=
+    //  <integer-constant>
+    //| <character-constant>
+    //| <floating-constant>
+    //| <enumeration-constant>
+
+
     /**
      * <pre>{@code
      *  <constant> ::= <integer-constant> | <character-constant>
      * }</pre>
      */
     private Node constant() {
-        if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT)) {
+        if (match(TokenType.INTEGER_CONSTANT, TokenType.CHARACTER_CONSTANT,
+                TokenType.FLOATING_CONSTANT, TokenType.ENUMERATION_CONSTANT)) {
             return new Node(NodeType.CONSTANT, previous());
         }
-        error(peek(), "Expected <integer-constant> or <character-constant>.");
+        error(peek(), "Expected a constant value (integer, character, floating-point, or enumeration).");
         return null;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // <expression> ::= <assignment-expression>
     //| <expression> , <assignment-expression>
