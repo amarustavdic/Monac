@@ -18,6 +18,12 @@ public class Node {
         this.token = token;
     }
 
+    public Node(NodeType type, Token token, String value) {
+        this.type = type;
+        this.token = token;
+        this.value = value;
+    }
+
     public Node(NodeType type, List<Node> children, String value) {
         this.type = type;
         this.children = children;

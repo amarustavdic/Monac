@@ -539,13 +539,13 @@ public class Parser {
                     if (match(TokenType.ELSE)) {
                         Node falseBranch = statement();
                         if (falseBranch != null) {
-                            return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch, falseBranch));
+                            return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch, falseBranch), "if");
                         } else {
                             error(peek(), "Expected <statement> after 'else'.");
                             return null;
                         }
                     } else {
-                        return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch));
+                        return new Node(NodeType.SELECTION_STATEMENT, List.of(condition, trueBranch), "if");
                     }
                 } else {
                     error(peek(), "Expected <statement> after 'if' condition.");
@@ -576,17 +576,17 @@ public class Parser {
         if (match(TokenType.GOTO)) {
             Token identifier = consume(TokenType.IDENTIFIER, "Expected identifier after 'goto'.");
             consume(TokenType.SEMICOLON, "Expected ';' after 'goto'.");
-            return new Node(NodeType.JUMP_STATEMENT, identifier);
+            return new Node(NodeType.JUMP_STATEMENT, identifier, "goto");
         }
 
         if (match(TokenType.CONTINUE)) {
             consume(TokenType.SEMICOLON, "Expected ';' after 'continue'.");
-            return new Node(NodeType.JUMP_STATEMENT, List.of());
+            return new Node(NodeType.JUMP_STATEMENT, List.of(), "continue");
         }
 
         if (match(TokenType.BREAK)) {
             consume(TokenType.SEMICOLON, "Expected ';' after 'break'.");
-            return new Node(NodeType.JUMP_STATEMENT, List.of());
+            return new Node(NodeType.JUMP_STATEMENT, List.of(), "break");
         }
 
         if (match(TokenType.RETURN)) {
@@ -595,7 +595,7 @@ public class Parser {
                 expression = expression();
             }
             consume(TokenType.SEMICOLON, "Expected ';' after 'return'.");
-            return new Node(NodeType.JUMP_STATEMENT, expression != null ? List.of(expression) : List.of());
+            return new Node(NodeType.JUMP_STATEMENT, expression != null ? List.of(expression) : List.of(), "return");
         }
 
         error(peek(), "Expected 'goto', 'continue', 'break', or 'return' statement.");

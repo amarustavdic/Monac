@@ -44,7 +44,7 @@ public class Main {
 
             String code = codeGenerator.getCode();
 
-            Path outputPath = Path.of("./src/main/resources/out/main.txt");
+            Path outputPath = Path.of("./src/main/resources/out/main.s");
             try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
                 writer.write(code);
             } catch (IOException e) {

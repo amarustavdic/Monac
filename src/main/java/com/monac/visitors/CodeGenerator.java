@@ -18,22 +18,48 @@ public class CodeGenerator implements Visitor {
     public void visit(Node node) {
 
         switch (node.getType()) {
-            case AND_EXPRESSION -> generateAndExpression(node);
-            case EQUALITY_EXPRESSION -> generateEqualityExpression(node);
-            case RELATIONAL_EXPRESSION -> generateRelationalExpression(node);
-            case SHIFT_EXPRESSION -> generateShiftExpression(node);
-            case ADDITIVE_EXPRESSION -> generateAdditiveExpression(node);
-            case MULTIPLICATIVE_EXPRESSION -> generateMultiplicativeExpression(node);
-            case CONSTANT -> generateConstant(node);
+            case AND_EXPRESSION -> andExpression(node);
+            case EQUALITY_EXPRESSION -> equalityExpression(node);
+            case RELATIONAL_EXPRESSION -> relationalExpression(node);
+            case SHIFT_EXPRESSION -> shiftExpression(node);
+            case ADDITIVE_EXPRESSION -> additiveExpression(node);
+            case MULTIPLICATIVE_EXPRESSION -> multiplicativeExpression(node);
+            case CONSTANT -> constant(node);
+            case SELECTION_STATEMENT -> selectionStatement(node);
         }
 
     }
 
-    private void generateAndExpression(Node node) {
+
+    private void selectionStatement(Node node) {
+
+        for (Node child : node.getChildren()) {
+            switch (child.getType()) {
+                case RELATIONAL_EXPRESSION -> relationalExpression(child);
+                case JUMP_STATEMENT -> jumpStatement(child);
+            }
+        }
+
+    }
+
+    private void jumpStatement(Node node) {
+
+        switch (node.getValue()) {
+            case "goto" -> handleGoto(node);
+        }
+
+    }
+
+    private void handleGoto(Node node) {
+        // TODO: Here should probably be checking if label is defined prior
+        code.append("JMP ").append(node.getToken().getLexeme());
+    }
+
+    private void andExpression(Node node) {
         // TODO: TBD how
     }
 
-    private void generateEqualityExpression(Node node) {
+    private void equalityExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
 
@@ -72,7 +98,7 @@ public class CodeGenerator implements Visitor {
     }
 
 
-    private void generateRelationalExpression(Node node) {
+    private void relationalExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
 
@@ -124,19 +150,15 @@ public class CodeGenerator implements Visitor {
                 System.out.println("Unsupported relational operator: " + operator);
         }
 
-        // Code for the false case (push 0 if comparison fails)
-        code.append("PUSH 0").append('\n');
         code.append("JMP ").append(endLabel).append('\n'); // Jump to end to avoid overwriting the result
 
-        // true case: push 1 if comparison is true
         code.append(trueLabel).append(": ").append('\n');
-        code.append("PUSH 1").append('\n');
 
         // end
         code.append(endLabel).append(": ").append('\n');
     }
 
-    private void generateShiftExpression(Node node) {
+    private void shiftExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
 
@@ -158,7 +180,7 @@ public class CodeGenerator implements Visitor {
         code.append("PUSH A").append('\n');
     }
 
-    private void generateAdditiveExpression(Node node) {
+    private void additiveExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
 
@@ -180,7 +202,7 @@ public class CodeGenerator implements Visitor {
         code.append("PUSH A").append('\n');
     }
 
-    private void generateMultiplicativeExpression(Node node) {
+    private void multiplicativeExpression(Node node) {
         Node left = node.getChildren().get(0);
         Node right = node.getChildren().get(1);
 
@@ -212,7 +234,7 @@ public class CodeGenerator implements Visitor {
         code.append("PUSH A").append('\n');
     }
 
-    private void generateConstant(Node node) {
+    private void constant(Node node) {
         String value = node.getToken().getLexeme();
         code.append("PUSH ").append(value).append('\n');
     }

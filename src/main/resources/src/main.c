@@ -1,1 +1,1 @@
-if ( 2 < 3 ) goto hjkl;
+if ( 2 < 3 ) goto end;
