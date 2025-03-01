@@ -186,213 +186,329 @@ public class Parser {
         return typedefName();
     }
 
-
-
-
-    // <struct-or-union-specifier> ::= <struct-or-union> <identifier> { {<struct-declaration>}+ }
-    //| <struct-or-union> { {<struct-declaration>}+ }
-    //| <struct-or-union> <identifier>
+    /**
+     * Parses a struct or union specifier, which can consist of:
+     * - A struct or union followed by an identifier and struct declarations.
+     * - A struct or union followed directly by struct declarations.
+     * - A struct or union followed by an identifier.
+     *
+     * <pre>{@code
+     * <struct-or-union-specifier> ::=
+     *      <struct-or-union> <identifier> { {<struct-declaration>}+ }
+     *    | <struct-or-union> { {<struct-declaration>}+ }
+     *    | <struct-or-union> <identifier>
+     * }</pre>
+     *
+     * @return A Node representing the struct or union specifier, or null if parsing fails.
+     */
     private Node structOrUnionSpecifier() {
-
         List<Node> children = new ArrayList<>();
 
+        // Parse the struct or union keyword (struct/union)
         Node structOrUnion = structOrUnion();
-        if (structOrUnion != null) {
-            children.add(structOrUnion); // include <struct-or-union>
-
-            Node identifier = identifier();
-            if (identifier != null) {
-                children.add(identifier); // include <identifier>
-
-                Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after identifier.");
-                if (leftBrace != null) {
-
-                    Node structDeclaration = structDeclaration();
-                    if (structDeclaration != null) {
-                        do children.add(structDeclaration);
-                        while ((structDeclaration = structDeclaration()) != null);
-                        Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after structDeclaration.");
-                        if (rightBrace != null) {
-                            return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        error(peek(), "Missing struct declaration.");
-                        return null;
-                    }
-                } else {
-                    return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
-                }
-
-            } else {
-                Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after struct or union.");
-                if (leftBrace != null) {
-                    Node structDeclaration = structDeclaration();
-                    if (structDeclaration != null) {
-                        do children.add(structDeclaration);
-                        while ((structDeclaration = structDeclaration()) != null);
-                        Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after structDeclaration.");
-                        if (rightBrace != null) {
-                            return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        error(peek(), "Missing struct declaration.");
-                        return null;
-                    }
-                } else {
-                    error(peek(), "Missing identifier.");
-                    return null;
-                }
-            }
-        }
-        return null;
-    }
-
-    // <struct-or-union> ::= struct | union
-    private Node structOrUnion() {
-        if (match(TokenType.STRUCT, TokenType.UNION)) return new Node(NodeType.STRUCT_OR_UNION, previous());
-        return null;
-    }
-
-    //<struct-declaration> ::= {<specifier-qualifier>}* <struct-declarator-list>
-    private Node structDeclaration() {
-
-        List<Node> children = new ArrayList<>();
-
-        Node specifierQualifier;
-        while ((specifierQualifier = specifierQualifier()) != null) children.add(specifierQualifier);
-
-        if (children.isEmpty()) {
-            return structDeclaratorList();
-        } else {
-            Node structDeclaratorList = structDeclaratorList();
-            if (structDeclaratorList != null) {
-                children.add(structDeclaratorList);
-                return new Node(NodeType.STRUCT_DECLARATION, children);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    // <specifier-qualifier> ::= <type-specifier> | <type-qualifier>
-    private Node specifierQualifier() {
-        return (typeSpecifier() != null) ? typeSpecifier() : typeQualifier();
-    }
-
-    //<struct-declarator-list> ::= <struct-declarator>
-    // | <struct-declarator-list> , <struct-declarator>
-    private Node structDeclaratorList() {
-
-        Node structDeclarator = structDeclarator();
-
-        if (structDeclarator != null) {
-            return structDeclarator;
-        } else {
-            List<Node> children = new ArrayList<>();
-            Node structDeclaratorList = structDeclaratorList();
-            if (structDeclaratorList != null) {
-                if (match(TokenType.COMMA)) {
-                    children.add(structDeclaratorList);
-                    structDeclarator = structDeclarator();
-                    if (structDeclarator != null) {
-                        children.add(structDeclarator);
-                        return new Node(NodeType.STRUCT_DECLARATOR_LIST, children);
-                    } else {
-                        error(peek(), "Expected struct declarator.");
-                        return null;
-                    }
-                } else {
-                    error(peek(), "Missing ',' after struct declarator list.");
-                    return null;
-                }
-            } else {
-                return structDeclarator;
-            }
-        }
-    }
-
-    //<struct-declarator> ::= <declarator>
-    //| <declarator> : <constant-expression>
-    //| : <constant-expression>
-    private Node structDeclarator() {
-        if (match(TokenType.COLON)) {
-            return constantExpression(); // : <constant-expression>
-        } else {
-            Node declarator = declarator();
-            if (declarator != null) {
-                if (match(TokenType.COLON)) {
-                    // <declarator> : <constant-expression>
-                    Node constantExpression = constantExpression();
-                    if (constantExpression != null) {
-                        return new Node(NodeType.STRUCT_DECLARATOR, List.of(declarator, constantExpression));
-                    } else {
-                        error(peek(), "Expected constant expression after ':'.");
-                        return null;
-                    }
-                } else {
-                    return declarator; // <declarator>
-                }
-            } else {
-                return null;
-            }
-        }
-    }
-
-    //<declarator> ::= {<pointer>}? <direct-declarator>
-    private Node declarator() {
-
-        List<Node> children = new ArrayList<>();
-
-        Node pointer = pointer();
-        if (pointer != null) children.add(pointer);
-
-        if (children.isEmpty()) {
-            return directDeclarator();
-        } else {
-            Node directDeclarator = directDeclarator();
-            if (directDeclarator != null) {
-                children.add(directDeclarator);
-                return new Node(NodeType.DECLARATOR, children);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    // <pointer> ::= * {<type-qualifier>}* {<pointer>}?
-    private Node pointer() {
-        // TODO: Well * is overloaded, so figure out how to handle it
-
-        if (match(TokenType.MULTIPLY)) {
-            List<Node> children = new ArrayList<>();
-            while (typeQualifier() != null) children.add(typeQualifier());
-
-            Node pointer = pointer();
-            if (pointer != null) children.add(pointer);
-            return new Node(NodeType.POINTER, children);
-        } else {
+        if (structOrUnion == null) {
             return null;
         }
-    }
 
-    // <type-qualifier> ::= const | volatile
-    private Node typeQualifier() {
-        if (match(TokenType.CONST, TokenType.VOLATILE)) return new Node(NodeType.TYPE_QUALIFIER, previous());
+        children.add(structOrUnion);
+
+        // Try to parse an identifier (optional)
+        Node identifier = identifier();
+        if (identifier != null) {
+            children.add(identifier); // Include identifier
+
+            Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after identifier.");
+            if (leftBrace == null) {
+                return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+            }
+
+            if (parseStructDeclarations(children)) {
+                return null;
+            }
+
+            Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after struct declarations.");
+            if (rightBrace != null) {
+                return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+            } else {
+                return null; // Missing right brace
+            }
+        }
+
+        Token leftBrace = consume(TokenType.LEFT_BRACE, "Expected '{' after struct or union.");
+        if (leftBrace == null) {
+            return null; // Missing left brace
+        }
+
+        if (parseStructDeclarations(children)) {
+            return null;
+        }
+
+        Token rightBrace = consume(TokenType.RIGHT_BRACE, "Expected '}' after struct declarations.");
+        if (rightBrace != null) {
+            return new Node(NodeType.STRUCT_OR_UNION_SPECIFIER, children);
+        }
+
         return null;
     }
 
-    // <direct-declarator> ::= <identifier>
-    //| ( <declarator> )
-    //| <direct-declarator> [ {<constant-expression>}? ]
-    //| <direct-declarator> ( <parameter-type-list> )
-    //| <direct-declarator> ( {<identifier>}* )
+    /**
+     * Helper method to parse one or more struct declarations and add them to the list of children.
+     *
+     * @param children The list to which the struct declarations will be added.
+     * @return true if struct declarations are successfully parsed, false if missing.
+     */
+    private boolean parseStructDeclarations(List<Node> children) {
+        Node structDeclaration = structDeclaration();
+        if (structDeclaration == null) {
+            error(peek(), "Missing struct declaration.");
+            return true;
+        }
+
+        do {
+            children.add(structDeclaration);
+        } while ((structDeclaration = structDeclaration()) != null);
+
+        return false;
+    }
+
+    /**
+     * Parses a struct or union keyword, which can be either "struct" or "union".
+     *
+     * <pre>{@code
+     * <struct-or-union> ::= struct | union
+     * }</pre>
+     *
+     * @return A Node representing the struct or union keyword, or null if no match is found.
+     */
+    private Node structOrUnion() {
+        if (match(TokenType.STRUCT, TokenType.UNION)) {
+            return new Node(NodeType.STRUCT_OR_UNION, previous());
+        }
+        return null;
+    }
+
+    /**
+     * Parses a struct declaration, which consists of:
+     * - Zero or more specifier-qualifiers
+     * - A struct declarator list
+     *
+     * <pre>{@code
+     * <struct-declaration> ::= {<specifier-qualifier>}* <struct-declarator-list>
+     * }</pre>
+     *
+     * @return A Node representing the struct declaration, or null if parsing fails.
+     */
+    private Node structDeclaration() {
+        List<Node> children = new ArrayList<>();
+
+        // Parse specifier-qualifiers (optional)
+        Node specifierQualifier;
+        while ((specifierQualifier = specifierQualifier()) != null) {
+            children.add(specifierQualifier);
+        }
+
+        // Always expect a struct declarator list
+        Node structDeclaratorList = structDeclaratorList();
+        if (structDeclaratorList == null) {
+            return null; // If no struct declarator list, return null
+        }
+
+        // Add struct declarator list to the children and return the struct declaration node
+        children.add(structDeclaratorList);
+        return new Node(NodeType.STRUCT_DECLARATION, children);
+    }
+
+    /**
+     * Parses a specifier-qualifier, which can either be a type specifier or a type qualifier.
+     *
+     * <pre>{@code
+     * <specifier-qualifier> ::= <type-specifier> | <type-qualifier>
+     * }</pre>
+     *
+     * @return A Node representing the specifier-qualifier, or null if no match is found.
+     */
+    private Node specifierQualifier() {
+        Node typeSpec = typeSpecifier();
+        if (typeSpec != null) {
+            return typeSpec;
+        }
+        return typeQualifier();
+    }
+
+    /**
+     * Parses a list of struct declarators, which can either be a single struct declarator
+     * or a comma-separated list of struct declarators.
+     *
+     * <pre>{@code
+     * <struct-declarator-list> ::= <struct-declarator>
+     *                            | <struct-declarator-list> , <struct-declarator>
+     * }</pre>
+     *
+     * @return A Node representing the struct declarator list, or null if parsing fails.
+     */
+    private Node structDeclaratorList() {
+        List<Node> children = new ArrayList<>();
+
+        // Parse the first struct declarator
+        Node structDeclarator = structDeclarator();
+        if (structDeclarator == null) {
+            return null; // If no struct declarator, return null
+        }
+
+        children.add(structDeclarator);
+
+        // Handle additional struct declarators (comma-separated)
+        while (match(TokenType.COMMA)) {
+            structDeclarator = structDeclarator();
+            if (structDeclarator != null) {
+                children.add(structDeclarator);
+            } else {
+                error(peek(), "Expected struct declarator after comma.");
+                return null;
+            }
+        }
+        return new Node(NodeType.STRUCT_DECLARATOR_LIST, children);
+    }
+
+    /**
+     * Parses a struct declarator, which can either be:
+     * - A declarator, or
+     * - A declarator followed by a colon and a constant expression, or
+     * - A colon followed by a constant expression.
+     *
+     * <pre>{@code
+     * <struct-declarator> ::= <declarator>
+     *                       | <declarator> : <constant-expression>
+     *                       | : <constant-expression>
+     * }</pre>
+     *
+     * @return A Node representing the struct declarator, or null if parsing fails.
+     */
+    private Node structDeclarator() {
+        // Handle the case where we start with a colon directly
+        if (match(TokenType.COLON)) {
+            return constantExpression(); // ": <constant-expression>"
+        }
+
+        Node declarator = declarator();
+        if (declarator == null) {
+            return null;
+        }
+
+        // If a colon follows the declarator, parse the constant expression
+        if (match(TokenType.COLON)) {
+            Node constantExpression = constantExpression();
+            if (constantExpression != null) {
+                return new Node(NodeType.STRUCT_DECLARATOR, List.of(declarator, constantExpression));
+            } else {
+                error(peek(), "Expected constant expression after ':'.");
+                return null;
+            }
+        }
+
+        // Return the declarator if no colon follows
+        return declarator; // "<declarator>"
+    }
+
+    /**
+     * Parses a declarator, which consists of an optional pointer followed by a direct declarator.
+     *
+     * <pre>{@code
+     * <declarator> ::= {<pointer>}? <direct-declarator>
+     * }</pre>
+     *
+     * @return A Node representing the declarator, or null if parsing fails.
+     */
+    private Node declarator() {
+        List<Node> children = new ArrayList<>();
+
+        // Parse the pointer (optional)
+        Node pointer = pointer();
+        if (pointer != null) {
+            children.add(pointer);
+        }
+
+        // Parse the direct declarator
+        Node directDeclarator = directDeclarator();
+        if (directDeclarator == null) {
+            return null;
+        }
+
+        // Add the direct declarator to the children list and return the declarator node
+        children.add(directDeclarator);
+        return new Node(NodeType.DECLARATOR, children);
+    }
+
+    /**
+     * Parses a pointer, which consists of an optional sequence of type qualifiers
+     * followed by an optional pointer.
+     * A pointer begins with a '*' token, followed by zero or more type qualifiers,
+     * and an optional nested pointer.
+     *
+     * <pre>{@code
+     * <pointer> ::= * {<type-qualifier>}* {<pointer>}?
+     * }</pre>
+     *
+     * @return A Node representing the pointer, or null if parsing fails.
+     */
+    private Node pointer() {
+        if (match(TokenType.MULTIPLY)) {
+            List<Node> children = new ArrayList<>();
+
+            Node typeQualifier;
+            while ((typeQualifier = typeQualifier()) != null) {
+                children.add(typeQualifier);
+            }
+
+            Node nestedPointer = pointer();
+            if (nestedPointer != null) {
+                children.add(nestedPointer);
+            }
+
+            return new Node(NodeType.POINTER, children);
+        }
+        return null;
+    }
+
+    /**
+     * Parses a type qualifier, which can be either "const" or "volatile".
+     *
+     * <pre>{@code
+     * <type-qualifier> ::= const | volatile
+     * }</pre>
+     *
+     * @return A Node representing the type qualifier, or null if parsing fails.
+     */
+    private Node typeQualifier() {
+        if (match(TokenType.CONST, TokenType.VOLATILE)) {
+            return new Node(NodeType.TYPE_QUALIFIER, previous());
+        }
+        return null;
+    }
+
+    /**
+     * Parses a direct declarator, which can be one of the following:
+     * - An identifier,
+     * - A declarator in parentheses,
+     * - A direct declarator followed by square brackets (with an optional constant expression),
+     * - A direct declarator followed by a parameter type list in parentheses,
+     * - A direct declarator followed by a list of identifiers in parentheses.
+     *
+     * <pre>{@code
+     * <direct-declarator> ::= <identifier>
+     *     | ( <declarator> )
+     *     | <direct-declarator> [ {<constant-expression>}? ]
+     *     | <direct-declarator> ( <parameter-type-list> )
+     *     | <direct-declarator> ( {<identifier>}* )
+     * }</pre>
+     *
+     * @return A Node representing the direct declarator, or null if parsing fails.
+     */
     private Node directDeclarator() {
         Node identifier = identifier();
-        if (identifier != null) return identifier;
+        if (identifier != null) {
+            return identifier;
+        }
 
         if (match(TokenType.LEFT_PAREN)) {
             Node declarator = declarator();
@@ -409,12 +525,11 @@ public class Parser {
             }
         }
 
-        // If we reach here, the first two cases have failed; we need a valid directDeclarator to proceed.
-        Node directDeclarator = identifier();  // Try to get an identifier first
-        if (directDeclarator == null) return null; // Avoid infinite recursion
-
         List<Node> children = new ArrayList<>();
-        children.add(directDeclarator);
+        Node baseDeclarator = identifier();
+        if (baseDeclarator == null) return null;
+
+        children.add(baseDeclarator);
 
         while (true) {
             if (match(TokenType.LEFT_BRACKET)) {
@@ -423,10 +538,11 @@ public class Parser {
                     error(peek(), "Expected ']'.");
                     return null;
                 }
-                if (constantExpression != null) children.add(constantExpression);
-                children.add(new Node(NodeType.DECLARATOR, children));
-
-            } else if (match(TokenType.LEFT_PAREN)) {
+                if (constantExpression != null) {
+                    children.add(constantExpression);
+                }
+            }
+            else if (match(TokenType.LEFT_PAREN)) {
                 List<Node> paramChildren = new ArrayList<>();
                 while ((identifier = identifier()) != null) {
                     paramChildren.add(identifier);
@@ -439,55 +555,81 @@ public class Parser {
 
                 children.add(new Node(NodeType.DIRECT_DECLARATOR, paramChildren));
             } else {
-                break;  // If no valid declarator, stop parsing
+                break;
             }
         }
-
         return new Node(NodeType.DIRECT_DECLARATOR, children);
     }
 
-    // <constant-expression> ::= <conditional-expression>
+    /**
+     * Parses a constant expression, which is equivalent to a conditional expression.
+     *
+     * <pre>{@code
+     * <constant-expression> ::= <conditional-expression>
+     * }</pre>
+     *
+     * @return A Node representing the constant expression, or null if parsing fails.
+     */
     private Node constantExpression() {
         return conditionalExpression();
     }
 
-    // <conditional-expression> ::= <logical-or-expression>
-    //| <logical-or-expression> ? <expression> : <conditional-expression>
+    /**
+     * Parses a conditional expression, which can either be:
+     * - A logical-or expression, or
+     * - A ternary expression in the form of "logical-or-expression ? expression : conditional-expression".
+     *
+     * <pre>{@code
+     * <conditional-expression> ::= <logical-or-expression>
+     *     | <logical-or-expression> ? <expression> : <conditional-expression>
+     * }</pre>
+     *
+     * @return A Node representing the conditional expression, or null if parsing fails.
+     */
     private Node conditionalExpression() {
-
         Node logicalOrExpression = logicalOrExpression();
-        if (logicalOrExpression != null) {
-            if (match(TokenType.QUESTION_MARK)) {
-                Node expression = expression();
-                if (expression != null) {
-                    if (match(TokenType.COLON)) {
-                        Node conditionalExpression = conditionalExpression();
-                        if (conditionalExpression != null) {
-                            return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(logicalOrExpression, expression, conditionalExpression));
-                        } else {
-                            error(peek(), "Expected conditional expression.");
-                            return null;
-                        }
-                    } else {
-                        error(peek(), "Expected ':'.");
-                        return null;
-                    }
-                }
+        if (logicalOrExpression == null) {
+            return null;
+        }
+
+        if (match(TokenType.QUESTION_MARK)) {
+            Node expression = expression();
+            if (expression == null) {
                 error(peek(), "Expected expression after '?'.");
                 return null;
             }
-            return logicalOrExpression;
+
+            if (!match(TokenType.COLON)) {
+                error(peek(), "Expected ':' after expression.");
+                return null;
+            }
+
+            Node conditionalExpression = conditionalExpression();
+            if (conditionalExpression == null) {
+                error(peek(), "Expected conditional expression after ':'");
+                return null;
+            }
+            return new Node(NodeType.CONDITIONAL_EXPRESSION, List.of(logicalOrExpression, expression, conditionalExpression));
         }
-        return null;
+        return logicalOrExpression;
     }
 
-    // <logical-or-expression> ::= <logical-and-expression>
-    //| <logical-or-expression> || <logical-and-expression>
+    /**
+     * Parses a logical OR expression, which can be a simple <logical-and-expression>
+     * or a series of <logical-and-expression> joined by '||' operators.
+     *
+     * <pre>{@code
+     * <logical-or-expression> ::= <logical-and-expression>
+     *     | <logical-or-expression> || <logical-and-expression>
+     * }</pre>
+     *
+     * @return A Node representing the logical OR expression, or null if parsing fails.
+     */
     private Node logicalOrExpression() {
-
-
         Node left = logicalAndExpression();
-        if (left == null) return null;
+        if (left == null) {
+            return null;
+        }
 
         while (match(TokenType.LOGICAL_OR)) {
             Token operator = previous();
@@ -495,21 +637,29 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <logical-and-expression> after '||'.");
-                // synchronize(); TODO: tbd sync
                 return left;
             }
-
             left = new Node(NodeType.LOGICAL_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    //<logical-and-expression> ::= <inclusive-or-expression>
-    //| <logical-and-expression> && <inclusive-or-expression>
+    /**
+     * Parses a logical AND expression, which can either be a single <inclusive-or-expression>
+     * or a series of <inclusive-or-expression> joined by '&&' operators.
+     *
+     * <pre>{@code
+     * <logical-and-expression> ::= <inclusive-or-expression>
+     *     | <logical-and-expression> && <inclusive-or-expression>
+     * }</pre>
+     *
+     * @return A Node representing the logical AND expression, or null if parsing fails.
+     */
     private Node logicalAndExpression() {
         Node left = inclusiveOrExpression();
-        if (left == null) return null;
+        if (left == null) {
+            return null;
+        }
 
         while (match(TokenType.LOGICAL_AND)) {
             Token operator = previous();
@@ -517,21 +667,29 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <inclusive-or-expression> after '&&'.");
-                // synchronize(); TODO: tbd sync recover from errors
                 return left;
             }
-
             left = new Node(NodeType.LOGICAL_AND_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <inclusive-or-expression> ::= <exclusive-or-expression>
-    // | <inclusive-or-expression> | <exclusive-or-expression>
+    /**
+     * Parses an inclusive OR expression, which can be a single <exclusive-or-expression>
+     * or a sequence of <exclusive-or-expression> joined by '|' (bitwise OR) operators.
+     *
+     * <pre>{@code
+     * <inclusive-or-expression> ::= <exclusive-or-expression>
+     *     | <inclusive-or-expression> | <exclusive-or-expression>
+     * }</pre>
+     *
+     * @return A Node representing the inclusive OR expression, or null if parsing fails.
+     */
     private Node inclusiveOrExpression() {
         Node left = exclusiveOrExpression();
-        if (left == null) return null;
+        if (left == null) {
+            return null;
+        }
 
         while (match(TokenType.BITWISE_OR)) {
             Token operator = previous();
@@ -539,21 +697,29 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <exclusive-or-expression> after '|'.");
-                // synchronize(); TODO: tbd sync, waiting better times
                 return left;
             }
-
             left = new Node(NodeType.INCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <exclusive-or-expression> ::= <and-expression>
-    //| <exclusive-or-expression> ^ <and-expression>
+    /**
+     * Parses an exclusive OR expression, which can be a single <and-expression>
+     * or a sequence of <and-expression> joined by '^' (bitwise XOR) operators.
+     *
+     * <pre>{@code
+     * <exclusive-or-expression> ::= <and-expression>
+     *     | <exclusive-or-expression> ^ <and-expression>
+     * }</pre>
+     *
+     * @return A Node representing the exclusive OR expression, or null if parsing fails.
+     */
     private Node exclusiveOrExpression() {
         Node left = andExpression();
-        if (left == null) return null;
+        if (left == null) {
+            return null;
+        }
 
         while (match(TokenType.BITWISE_XOR)) {
             Token operator = previous();
@@ -561,18 +727,24 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <and-expression> after '^'.");
-                // synchronize(); TODO sync
                 return left;
             }
-
             left = new Node(NodeType.EXCLUSIVE_OR_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <and-expression> ::= <equality-expression>
-    //| <and-expression> & <equality-expression>
+    /**
+     * Parses an AND expression, which consists of one or more <equality-expression>
+     * joined by '&' (bitwise AND) operators.
+     *
+     * <pre>{@code
+     * <and-expression> ::= <equality-expression>
+     *     | <and-expression> & <equality-expression>
+     * }</pre>
+     *
+     * @return A Node representing the AND expression, or null if parsing fails.
+     */
     private Node andExpression() {
         Node left = equalityExpression();
         if (left == null) return null;
@@ -583,18 +755,25 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <equality-expression> after '&'.");
-                // synchronize(); TODO: sync
                 return left;
             }
-
             left = new Node(NodeType.AND_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
         return left;
     }
 
-    // <equality-expression> ::= <relational-expression>
-    //| <equality-expression> == <relational-expression>
-    //| <equality-expression> != <relational-expression>
+    /**
+     * Parses an equality expression, which consists of one or more <relational-expression>
+     * joined by equality operators ('==' or '!=').
+     *
+     * <pre>{@code
+     * <equality-expression> ::= <relational-expression>
+     *     | <equality-expression> == <relational-expression>
+     *     | <equality-expression> != <relational-expression>
+     * }</pre>
+     *
+     * @return A Node representing the equality expression, or null if parsing fails.
+     */
     private Node equalityExpression() {
         Node left = relationalExpression();
         if (left == null) return null;
@@ -605,7 +784,6 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <relational-expression> after '==' or '!='.");
-                // synchronize(); TODO: sync
                 return left;
             }
             left = new Node(NodeType.EQUALITY_EXPRESSION, List.of(left, right), operator.getLexeme());
@@ -613,11 +791,20 @@ public class Parser {
         return left;
     }
 
-    // <relational-expression> ::= <shift-expression>
-    //| <relational-expression> < <shift-expression>
-    //| <relational-expression> > <shift-expression>
-    //| <relational-expression> <= <shift-expression>
-    //| <relational-expression> >= <shift-expression>
+    /**
+     * Parses a relational expression, which consists of one or more <shift-expression>
+     * joined by relational operators ('<', '>', '<=', '>='), representing relational comparisons.
+     *
+     * <pre>{@code
+     * <relational-expression> ::= <shift-expression>
+     *     | <relational-expression> < <shift-expression>
+     *     | <relational-expression> > <shift-expression>
+     *     | <relational-expression> <= <shift-expression>
+     *     | <relational-expression> >= <shift-expression>
+     * }</pre>
+     *
+     * @return A Node representing the relational expression, or null if parsing fails.
+     */
     private Node relationalExpression() {
         Node left = shiftExpression();
         if (left == null) return null;
@@ -628,20 +815,25 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <shift-expression> after relational operator.");
-                // synchronize(); TODO: sync
                 return left;
             }
-
-            // TODO: Potential problem with defaulting to '<'
             left = new Node(NodeType.RELATIONAL_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <shift-expression> ::= <additive-expression>
-    //| <shift-expression> << <additive-expression>
-    //| <shift-expression> >> <additive-expression>
+    /**
+     * Parses a shift expression, which consists of one or more <additive-expression>
+     * joined by shift operators ('<<', '>>').
+     *
+     * <pre>{@code
+     * <shift-expression> ::= <additive-expression>
+     *     | <shift-expression> << <additive-expression>
+     *     | <shift-expression> >> <additive-expression>
+     * }</pre>
+     *
+     * @return A Node representing the shift expression, or null if parsing fails.
+     */
     private Node shiftExpression() {
         Node left = additiveExpression();
         if (left == null) return null;
@@ -652,19 +844,25 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <additive-expression> after shift operator.");
-                // synchronize(); TODO: sync
                 return left;
             }
-
             left = new Node(NodeType.SHIFT_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <additive-expression> ::= <multiplicative-expression>
-    //| <additive-expression> + <multiplicative-expression>
-    //| <additive-expression> - <multiplicative-expression>
+    /**
+     * Parses an additive expression, which consists of one or more <multiplicative-expression>
+     * joined by addition or subtraction operators ('+' or '-').
+     *
+     * <pre>{@code
+     * <additive-expression> ::= <multiplicative-expression>
+     *     | <additive-expression> + <multiplicative-expression>
+     *     | <additive-expression> - <multiplicative-expression>
+     * }</pre>
+     *
+     * @return A Node representing the additive expression, or null if parsing fails.
+     */
     private Node additiveExpression() {
         Node left = multiplicativeExpression();
         if (left == null) return null;
@@ -675,20 +873,27 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <multiplicative-expression> after " + operator.getLexeme());
-                // synchronize(); TODO: sync later
                 return left;
             }
-
             left = new Node(NodeType.ADDITIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-    // <multiplicative-expression> ::= <cast-expression>
-    //| <multiplicative-expression> * <cast-expression>
-    //| <multiplicative-expression> / <cast-expression>
-    //| <multiplicative-expression> % <cast-expression>
+    /**
+     * Parses a multiplicative expression, which consists of a cast-expression
+     * optionally followed by one or more multiplication (*), division (/), or modulus (%) operators
+     * joined with additional cast-expression elements.
+     *
+     * <pre>{@code
+     * <multiplicative-expression> ::= <cast-expression>
+     *     | <multiplicative-expression> * <cast-expression>
+     *     | <multiplicative-expression> / <cast-expression>
+     *     | <multiplicative-expression> % <cast-expression>
+     * }</pre>
+     *
+     * @return A Node representing the multiplicative expression, or null if parsing fails.
+     */
     private Node multiplicativeExpression() {
         Node left = castExpression();
         if (left == null) return null;
@@ -699,37 +904,72 @@ public class Parser {
 
             if (right == null) {
                 error(peek(), "Expected <cast-expression> after " + operator.getLexeme());
-                // synchronize(); TODO: sync later
                 return left;
             }
-
             left = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, List.of(left, right), operator.getLexeme());
         }
-
         return left;
     }
 
-
-    // <cast-expression> ::= <unary-expression>
-    //| ( <type-name> ) <cast-expression>
+    /**
+     * Parses a cast expression, which can either be a unary expression or
+     * a type-cast expression of the form ( <type-name> ) <cast-expression>.
+     *
+     * <pre>{@code
+     * <cast-expression> ::= <unary-expression>
+     *     | ( <type-name> ) <cast-expression>
+     * }</pre>
+     *
+     * @return A Node representing the cast expression, or null if parsing fails.
+     */
     private Node castExpression() {
+        Node unary = unaryExpression();
+        if (unary != null) {
+            return unary;
+        }
 
-
-
-        return unaryExpression();
+        if (match(TokenType.LEFT_PAREN)) {
+            Node typeName = typeName();
+            if (typeName != null) {
+                if (match(TokenType.RIGHT_PAREN)) {
+                    Node castExpr = castExpression();
+                    if (castExpr != null) {
+                        return new Node(NodeType.CAST_EXPRESSION, List.of(typeName, castExpr));
+                    } else {
+                        error(peek(), "Expected <cast-expression> after cast.");
+                        return null;
+                    }
+                } else {
+                    error(peek(), "Expected ')' after <type-name>.");
+                    return null;
+                }
+            } else {
+                error(peek(), "Expected <type-name> in cast expression.");
+                return null;
+            }
+        }
+        return null;
     }
 
-
-
-
-    // <unary-expression> ::= <postfix-expression>
-    //| ++ <unary-expression>
-    //| -- <unary-expression>
-    //| <unary-operator> <cast-expression>
-    //| sizeof <unary-expression>
-    //| sizeof <type-name>
+    /**
+     * Parses a unary expression, which can be:
+     * - a postfix expression,
+     * - a pre-increment or pre-decrement (e.g., ++<expr>, --<expr>),
+     * - a unary operator applied to a cast expression,
+     * - a sizeof expression applied to a unary expression or a type name.
+     *
+     * <pre>{@code
+     * <unary-expression> ::= <postfix-expression>
+     *     | ++ <unary-expression>
+     *     | -- <unary-expression>
+     *     | <unary-operator> <cast-expression>
+     *     | sizeof <unary-expression>
+     *     | sizeof <type-name>
+     * }</pre>
+     *
+     * @return A Node representing the unary expression, or null if parsing fails.
+     */
     private Node unaryExpression() {
-
         if (match(TokenType.INCREMENT, TokenType.DECREMENT)) {
             Token operator = previous();
             Node right = unaryExpression();
@@ -739,9 +979,38 @@ public class Parser {
                 error(operator, "Expected <unary-expression> after '++' or '--'.");
                 return null;
             }
-        } else {
-            return postfixExpression();
         }
+
+        if (match(TokenType.SIZEOF)) {
+            Node unaryExpr = unaryExpression();
+            if (unaryExpr != null) {
+                return new Node(NodeType.UNARY_EXPRESSION, List.of(unaryExpr));
+            } else {
+                error(peek(), "Expected <unary-expression> after 'sizeof'.");
+                return null;
+            }
+        }
+
+        if (match(TokenType.SIZEOF)) {
+            Node typeName = typeName();
+            if (typeName != null) {
+                return new Node(NodeType.UNARY_EXPRESSION, List.of(typeName));
+            } else {
+                error(peek(), "Expected <type-name> after 'sizeof'.");
+                return null;
+            }
+        }
+
+        Node operator = unaryOperator();
+        if (operator != null) {
+            Node castExpression = castExpression();
+            if (castExpression != null) {
+                return new Node(NodeType.UNARY_EXPRESSION, List.of(operator, castExpression));
+            } else {
+                return null;
+            }
+        }
+        return postfixExpression();
     }
 
     // <postfix-expression> ::= <primary-expression>
@@ -752,8 +1021,11 @@ public class Parser {
     //| <postfix-expression> ++
     //| <postfix-expression> --
     private Node postfixExpression() {
-        return primaryExpression();
+
     }
+
+
+
 
     // <primary-expression> ::= <identifier>
     //| <constant>
