@@ -50,7 +50,7 @@ public class MultiplicativeExpressionRule implements Rule {
 
     private Node parsePrime(Parser parser, Node left) {
 
-        while (parser.match(TokenType.MUL)) {
+        while (parser.match(TokenType.MUL, TokenType.DIV, TokenType.MOD)) {
             Token operator = parser.previous();
 
             Node right = terminal.parse(parser);

@@ -4,6 +4,8 @@ public enum TokenType {
 
     // Arithmetic
     MUL, // *
+    DIV, // /
+    MOD, // %
 
     INTEGER_CONSTANT,
 

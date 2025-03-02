@@ -23,6 +23,8 @@ public class Lexer {
 
         // Arithmetic
         this.patterns.put(TokenType.MUL, Pattern.compile("\\*"));
+        this.patterns.put(TokenType.DIV, Pattern.compile("/"));
+        this.patterns.put(TokenType.MOD, Pattern.compile("%"));
 
         // Other
         this.patterns.put(TokenType.WHITESPACE, Pattern.compile("\\s+"));
