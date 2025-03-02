@@ -10,4 +10,6 @@ public enum NodeType {
 
     CONSTANT,
 
+    INTEGER_CONSTANT,
+
 }
