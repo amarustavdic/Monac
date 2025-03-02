@@ -32,7 +32,7 @@ public class PrimaryExpressionRule implements Nonterminal, Terminal {
 
         // ==> thus figure out what to do in that case, leave this method empty?
 
-        return null;
+        return new ConstantRule().parse(parser);
     }
 
 }

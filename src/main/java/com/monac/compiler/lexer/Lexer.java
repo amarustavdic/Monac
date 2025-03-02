@@ -20,6 +20,13 @@ public class Lexer {
 
         // Literals
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
+
+        // Arithmetic
+        this.patterns.put(TokenType.MUL, Pattern.compile("\\*"));
+
+        // Other
+        this.patterns.put(TokenType.WHITESPACE, Pattern.compile("\\s+"));
+        this.patterns.put(TokenType.COMMENT, Pattern.compile("^\\s*#.*"));
     }
 
     public List<Token> tokenize() {
