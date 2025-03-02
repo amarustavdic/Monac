@@ -4,6 +4,7 @@ import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.rules.expression.ConstantRule;
+import com.monac.compiler.parser.rules.expression.PrimaryExpressionRule;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
@@ -54,7 +55,14 @@ public class Parser {
     // Actual method for generating final AST
 
     public Node parse() {
-        return new ConstantRule().parse(this);
+
+        // And this is how parser is going to be recursively built
+        // the reason I decided to make it this modular, is cuz first
+        // time I was doing it in one file, and it was hard to change things
+
+        return new PrimaryExpressionRule().parse(
+                this, new ConstantRule()
+        );
     }
 
 }
