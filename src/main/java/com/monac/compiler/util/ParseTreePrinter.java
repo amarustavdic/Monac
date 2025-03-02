@@ -27,7 +27,7 @@ public class ParseTreePrinter implements ParseTreeVisitor {
         }
     }
 
-    private String formatNode(Node node) {
+    public String formatNode(Node node) {
         return node.getType() + "";
     }
 

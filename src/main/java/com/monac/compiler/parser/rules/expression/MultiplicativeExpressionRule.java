@@ -6,7 +6,6 @@ import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
-import com.monac.compiler.parser.tree.nodes.expression.MultiplicativeExpressionNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +50,8 @@ public class MultiplicativeExpressionRule implements Rule {
             Node right = terminal.parse(parser);
             if (right == null) return left;
 
-            MultiplicativeExpressionNode node = new MultiplicativeExpressionNode(
-                    NodeType.MULTIPLICATIVE_EXPRESSION,
-                    operator.getLine(),
-                    operator.getColumn()
-            );
+            Node node = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, operator.getLine(), operator.getColumn());
+            node.setLiteral(operator.getLexeme());
 
             List<Node> children = new ArrayList<>();
             children.add(left);

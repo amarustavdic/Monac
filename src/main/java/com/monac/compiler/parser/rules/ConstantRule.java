@@ -5,7 +5,6 @@ import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.NodeType;
-import com.monac.compiler.parser.tree.nodes.expression.ConstantNode;
 
 // TODO: Refactor class Constant since by c-lang BNF this should be nonterminal
 
@@ -17,12 +16,9 @@ public class ConstantRule implements Rule {
 
         if (parser.match(TokenType.INTEGER_CONSTANT)) {
             Token token = parser.previous();
-            return new ConstantNode(
-                    NodeType.CONSTANT,
-                    token.getLine(),
-                    token.getColumn(),
-                    Integer.parseInt(token.getLexeme())
-            );
+            Node node = new Node(NodeType.CONSTANT, token.getLine(), token.getColumn());
+            node.setLiteral(Integer.parseInt(token.getLexeme()));
+            return node;
         }
 
         // if it is not matching, then would be better to throw some sort
