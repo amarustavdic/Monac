@@ -1,4 +1,4 @@
-package com.monac.compiler.parser.tree.nodes;
+package com.monac.compiler.parser.tree.nodes.expression;
 
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;

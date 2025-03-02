@@ -4,7 +4,7 @@ import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
 
-public class Printer implements Visitor {
+public class PrintVisitor implements Visitor {
 
     @Override
     public void visit(Node node) {

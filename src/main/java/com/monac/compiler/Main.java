@@ -2,7 +2,7 @@ package com.monac.compiler;
 
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.visitors.Printer;
+import com.monac.compiler.visitors.PrintVisitor;
 
 import java.util.Scanner;
 
@@ -19,7 +19,7 @@ public class Main {
             Parser parser = new Parser(new Lexer(input));
             var ast = parser.parse();
 
-            ast.accept(new Printer());
+            ast.accept(new PrintVisitor());
 
             System.out.print(">>> ");
         }
