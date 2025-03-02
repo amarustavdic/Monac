@@ -2,7 +2,11 @@ package com.monac.compiler.lexer;
 
 public enum TokenType {
 
+    IDENTIFIER, //
+    STRING,     // " "
 
+    LPAREN,     // (
+    RPAREN,     // (
 
     // For expressions
     SHL,        // <<

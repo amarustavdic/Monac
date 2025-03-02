@@ -18,12 +18,18 @@ public class Lexer {
     public Lexer(String input) {
         this.input = input;
 
+        this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$\n"));
+        //this.patterns.put(TokenType.STRING, Pattern.compile(""));
+
         // Literals
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
         // 2 char
         this.patterns.put(TokenType.SHL, Pattern.compile("<<"));
         this.patterns.put(TokenType.SHR, Pattern.compile(">>"));
+
+        this.patterns.put(TokenType.LPAREN, Pattern.compile("\\("));
+        this.patterns.put(TokenType.RPAREN, Pattern.compile("\\)"));
 
         // Arithmetic
         this.patterns.put(TokenType.PLUS, Pattern.compile("\\+"));

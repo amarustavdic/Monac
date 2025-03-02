@@ -6,6 +6,8 @@ public enum NodeType {
     ADDITIVE_EXPRESSION,
     MULTIPLICATIVE_EXPRESSION,
 
+    PRIMARY_EXPRESSION,
+
     CONSTANT,
 
 }

@@ -73,6 +73,8 @@ public class Parser {
         var additiveExpression = new AdditiveExpressionRule(multiplicativeExpression);
         var shiftExpression = new ShiftExpressionRule(additiveExpression);
 
+        primaryExpression.setExpression(shiftExpression);
+
         return shiftExpression.parse(this);
     }
 
