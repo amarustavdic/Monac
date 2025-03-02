@@ -22,6 +22,8 @@ public class Lexer {
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
         // Arithmetic
+        this.patterns.put(TokenType.PLUS, Pattern.compile("\\+"));
+        this.patterns.put(TokenType.MINUS, Pattern.compile("-"));
         this.patterns.put(TokenType.MUL, Pattern.compile("\\*"));
         this.patterns.put(TokenType.DIV, Pattern.compile("/"));
         this.patterns.put(TokenType.MOD, Pattern.compile("%"));

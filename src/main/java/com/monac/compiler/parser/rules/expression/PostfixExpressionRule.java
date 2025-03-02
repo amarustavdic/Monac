@@ -44,7 +44,7 @@ public class PostfixExpressionRule implements Rule {
 
         // Probably would be nice to have rules implement static parse method instead...
 
-        return null;
+        return terminal.parse(parser);
     }
 
     private Node parsePrime(Parser parser) {

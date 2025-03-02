@@ -38,13 +38,10 @@ public class MultiplicativeExpressionRule implements Rule {
 
     @Override
     public Node parse(Parser parser) {
-
-        // Parse left operand first
         Node left = terminal.parse(parser);
         if (left == null) {
-            return null; // Error: expected a valid operand
+            return null;
         }
-
         return parsePrime(parser, left);
     }
 
@@ -55,7 +52,6 @@ public class MultiplicativeExpressionRule implements Rule {
 
             Node right = terminal.parse(parser);
             if (right == null) {
-                // TODO: Error handling or synchronization
                 return left;
             }
 

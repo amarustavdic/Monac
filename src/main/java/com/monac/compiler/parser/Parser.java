@@ -60,14 +60,18 @@ public class Parser {
     // Actual method for generating final AST
     public Node parse() {
 
+        // Define the rules in order of precedence
+
         var constant = new ConstantRule();
         var primaryExpression = new PrimaryExpressionRule(constant);
         var postfixExpression = new PostfixExpressionRule(primaryExpression);
         var unaryExpression = new UnaryExpressionRule(postfixExpression);
         var castExpression = new CastExpressionRule(unaryExpression);
         var multiplicativeExpression = new MultiplicativeExpressionRule(castExpression);
+        var additiveExpression = new AdditiveExpressionRule(multiplicativeExpression);
 
-        return multiplicativeExpression.parse(this);
+        return additiveExpression.parse(this);
     }
+
 
 }

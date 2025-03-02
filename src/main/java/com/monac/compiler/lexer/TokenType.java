@@ -3,9 +3,11 @@ package com.monac.compiler.lexer;
 public enum TokenType {
 
     // Arithmetic
-    MUL, // *
-    DIV, // /
-    MOD, // %
+    PLUS,       // +
+    MINUS,      // -
+    MUL,        // *
+    DIV,        // /
+    MOD,        // %
 
     INTEGER_CONSTANT,
 
