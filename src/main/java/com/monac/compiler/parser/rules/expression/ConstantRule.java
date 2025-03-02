@@ -2,7 +2,7 @@ package com.monac.compiler.parser.rules.expression;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.Terminal;
+import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.NodeType;
@@ -10,7 +10,8 @@ import com.monac.compiler.parser.tree.nodes.expression.ConstantNode;
 
 // TODO: Refactor class Constant since by c-lang BNF this should be nonterminal
 
-public class ConstantRule implements Terminal {
+public class ConstantRule implements Rule {
+
 
     @Override
     public Node parse(Parser parser) {

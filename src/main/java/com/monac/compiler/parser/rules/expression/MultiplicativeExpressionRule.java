@@ -3,8 +3,7 @@ package com.monac.compiler.parser.rules.expression;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Nonterminal;
-import com.monac.compiler.parser.rules.Terminal;
+import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 import com.monac.compiler.parser.tree.nodes.expression.MultiplicativeExpressionNode;
@@ -12,7 +11,7 @@ import com.monac.compiler.parser.tree.nodes.expression.MultiplicativeExpressionN
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplicativeExpressionRule implements Nonterminal {
+public class MultiplicativeExpressionRule implements Rule {
 
     // Original BNF but problem is left recursion
 
@@ -31,8 +30,14 @@ public class MultiplicativeExpressionRule implements Nonterminal {
 
     // This above should be it, I mean without left recursion
 
+    private final Rule terminal;
+
+    public MultiplicativeExpressionRule(Rule terminal) {
+        this.terminal = terminal;
+    }
+
     @Override
-    public Node parse(Parser parser, Terminal terminal) {
+    public Node parse(Parser parser) {
 
         // Parse left operand first
         Node left = terminal.parse(parser);
@@ -40,10 +45,10 @@ public class MultiplicativeExpressionRule implements Nonterminal {
             return null; // Error: expected a valid operand
         }
 
-        return parsePrime(parser, left, terminal);
+        return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser, Node left, Terminal terminal) {
+    private Node parsePrime(Parser parser, Node left) {
 
         while (parser.match(TokenType.MUL)) {
             Token operator = parser.previous();

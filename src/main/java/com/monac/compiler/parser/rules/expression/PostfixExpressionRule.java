@@ -1,11 +1,10 @@
 package com.monac.compiler.parser.rules.expression;
 
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Nonterminal;
-import com.monac.compiler.parser.rules.Terminal;
+import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 
-public class PostfixExpressionRule implements Nonterminal {
+public class PostfixExpressionRule implements Rule {
 
     //<postfix-expression> ::= <primary-expression>
     //                       | <postfix-expression> [ <expression> ]
@@ -35,14 +34,14 @@ public class PostfixExpressionRule implements Nonterminal {
     // -----------------------------------------------------------------------
 
     @Override
-    public Node parse(Parser parser, Terminal terminal) {
+    public Node parse(Parser parser) {
 
         // Probably would be nice to have rules implement static parse method instead...
 
         return null;
     }
 
-    private Node parsePrime(Parser parser, Terminal terminal) {
+    private Node parsePrime(Parser parser) {
         return null;
     }
 
