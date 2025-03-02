@@ -2,7 +2,6 @@ package com.monac.compiler;
 
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.tree.nodes.ConstantNode;
 import com.monac.compiler.visitors.Printer;
 
 import java.util.Scanner;

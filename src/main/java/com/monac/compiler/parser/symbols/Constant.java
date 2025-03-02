@@ -7,6 +7,8 @@ import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.NodeType;
 import com.monac.compiler.parser.tree.nodes.ConstantNode;
 
+// TODO: Refactor class Constant since by c-lang BNF this should be nonterminal
+
 public class Constant implements Terminal {
 
     @Override
