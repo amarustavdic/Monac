@@ -5,6 +5,8 @@ import java.util.List;
 public abstract class Node {
 
     private final NodeType type;
+
+    // Useful for error reporting
     private final int line;
     private final int column;
 
@@ -40,6 +42,7 @@ public abstract class Node {
     }
 
     // Setters
+
     public void setParent(Node parent) {
         this.parent = parent;
     }
