@@ -2,7 +2,7 @@ package com.monac.compiler.parser.tree.nodes.expression;
 
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
-import com.monac.compiler.visitors.Visitor;
+import com.monac.compiler.parser.tree.ParseTreeVisitor;
 
 public class ConstantNode extends Node {
 
@@ -19,8 +19,8 @@ public class ConstantNode extends Node {
     }
 
     @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
+    public void accept(ParseTreeVisitor parseTreeVisitor) {
+        parseTreeVisitor.visit(this);
     }
 
 }

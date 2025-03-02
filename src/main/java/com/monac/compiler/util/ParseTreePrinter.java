@@ -1,10 +1,11 @@
-package com.monac.compiler.visitors;
+package com.monac.compiler.util;
 
 import com.monac.compiler.parser.tree.Node;
+import com.monac.compiler.parser.tree.ParseTreeVisitor;
 
 import java.util.List;
 
-public class PrintVisitor implements Visitor {
+public class ParseTreePrinter implements ParseTreeVisitor {
 
     @Override
     public void visit(Node node) {
