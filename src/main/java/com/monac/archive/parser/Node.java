@@ -1,8 +1,8 @@
-package com.monac.parser;
+package com.monac.archive.parser;
 
 
-import com.monac.lexer.Token;
-import com.monac.visitors.Visitor;
+import com.monac.archive.lexer.Token;
+import com.monac.archive.visitors.Visitor;
 
 import java.util.List;
 

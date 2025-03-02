@@ -1,4 +1,4 @@
-package com.monac.parser;
+package com.monac.archive.parser;
 
 public enum NodeType {
 

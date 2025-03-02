@@ -1,11 +1,11 @@
-package com.monac;
+package com.monac.archive;
 
-import com.monac.lexer.Lexer;
-import com.monac.lexer.Token;
-import com.monac.parser.Node;
-import com.monac.parser.Parser;
-import com.monac.visitors.CodeGenerator;
-import com.monac.visitors.Printer;
+import com.monac.archive.lexer.Lexer;
+import com.monac.archive.lexer.Token;
+import com.monac.archive.parser.Node;
+import com.monac.archive.parser.Parser;
+import com.monac.archive.visitors.CodeGenerator;
+import com.monac.archive.visitors.Printer;
 
 import java.io.*;
 import java.nio.file.Files;

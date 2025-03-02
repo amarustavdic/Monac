@@ -1,4 +1,4 @@
-package com.monac.lexer;
+package com.monac.archive.lexer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

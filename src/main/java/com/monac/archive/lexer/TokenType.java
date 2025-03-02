@@ -1,4 +1,4 @@
-package com.monac.lexer;
+package com.monac.archive.lexer;
 
 public enum TokenType {
 
