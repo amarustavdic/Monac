@@ -4,6 +4,9 @@ public enum TokenType {
 
     INTEGER_CONSTANT,
 
+    WHITESPACE,
+    COMMENT,
+
     EOF
 
 }
