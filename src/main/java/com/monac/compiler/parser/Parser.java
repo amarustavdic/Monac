@@ -3,9 +3,7 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.expression.ConstantRule;
-import com.monac.compiler.parser.rules.expression.MultiplicativeExpressionRule;
-import com.monac.compiler.parser.rules.expression.PrimaryExpressionRule;
+import com.monac.compiler.parser.rules.expression.*;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
@@ -63,7 +61,13 @@ public class Parser {
     public Node parse() {
 
         var constant = new ConstantRule();
-        return new MultiplicativeExpressionRule(constant).parse(this);
+        var primaryExpression = new PrimaryExpressionRule(constant);
+        var postfixExpression = new PostfixExpressionRule(primaryExpression);
+        var unaryExpression = new UnaryExpressionRule(postfixExpression);
+        var castExpression = new CastExpressionRule(unaryExpression);
+        var multiplicativeExpression = new MultiplicativeExpressionRule(castExpression);
+
+        return multiplicativeExpression.parse(this);
     }
 
 }

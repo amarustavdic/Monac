@@ -6,6 +6,12 @@ import com.monac.compiler.parser.tree.Node;
 
 public class PostfixExpressionRule implements Rule {
 
+    private final Rule terminal;
+
+    public PostfixExpressionRule(Rule terminal) {
+        this.terminal = terminal;
+    }
+
     //<postfix-expression> ::= <primary-expression>
     //                       | <postfix-expression> [ <expression> ]
     //                       | <postfix-expression> ( {<assignment-expression>}* )

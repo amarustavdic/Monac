@@ -4,18 +4,13 @@ import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 
-public class PrimaryExpressionRule implements Rule {
+public class CastExpressionRule implements Rule {
 
     private final Rule terminal;
 
-    public PrimaryExpressionRule(Rule terminal) {
+    public CastExpressionRule(Rule terminal) {
         this.terminal = terminal;
     }
-
-    // <primary-expression> ::= <identifier>
-    //                        | <constant>
-    //                        | <string>
-    //                        | ( <expression> )
 
     @Override
     public Node parse(Parser parser) {
