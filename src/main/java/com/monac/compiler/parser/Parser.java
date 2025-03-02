@@ -3,7 +3,7 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.symbols.Constant;
+import com.monac.compiler.parser.rules.ConstantRule;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public class Parser {
     // Actual method for generating final AST
 
     public Node parse() {
-        return new Constant().parse(this);
+        return new ConstantRule().parse(this);
     }
 
 }

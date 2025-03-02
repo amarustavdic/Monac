@@ -1,4 +1,4 @@
-package com.monac.compiler.parser.symbols;
+package com.monac.compiler.parser.rules;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
@@ -9,7 +9,7 @@ import com.monac.compiler.parser.tree.nodes.ConstantNode;
 
 // TODO: Refactor class Constant since by c-lang BNF this should be nonterminal
 
-public class Constant implements Terminal {
+public class ConstantRule implements Terminal {
 
     @Override
     public Node parse(Parser parser) {
