@@ -1,5 +1,6 @@
 package com.monac.compiler.parser.rules.expression;
 
+
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
@@ -41,14 +42,20 @@ public class PostfixExpressionRule implements Rule {
 
     @Override
     public Node parse(Parser parser) {
-
-        // Probably would be nice to have rules implement static parse method instead...
-
-        return terminal.parse(parser);
+        Node left = terminal.parse(parser);
+        if (left == null) return null;
+        return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser) {
-        return null;
+    private Node parsePrime(Parser parser, Node left) {
+//
+//        while (parser.match(TokenType.LBRACKET, TokenType.LPAREN, TokenType.DOT,
+//                TokenType.ARROW, TokenType.INCREMENT, TokenType.DECREMENT
+//        )) {
+//            // TODO: To be continued...
+//        }
+
+        return left;
     }
 
 }

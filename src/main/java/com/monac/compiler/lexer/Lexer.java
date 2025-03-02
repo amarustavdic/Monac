@@ -18,29 +18,41 @@ public class Lexer {
     public Lexer(String input) {
         this.input = input;
 
-        this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$\n"));
-        //this.patterns.put(TokenType.STRING, Pattern.compile(""));
 
-        // Literals
+        // Identifiers
+        this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*"));
+
+        // String literals (supports escape sequences)
+        this.patterns.put(TokenType.STRING, Pattern.compile("\"(\\\\.|[^\"])*\""));
+
+        // Integer literals
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
-        // 2 char
-        this.patterns.put(TokenType.SHL, Pattern.compile("<<"));
-        this.patterns.put(TokenType.SHR, Pattern.compile(">>"));
-
+        // Parentheses and brackets
         this.patterns.put(TokenType.LPAREN, Pattern.compile("\\("));
         this.patterns.put(TokenType.RPAREN, Pattern.compile("\\)"));
+        this.patterns.put(TokenType.LBRACKET, Pattern.compile("\\["));
+        this.patterns.put(TokenType.RBRACKET, Pattern.compile("]"));
+        this.patterns.put(TokenType.LBRACE, Pattern.compile("\\{"));
+        this.patterns.put(TokenType.RBRACE, Pattern.compile("}"));
 
-        // Arithmetic
+        // Operators
+        this.patterns.put(TokenType.DOT, Pattern.compile("\\."));
+        this.patterns.put(TokenType.ARROW, Pattern.compile("->"));
+        this.patterns.put(TokenType.INCREMENT, Pattern.compile("\\+\\+"));
+        this.patterns.put(TokenType.DECREMENT, Pattern.compile("--"));
+        this.patterns.put(TokenType.SHL, Pattern.compile("<<"));
+        this.patterns.put(TokenType.SHR, Pattern.compile(">>"));
         this.patterns.put(TokenType.PLUS, Pattern.compile("\\+"));
         this.patterns.put(TokenType.MINUS, Pattern.compile("-"));
         this.patterns.put(TokenType.MUL, Pattern.compile("\\*"));
         this.patterns.put(TokenType.DIV, Pattern.compile("/"));
         this.patterns.put(TokenType.MOD, Pattern.compile("%"));
 
-        // Other
+        // Whitespace and comments
         this.patterns.put(TokenType.WHITESPACE, Pattern.compile("\\s+"));
-        this.patterns.put(TokenType.COMMENT, Pattern.compile("^\\s*#.*"));
+        this.patterns.put(TokenType.COMMENT, Pattern.compile("#.*"));
+
     }
 
     public List<Token> tokenize() {

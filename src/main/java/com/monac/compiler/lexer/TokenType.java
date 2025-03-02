@@ -3,10 +3,17 @@ package com.monac.compiler.lexer;
 public enum TokenType {
 
     IDENTIFIER, //
-    STRING,     // " "
+    STRING,     //
 
-    LPAREN,     // (
-    RPAREN,     // (
+    LPAREN, RPAREN,
+    LBRACKET, RBRACKET,
+    LBRACE, RBRACE,
+
+    DOT, // .
+    ARROW, // ->
+
+    INCREMENT, // ++
+    DECREMENT, // --
 
     // For expressions
     SHL,        // <<
