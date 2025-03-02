@@ -3,7 +3,6 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.ConstantRule;
 import com.monac.compiler.parser.rules.expression.*;
 import com.monac.compiler.parser.tree.Node;
 
@@ -63,19 +62,7 @@ public class Parser {
 
         // Define the rules in order of precedence
 
-        var constant = new ConstantRule();
-
-        var primaryExpression = new PrimaryExpressionRule(constant);
-        var postfixExpression = new PostfixExpressionRule(primaryExpression);
-        var unaryExpression = new UnaryExpressionRule(postfixExpression);
-        var castExpression = new CastExpressionRule(unaryExpression);
-        var multiplicativeExpression = new MultiplicativeExpressionRule(castExpression);
-        var additiveExpression = new AdditiveExpressionRule(multiplicativeExpression);
-        var shiftExpression = new ShiftExpressionRule(additiveExpression);
-
-        primaryExpression.setExpression(shiftExpression);
-
-        return shiftExpression.parse(this);
+        return Expression.parse(this);
     }
 
 

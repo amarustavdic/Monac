@@ -3,20 +3,13 @@ package com.monac.compiler.parser.rules.expression;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShiftExpressionRule implements Rule {
-
-    private final Rule terminal;
-
-    public ShiftExpressionRule(Rule terminal) {
-        this.terminal = terminal;
-    }
+public final class ShiftExpression {
 
     //<shift-expression> ::= <additive-expression>
     //| <shift-expression> << <additive-expression>
@@ -31,19 +24,18 @@ public class ShiftExpressionRule implements Rule {
     //                      | ε
 
 
-    @Override
-    public Node parse(Parser parser) {
-        Node left = terminal.parse(parser);
+    public static Node parse(Parser parser) {
+        Node left = AdditiveExpression.parse(parser);
         if (left == null) return null;
         return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser, Node left) {
+    private static Node parsePrime(Parser parser, Node left) {
 
         while (parser.match(TokenType.SHL, TokenType.SHR)) {
             Token operator = parser.previous();
 
-            Node right = terminal.parse(parser);
+            Node right = AdditiveExpression.parse(parser);
             if (right == null) return left;
 
             Node node = new Node(NodeType.SHIFT_EXPRESSION, operator.getLine(), operator.getColumn());

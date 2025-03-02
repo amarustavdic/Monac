@@ -1,17 +1,9 @@
 package com.monac.compiler.parser.rules.expression;
 
-
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 
-public class PostfixExpressionRule implements Rule {
-
-    private final Rule terminal;
-
-    public PostfixExpressionRule(Rule terminal) {
-        this.terminal = terminal;
-    }
+public final class PostfixExpression {
 
     //<postfix-expression> ::= <primary-expression>
     //                       | <postfix-expression> [ <expression> ]
@@ -40,14 +32,13 @@ public class PostfixExpressionRule implements Rule {
     //              FOR NOW HANDLING ONLY INCREMENT AND DECREMENT
     // -----------------------------------------------------------------------
 
-    @Override
-    public Node parse(Parser parser) {
-        Node left = terminal.parse(parser);
+    public static Node parse(Parser parser) {
+        Node left = PrimaryExpression.parse(parser);
         if (left == null) return null;
         return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser, Node left) {
+    private static Node parsePrime(Parser parser, Node left) {
 //
 //        while (parser.match(TokenType.LBRACKET, TokenType.LPAREN, TokenType.DOT,
 //                TokenType.ARROW, TokenType.INCREMENT, TokenType.DECREMENT

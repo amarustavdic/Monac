@@ -3,14 +3,13 @@ package com.monac.compiler.parser.rules.expression;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiplicativeExpressionRule implements Rule {
+public final class MultiplicativeExpression {
 
     // Original BNF but problem is left recursion
 
@@ -29,25 +28,18 @@ public class MultiplicativeExpressionRule implements Rule {
 
     // This above should be it, I mean without left recursion
 
-    private final Rule terminal;
-
-    public MultiplicativeExpressionRule(Rule terminal) {
-        this.terminal = terminal;
-    }
-
-    @Override
-    public Node parse(Parser parser) {
-        Node left = terminal.parse(parser);
+    public static Node parse(Parser parser) {
+        Node left = CastExpression.parse(parser);
         if (left == null) return null;
         return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser, Node left) {
+    private static Node parsePrime(Parser parser, Node left) {
 
         while (parser.match(TokenType.MUL, TokenType.DIV, TokenType.MOD)) {
             Token operator = parser.previous();
 
-            Node right = terminal.parse(parser);
+            Node right = CastExpression.parse(parser);
             if (right == null) return left;
 
             Node node = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, operator.getLine(), operator.getColumn());

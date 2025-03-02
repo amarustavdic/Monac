@@ -3,20 +3,13 @@ package com.monac.compiler.parser.rules.expression;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdditiveExpressionRule implements Rule {
-
-    private final Rule terminal;
-
-    public AdditiveExpressionRule(Rule terminal) {
-        this.terminal = terminal;
-    }
+public final class AdditiveExpression {
 
     //<additive-expression> ::= <multiplicative-expression>
     //| <additive-expression> + <multiplicative-expression>
@@ -32,18 +25,17 @@ public class AdditiveExpressionRule implements Rule {
 
     // <multiplicative-expression> is basically terminal
 
-    @Override
-    public Node parse(Parser parser) {
-        Node left = terminal.parse(parser);
+    public static Node parse(Parser parser) {
+        Node left = MultiplicativeExpression.parse(parser);
         if (left == null) return null;
         return parsePrime(parser, left);
     }
 
-    private Node parsePrime(Parser parser, Node left) {
+    private static Node parsePrime(Parser parser, Node left) {
         while (parser.match(TokenType.PLUS, TokenType.MINUS)) {
             Token operator = parser.previous();
 
-            Node right = terminal.parse(parser);
+            Node right = MultiplicativeExpression.parse(parser);
             if (right == null) return left;
 
             Node node = new Node(NodeType.ADDITIVE_EXPRESSION, operator.getLine(), operator.getColumn());
