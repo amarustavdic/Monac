@@ -2,7 +2,11 @@ package com.monac.compiler.lexer;
 
 public enum TokenType {
 
-    // Arithmetic
+
+
+    // For expressions
+    SHL,        // <<
+    SHR,        // >>
     PLUS,       // +
     MINUS,      // -
     MUL,        // *

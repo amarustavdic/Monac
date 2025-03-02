@@ -64,14 +64,16 @@ public class Parser {
         // Define the rules in order of precedence
 
         var constant = new ConstantRule();
+
         var primaryExpression = new PrimaryExpressionRule(constant);
         var postfixExpression = new PostfixExpressionRule(primaryExpression);
         var unaryExpression = new UnaryExpressionRule(postfixExpression);
         var castExpression = new CastExpressionRule(unaryExpression);
         var multiplicativeExpression = new MultiplicativeExpressionRule(castExpression);
         var additiveExpression = new AdditiveExpressionRule(multiplicativeExpression);
+        var shiftExpression = new ShiftExpressionRule(additiveExpression);
 
-        return additiveExpression.parse(this);
+        return shiftExpression.parse(this);
     }
 
 

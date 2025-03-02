@@ -21,6 +21,10 @@ public class Lexer {
         // Literals
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
+        // 2 char
+        this.patterns.put(TokenType.SHL, Pattern.compile("<<"));
+        this.patterns.put(TokenType.SHR, Pattern.compile(">>"));
+
         // Arithmetic
         this.patterns.put(TokenType.PLUS, Pattern.compile("\\+"));
         this.patterns.put(TokenType.MINUS, Pattern.compile("-"));

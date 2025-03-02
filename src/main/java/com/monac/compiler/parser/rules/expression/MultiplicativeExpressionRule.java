@@ -39,9 +39,7 @@ public class MultiplicativeExpressionRule implements Rule {
     @Override
     public Node parse(Parser parser) {
         Node left = terminal.parse(parser);
-        if (left == null) {
-            return null;
-        }
+        if (left == null) return null;
         return parsePrime(parser, left);
     }
 
@@ -51,9 +49,7 @@ public class MultiplicativeExpressionRule implements Rule {
             Token operator = parser.previous();
 
             Node right = terminal.parse(parser);
-            if (right == null) {
-                return left;
-            }
+            if (right == null) return left;
 
             MultiplicativeExpressionNode node = new MultiplicativeExpressionNode(
                     NodeType.MULTIPLICATIVE_EXPRESSION,
