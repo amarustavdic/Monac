@@ -1,8 +1,7 @@
-package com.monac.compiler.parser.rules.expression;
+package com.monac.compiler.parser.rules;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.Rule;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.NodeType;
