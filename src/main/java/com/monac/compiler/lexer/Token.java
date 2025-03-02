@@ -6,7 +6,6 @@ public class Token {
     private final String lexeme;
     private final int line;
     private final int column;
-    private Object literal;                 // Actual value converted
 
     public Token(TokenType type, String lexeme, int line, int column) {
         this.type = type;
@@ -31,16 +30,6 @@ public class Token {
 
     public int getColumn() {
         return column;
-    }
-
-    public Object getLiteral() {
-        return literal;
-    }
-
-    // Setters
-
-    public void setLiteral(Object literal) {
-        this.literal = literal;
     }
 
 }

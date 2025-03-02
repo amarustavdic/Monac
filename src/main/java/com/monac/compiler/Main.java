@@ -1,40 +1,27 @@
 package com.monac.compiler;
 
+import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
+import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.tree.nodes.ConstantNode;
 
 import java.util.List;
 
 public class Main {
 
+    public static void main(String[] args) {
 
-}
+        String input = "234";
 
-class Node {
+        Parser parser = new Parser(new Lexer(input));
 
-}
+        var ast = parser.parse();
 
-class ParserX {
+        if (ast instanceof ConstantNode) {
+            System.out.println("yay");
+        }
 
-    List<Token> tokens;
 
-    public ParserX(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-
-    public Node parse() {
-        return new PrimaryExpression().parse(null, this);
-    }
-
-}
-
-interface Nonterminal {
-    Node parse(Nonterminal nonterminal, ParserX parser);
-}
-
-class PrimaryExpression implements Nonterminal {
-
-    @Override
-    public Node parse(Nonterminal nonterminal, ParserX parser) {
-        return null;
     }
 }
+

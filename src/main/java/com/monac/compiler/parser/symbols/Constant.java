@@ -18,7 +18,7 @@ public class Constant implements Terminal {
                     NodeType.CONSTANT,
                     token.getLine(),
                     token.getColumn(),
-                    (int) token.getLiteral()
+                    Integer.parseInt(token.getLexeme())
             );
         }
 
