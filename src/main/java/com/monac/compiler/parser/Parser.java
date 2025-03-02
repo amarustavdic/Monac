@@ -3,6 +3,8 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
+import com.monac.compiler.parser.symbols.Constant;
+import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
 
@@ -14,6 +16,8 @@ public class Parser {
     public Parser(Lexer lexer) {
         this.tokens = lexer.tokenize();
     }
+
+    // Helper methods for terminal classes
 
     public boolean match(TokenType... types) {
         for (TokenType type : types) {
@@ -45,6 +49,12 @@ public class Parser {
 
     public Token previous() {
         return tokens.get(cursor - 1);
+    }
+
+    // Actual method for generating final AST
+
+    public Node parse() {
+        return new Constant().parse(this);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.monac.compiler.parser.nonterminals;
+package com.monac.compiler.parser.symbols;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
@@ -7,10 +7,10 @@ import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.NodeType;
 import com.monac.compiler.parser.tree.nodes.ConstantNode;
 
-public class Constant implements Nonterminal {
+public class Constant implements Terminal {
 
     @Override
-    public Node parse(Parser parser, Nonterminal nonterminal) {
+    public Node parse(Parser parser) {
 
         if (parser.match(TokenType.INTEGER_CONSTANT)) {
             Token token = parser.previous();
