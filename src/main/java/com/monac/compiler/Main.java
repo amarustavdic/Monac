@@ -3,6 +3,7 @@ package com.monac.compiler;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.nodes.ConstantNode;
+import com.monac.compiler.visitors.Printer;
 
 import java.util.Scanner;
 
@@ -18,9 +19,8 @@ public class Main {
         while ((input = sc.nextLine()) != null) {
             Parser parser = new Parser(new Lexer(input));
             var ast = parser.parse();
-            if (ast instanceof ConstantNode) {
-                System.out.println("yay");
-            }
+
+            ast.accept(new Printer());
 
             System.out.print(">>> ");
         }

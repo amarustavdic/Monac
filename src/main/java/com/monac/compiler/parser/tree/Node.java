@@ -1,5 +1,7 @@
 package com.monac.compiler.parser.tree;
 
+import com.monac.compiler.visitors.Visitor;
+
 import java.util.List;
 
 public abstract class Node {
@@ -50,5 +52,8 @@ public abstract class Node {
     public void setChildren(List<Node> children) {
         this.children = children;
     }
+
+    // Method for accepting visitors (each subtype of node has to implement)
+    public abstract void accept(Visitor visitor);
 
 }
