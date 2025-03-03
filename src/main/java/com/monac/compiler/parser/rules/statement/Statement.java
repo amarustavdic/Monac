@@ -14,6 +14,13 @@ public final class Statement {
 
     public static Node parse(Parser parser) {
 
+        Node cs = CompoundStatement.parse(parser);
+        if (cs != null) return cs;
+
+        Node ss = SelectionStatement.parse(parser);
+        if (ss != null) return ss;
+
         return ExpressionStatement.parse(parser);
     }
+
 }

@@ -5,6 +5,7 @@ import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.rules.expression.*;
 import com.monac.compiler.parser.rules.statement.SelectionStatement;
+import com.monac.compiler.parser.rules.statement.Statement;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return SelectionStatement.parse(this);
+        return Statement.parse(this);
     }
 
 }
