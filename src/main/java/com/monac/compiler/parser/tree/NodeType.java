@@ -29,6 +29,7 @@ public enum NodeType {
     LABELED_STATEMENT,
 
     RELATIONAL_EXPRESSION,
+    EQUALITY_EXPRESSION,
 
 
 }

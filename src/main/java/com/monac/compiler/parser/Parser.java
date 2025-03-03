@@ -90,7 +90,7 @@ public class Parser {
     public Node parse() {
 
         try {
-            return RelationalExpression.parse(this);
+            return EqualityExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
