@@ -90,7 +90,7 @@ public class Parser {
     public Node parse() {
 
         try {
-            return AndExpression.parse(this);
+            return ExclusiveOrExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -17,7 +17,7 @@ public final class AndExpression {
     }
 
     public static Node parsePrime(Parser parser, Node left) {
-        while (parser.match(TokenType.BAND)) {
+        while (parser.match(TokenType.AND)) {
             Token operator = parser.previous();
             Node right = RelationalExpression.parse(parser);
 

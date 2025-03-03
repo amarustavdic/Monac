@@ -14,8 +14,8 @@ public enum TokenType {
     // Size and type
     SIZEOF,
 
-    BAND, // & bitwise and
-
+    AND, // &
+    XOR, // ^
 
     // Identifiers and literals
     IDENTIFIER, STRING, INTEGER_CONSTANT,

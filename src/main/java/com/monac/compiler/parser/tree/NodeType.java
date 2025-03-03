@@ -32,5 +32,7 @@ public enum NodeType {
     EQUALITY_EXPRESSION,
     AND_EXPRESSION,
 
+    EXCLUSIVE_OR_EXPRESSION,
+
 
 }
