@@ -12,4 +12,8 @@ public enum NodeType {
 
     INTEGER_CONSTANT,
 
+    COMPOUND_STATEMENT,
+    SELECTION_STATEMENT,
+
+
 }

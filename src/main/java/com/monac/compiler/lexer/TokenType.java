@@ -2,6 +2,12 @@ package com.monac.compiler.lexer;
 
 public enum TokenType {
 
+    GOTO,
+    CONTINUE,
+    RETURN,
+    BREAK,
+
+
     IDENTIFIER, //
     STRING,     //
 
@@ -14,6 +20,16 @@ public enum TokenType {
 
     INCREMENT, // ++
     DECREMENT, // --
+
+    IF,
+    ELSE,
+    SWITCH,
+    WHILE,
+    DO,
+    FOR,
+
+
+    SEMICOLON,
 
     // For expressions
     SHL,        // <<

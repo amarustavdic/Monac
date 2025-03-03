@@ -19,6 +19,13 @@ public class Parser {
 
     // Helper methods for terminal classes
 
+    public Token consume(TokenType type, String message) {
+        if (check(type)) return advance();
+
+        // throw error(peek(), message);
+        return null;
+    }
+
     public boolean match(TokenType... types) {
         for (TokenType type : types) {
             if (check(type)) {
@@ -53,7 +60,17 @@ public class Parser {
 
     // Method for putting parser back in sync after error encountering
     public void synchronize() {
-        // TODO: Implement sync method for parser
+        advance();
+
+        while (!isAtEnd()) {
+            if (previous().getType() == TokenType.SEMICOLON) return;
+
+            switch (peek().getType()) {
+
+            }
+        }
+
+        advance();
     }
 
     // TODO: Maybe handle errors?
