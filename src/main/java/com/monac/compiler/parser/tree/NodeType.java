@@ -33,6 +33,7 @@ public enum NodeType {
     AND_EXPRESSION,
 
     EXCLUSIVE_OR_EXPRESSION,
+    INCLUSIVE_OR_EXPRESSION,
 
 
 }

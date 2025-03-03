@@ -46,6 +46,7 @@ public class Lexer {
         this.patterns.put(TokenType.SEMICOLON, Pattern.compile(";"));
 
         // Operators
+        this.patterns.put(TokenType.OR, Pattern.compile("\\|"));
         this.patterns.put(TokenType.AND, Pattern.compile("&"));
         this.patterns.put(TokenType.XOR, Pattern.compile("\\^"));
         this.patterns.put(TokenType.DOT, Pattern.compile("\\."));
