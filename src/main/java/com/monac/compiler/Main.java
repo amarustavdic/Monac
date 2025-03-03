@@ -27,7 +27,9 @@ public class Main {
         Parser parser = new Parser(new Lexer(content));
         Node tree = parser.parse();
 
-        tree.accept(new LiteralPrinter());
+        if (tree != null) {
+            tree.accept(new LiteralPrinter());
+        }
     }
 
 

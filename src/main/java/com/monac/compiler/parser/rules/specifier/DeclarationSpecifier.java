@@ -10,7 +10,10 @@ public final class DeclarationSpecifier {
     //| <type-qualifier>
 
     public static Node parse(Parser parser) {
-        return null;
+
+        // for now only type specifier :P
+
+        return TypeSpecifier.parse(parser);
     }
 
 }

@@ -8,6 +8,12 @@ public enum TokenType {
     GOTO, CONTINUE, RETURN, BREAK,
     IF, ELSE, SWITCH, WHILE, DO, FOR,
 
+    // Types
+    VOID,
+    CHAR,
+    INT,
+
+
     // Relational and equality operators
     LT, GT, LE, GE, EQ, NE,
 

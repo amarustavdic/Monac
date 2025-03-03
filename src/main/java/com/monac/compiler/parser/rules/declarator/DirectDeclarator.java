@@ -1,6 +1,7 @@
 package com.monac.compiler.parser.rules.declarator;
 
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.rules.other.Identifier;
 import com.monac.compiler.parser.tree.Node;
 
 public class DirectDeclarator {
@@ -12,7 +13,7 @@ public class DirectDeclarator {
     //| <direct-declarator> ( {<identifier>}* )
 
     public static Node parse(Parser parser) {
-        return null;
+        return Identifier.parse(parser);
     }
 
 }

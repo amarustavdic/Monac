@@ -18,6 +18,10 @@ public class Lexer {
     public Lexer(String input) {
         this.input = input;
 
+        this.patterns.put(TokenType.VOID, Pattern.compile("void"));
+        this.patterns.put(TokenType.CHAR, Pattern.compile("char"));
+        this.patterns.put(TokenType.INT, Pattern.compile("int"));
+
         // Keywords
         this.patterns.put(TokenType.CONST, Pattern.compile("\\bconst\\b"));
         this.patterns.put(TokenType.VOLATILE, Pattern.compile("\\bvolatile\\b"));
