@@ -23,5 +23,7 @@ public enum NodeType {
 
     STRUCT_OR_UNION,
 
+    JUMP_STATEMENT,
+
 
 }
