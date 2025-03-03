@@ -1,42 +1,41 @@
 package com.monac.compiler.parser.rules.expression;
 
+import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.parser.rules.constant.Constant;
 import com.monac.compiler.parser.rules.other.Identifier;
 import com.monac.compiler.parser.rules.other.String;
 import com.monac.compiler.parser.tree.Node;
 
-/**
- * A utility class for parsing primary expressions in the source code.
- * <p>
- * A primary expression can be an identifier, a constant, a string literal,
- * or a parenthesized expression. This class attempts to parse each of these
- * in order and returns the corresponding AST (Abstract Syntax Tree) node.
- * </p>
- */
 public final class PrimaryExpression {
 
-    /**
-     * Parses a primary expression from the parser.
-     * <p>
-     * This method attempts to parse a primary expression, which can be:
-     * <ul>
-     *   <li>An identifier</li>
-     *   <li>A constant</li>
-     *   <li>A string literal</li>
-     *   <li>A parenthesized expression</li>
-     * </ul>
-     * If a parenthesized expression is encountered, it ensures that a closing
-     * parenthesis is present. If not, an exception is thrown.
-     * </p>
-     *
-     * @param parser The parser instance used to analyze the token stream.
-     * @return A {@link Node} representing the parsed primary expression in the AST,
-     *         or {@code null} if no valid primary expression is found.
-     * @throws Exception If a parenthesized expression is not properly closed.
-     */
-    public static Node parse(Parser parser) throws Exception {
+    public static Node parse(Parser parser) {
+
+        if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+
+            // TODO: This one might ... idk what yet
+            Node expression = Expression.parse(parser);
+            // Figure out how to handle expression, does it return null possibly?
+
+            if (expression != null) {
+                if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                    return expression;
+                } else {
+                    Token token = parser.peek();
+                    parser.addError(new ParserException(
+                            "Expected ')' after expression.",
+                            token.getLine(), token.getColumn(),
+                            token.getLexeme(), ")"
+                    ));
+                    parser.synchronize();
+                }
+            } else {
+                parser.addError(null);
+                parser.synchronize();
+            }
+        }
 
         Node identifier = Identifier.parse(parser);
         if (identifier != null) return identifier;
@@ -44,18 +43,6 @@ public final class PrimaryExpression {
         Node constant = Constant.parse(parser);
         if (constant != null) return constant;
 
-        Node string = String.parse(parser);
-        if (string != null) return string;
-
-        if (parser.match(TokenType.LEFT_PARENTHESIS)) {
-            Node expression = Expression.parse(parser);
-            if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
-                return expression;
-            } else {
-                throw new Exception("Expected closed parenthesis.");
-            }
-        }
-
-        return null;
+        return String.parse(parser);
     }
 }

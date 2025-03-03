@@ -60,6 +60,10 @@ public class Parser {
         return tokens.get(cursor - 1);
     }
 
+    public void addError(ParserException e) {
+        errors.add(e);
+    }
+
     // Method for putting parser back in sync after error encountering
     public void synchronize() {
         advance();
