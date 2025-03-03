@@ -27,7 +27,8 @@ public final class PrimaryExpression {
                     parser.addError(new ParserException(
                             "Expected ')' after expression.",
                             token.getLine(), token.getColumn(),
-                            token.getLexeme(), ")"
+                            token.getLexeme(), ")",
+                            ""
                     ));
                     parser.synchronize();
                 }

@@ -36,6 +36,7 @@ public final class UnaryExpression {
                 parser.addError(new ParserException(
                         "Expected unary expression after increment/decrement operator.",
                         0, 0, "", "" // todo figure out how to handle this properly
+                        ,""
                 ));
                 parser.synchronize();
             }

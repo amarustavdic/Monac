@@ -60,6 +60,14 @@ public class Parser {
         return tokens.get(cursor - 1);
     }
 
+    public boolean hadErrors() {
+        return !errors.isEmpty();
+    }
+
+    public List<ParserException> getErrors() {
+        return errors;
+    }
+
     public void addError(ParserException e) {
         errors.add(e);
     }
@@ -82,7 +90,7 @@ public class Parser {
     public Node parse() {
 
         try {
-            return PrimaryExpression.parse(this);
+            return MultiplicativeExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

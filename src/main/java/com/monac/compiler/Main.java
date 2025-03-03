@@ -2,6 +2,7 @@ package com.monac.compiler;
 
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.util.LiteralPrinter;
 
 import java.util.Scanner;
@@ -18,6 +19,10 @@ public class Main {
         while ((input = sc.nextLine()) != null) {
             Parser parser = new Parser(new Lexer(input));
             var ast = parser.parse();
+
+            for (ParserException error : parser.getErrors()) {
+                System.out.println(error);
+            }
 
             if (ast != null) {
                 ast.accept(new LiteralPrinter());
