@@ -88,14 +88,7 @@ public class Parser {
     }
 
     public Node parse() {
-
-        try {
-            return InclusiveOrExpression.parse(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return LogicalAndExpression.parse(this);
     }
 
 }

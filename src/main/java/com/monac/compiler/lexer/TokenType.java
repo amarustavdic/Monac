@@ -18,6 +18,9 @@ public enum TokenType {
     XOR, // ^
     OR,  // |
 
+    LAND, // &&
+
+
     // Identifiers and literals
     IDENTIFIER, STRING, INTEGER_CONSTANT,
 
