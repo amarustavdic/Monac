@@ -82,15 +82,15 @@ public class Parser {
 //            switch (peek().getType()) {
 //
 //            }
+            advance();
         }
-
         advance();
     }
 
     public Node parse() {
 
         try {
-            return MultiplicativeExpression.parse(this);
+            return AdditiveExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

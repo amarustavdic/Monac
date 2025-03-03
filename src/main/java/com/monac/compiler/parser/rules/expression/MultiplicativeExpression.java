@@ -38,10 +38,12 @@ public final class MultiplicativeExpression {
 
             Node node = new Node(NodeType.MULTIPLICATIVE_EXPRESSION, operator.getLine(), operator.getColumn());
             node.setLiteral(operator.getLexeme());
+
             List<Node> children = new ArrayList<>();
             children.add(left);
             children.add(right);
             node.setChildren(children);
+
             left = node;
         }
         return left;
