@@ -16,35 +16,32 @@ public final class AssignmentExpression {
 
     public static Node parse(Parser parser) {
 
-        Node conditional = ConditionalExpression.parse(parser);
-        if (conditional != null) {
-            return conditional;
-        }
-
-        Node left = UnaryExpression.parse(parser);
-        if (left != null) {
-            Node middle = AssignmentOperator.parse(parser);
-            if (middle != null) {
-                Node right = AssignmentExpression.parse(parser);
-                if (right != null) {
-                    Node result = new Node(NodeType.ASSIGNMENT_EXPRESSION, left.getLine(), left.getColumn());
-                    result.setChildren(List.of(left, middle, right));
-                    return result;
-                } else {
-                    Token actual = parser.peek();
-                    // TODO: Make nice error message
-                    parser.addError(null);
-                    parser.synchronize();
-                }
-            } else {
-                Token actual = parser.peek();
-                // TODO: Make nice error message
-                parser.addError(null);
-                parser.synchronize();
-            }
-        }
-
-        return null;
+//        Node left = UnaryExpression.parse(parser);
+//        if (left != null) {
+//            Node middle = AssignmentOperator.parse(parser);
+//            if (middle != null) {
+//                Node right = AssignmentExpression.parse(parser);
+//                if (right != null) {
+//                    Node result = new Node(NodeType.ASSIGNMENT_EXPRESSION, left.getLine(), left.getColumn());
+//                    result.setChildren(List.of(left, middle, right));
+//                    return result;
+//                } else {
+//                    Token actual = parser.peek();
+//                    // TODO: Make nice error message
+//                    parser.addError(null);
+//                    parser.synchronize();
+//                }
+//            } else {
+//                Token actual = parser.peek();
+//                // TODO: Make nice error message
+//                parser.addError(null);
+//                parser.synchronize();
+//            }
+//        } else {
+//            return ConditionalExpression.parse(parser);
+//        }
+//        return null; // is this okay?
+        return ConditionalExpression.parse(parser);
     }
 
 }
