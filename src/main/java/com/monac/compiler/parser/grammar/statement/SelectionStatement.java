@@ -15,7 +15,7 @@ public final class SelectionStatement {
     //| if ( <expression> ) <statement> else <statement>
     //| switch ( <expression> ) <statement>
 
-    public static Node parse(Parser parser) {
+    public static Node parse(Parser parser) throws Exception {
         if (parser.match(TokenType.IF)) {
             Token ifToken = parser.previous();
 

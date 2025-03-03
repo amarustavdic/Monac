@@ -12,7 +12,7 @@ public final class Statement {
     //| <iteration-statement>
     //| <jump-statement>
 
-    public static Node parse(Parser parser) {
+    public static Node parse(Parser parser) throws Exception {
 
         try {
             Node labeledStatement = LabeledStatement.parse(parser);
