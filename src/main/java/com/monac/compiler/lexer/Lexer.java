@@ -70,6 +70,8 @@ public class Lexer {
         this.patterns.put(TokenType.EQ, Pattern.compile("=="));
         this.patterns.put(TokenType.NE, Pattern.compile("!="));
 
+        this.patterns.put(TokenType.ASSIGN, Pattern.compile("="));
+
         // Whitespace and comments
         this.patterns.put(TokenType.WHITESPACE, Pattern.compile("[\\t\\n\\r\\f\\v ]+"));
         this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\n]*|/\\*[^*]*\\*+([^/*][^*]*\\*+)*/"));

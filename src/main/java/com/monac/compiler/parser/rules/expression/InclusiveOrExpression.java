@@ -19,7 +19,7 @@ public final class InclusiveOrExpression {
     public static Node parsePrime(Parser parser, Node left) {
         while (parser.match(TokenType.OR)) {
             Token operator = parser.previous();
-            Node right = RelationalExpression.parse(parser);
+            Node right = ExclusiveOrExpression.parse(parser);
 
             if (right == null) {
                 Token actual = parser.peek();

@@ -19,7 +19,7 @@ public final class ExclusiveOrExpression {
     private static Node parsePrime(Parser parser, Node left) {
         while (parser.match(TokenType.XOR)) {
             Token operator = parser.previous();
-            Node right = RelationalExpression.parse(parser);
+            Node right = EqualityExpression.parse(parser);
 
             if (right == null) {
                 Token actual = parser.peek();

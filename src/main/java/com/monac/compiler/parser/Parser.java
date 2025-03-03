@@ -88,7 +88,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return LogicalAndExpression.parse(this);
+        return Expression.parse(this);
     }
 
 }

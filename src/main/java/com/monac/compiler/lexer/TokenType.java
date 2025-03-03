@@ -14,12 +14,28 @@ public enum TokenType {
     // Size and type
     SIZEOF,
 
-    AND, // &
-    XOR, // ^
-    OR,  // |
+    AND,    // &
+    XOR,    // ^
+    OR,     // |
 
-    LAND, // &&
+    LAND,   // &&
+    LOR,    // ||
 
+    QUESTION,
+
+    COMMA,
+
+    ASSIGN,     // =
+    MUL_ASSIGN, // *=
+    DIV_ASSIGN, // /=
+    MOD_ASSIGN, // %=
+    INC_ASSIGN, // +=
+    DEC_ASSIGN, // -=
+    SHL_ASSIGN, // <<=
+    SHR_ASSIGN, // >>=
+    AND_ASSIGN, // &
+    XOR_ASSIGN, // ^
+    OR_ASSIGN,  // |
 
     // Identifiers and literals
     IDENTIFIER, STRING, INTEGER_CONSTANT,
