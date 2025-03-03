@@ -12,36 +12,8 @@ public final class Statement {
     //| <iteration-statement>
     //| <jump-statement>
 
-    public static Node parse(Parser parser) throws Exception {
+    public static Node parse(Parser parser) {
 
-        try {
-            Node labeledStatement = LabeledStatement.parse(parser);
-            if (labeledStatement != null) return labeledStatement;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            return ExpressionStatement.parse(parser);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Node e = ExpressionStatement.parse(parser);
-        if (e != null) return e;
-
-        Node c = CompoundStatement.parse(parser);
-        if (c != null) return c;
-
-        Node s = SelectionStatement.parse(parser);
-        if (s != null) return s;
-
-        Node i = IterationStatement.parse(parser);
-        if (i != null) return i;
-
-        Node j = JumpStatement.parse(parser);
-        if (j != null) return j;
-
-        return null; // Handle error or unexpected input
+        return ExpressionStatement.parse(parser);
     }
 }
