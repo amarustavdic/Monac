@@ -19,6 +19,12 @@ public class Lexer {
         this.input = input;
 
         // Keywords
+        this.patterns.put(TokenType.CONST, Pattern.compile("\\bconst\\b"));
+        this.patterns.put(TokenType.VOLATILE, Pattern.compile("\\bvolatile\\b"));
+        this.patterns.put(TokenType.STRUCT, Pattern.compile("\\bstruct\\b"));
+        this.patterns.put(TokenType.UNION, Pattern.compile("\\bunion\\b"));
+        this.patterns.put(TokenType.CASE, Pattern.compile("\\bcase\\b"));
+        this.patterns.put(TokenType.DEFAULT, Pattern.compile("\\bdefault\\b"));
         this.patterns.put(TokenType.GOTO, Pattern.compile("\\bgoto\\b"));
         this.patterns.put(TokenType.CONTINUE, Pattern.compile("\\bcontinue\\b"));
         this.patterns.put(TokenType.RETURN, Pattern.compile("\\breturn\\b"));
@@ -29,29 +35,33 @@ public class Lexer {
         this.patterns.put(TokenType.WHILE, Pattern.compile("\\bwhile\\b"));
         this.patterns.put(TokenType.DO, Pattern.compile("\\bdo\\b"));
         this.patterns.put(TokenType.FOR, Pattern.compile("\\bfor\\b"));
+        this.patterns.put(TokenType.SIZEOF, Pattern.compile("\\bsizeof\\b"));
 
         // Identifiers and literals
         this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*"));
         this.patterns.put(TokenType.STRING, Pattern.compile("\"(\\\\[\\s\\S]|[^\"\\n])*\""));
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
-        // Punctuation and grouping
+        // Punctuation and symbols
         this.patterns.put(TokenType.LEFT_PARENTHESIS, Pattern.compile("\\("));
         this.patterns.put(TokenType.RIGHT_PARENTHESIS, Pattern.compile("\\)"));
         this.patterns.put(TokenType.LBRACKET, Pattern.compile("\\["));
-        this.patterns.put(TokenType.RBRACKET, Pattern.compile("]"));
+        this.patterns.put(TokenType.RBRACKET, Pattern.compile("\\]"));
         this.patterns.put(TokenType.LBRACE, Pattern.compile("\\{"));
-        this.patterns.put(TokenType.RBRACE, Pattern.compile("}"));
+        this.patterns.put(TokenType.RBRACE, Pattern.compile("\\}"));
         this.patterns.put(TokenType.COLON, Pattern.compile(":"));
         this.patterns.put(TokenType.SEMICOLON, Pattern.compile(";"));
+        this.patterns.put(TokenType.COMMA, Pattern.compile(","));
+        this.patterns.put(TokenType.QUESTION, Pattern.compile("\\?"));
+        this.patterns.put(TokenType.DOT, Pattern.compile("\\."));
+        this.patterns.put(TokenType.ARROW, Pattern.compile("->"));
 
         // Operators
         this.patterns.put(TokenType.LAND, Pattern.compile("&&"));
-        this.patterns.put(TokenType.OR, Pattern.compile("\\|"));
+        this.patterns.put(TokenType.LOR, Pattern.compile("\\|\\|"));
         this.patterns.put(TokenType.AND, Pattern.compile("&"));
+        this.patterns.put(TokenType.OR, Pattern.compile("\\|"));
         this.patterns.put(TokenType.XOR, Pattern.compile("\\^"));
-        this.patterns.put(TokenType.DOT, Pattern.compile("\\."));
-        this.patterns.put(TokenType.ARROW, Pattern.compile("->"));
         this.patterns.put(TokenType.INCREMENT, Pattern.compile("\\+\\+"));
         this.patterns.put(TokenType.DECREMENT, Pattern.compile("--"));
         this.patterns.put(TokenType.SHL, Pattern.compile("<<"));
@@ -69,15 +79,23 @@ public class Lexer {
         this.patterns.put(TokenType.GE, Pattern.compile(">="));
         this.patterns.put(TokenType.EQ, Pattern.compile("=="));
         this.patterns.put(TokenType.NE, Pattern.compile("!="));
-
         this.patterns.put(TokenType.ASSIGN, Pattern.compile("="));
+
+        // Assignment operators
+        this.patterns.put(TokenType.MUL_ASSIGN, Pattern.compile("\\*="));
+        this.patterns.put(TokenType.DIV_ASSIGN, Pattern.compile("/="));
+        this.patterns.put(TokenType.MOD_ASSIGN, Pattern.compile("%="));
+        this.patterns.put(TokenType.INC_ASSIGN, Pattern.compile("\\+="));
+        this.patterns.put(TokenType.DEC_ASSIGN, Pattern.compile("-="));
+        this.patterns.put(TokenType.SHL_ASSIGN, Pattern.compile("<<="));
+        this.patterns.put(TokenType.SHR_ASSIGN, Pattern.compile(">>="));
+        this.patterns.put(TokenType.AND_ASSIGN, Pattern.compile("&="));
+        this.patterns.put(TokenType.XOR_ASSIGN, Pattern.compile("\\^="));
+        this.patterns.put(TokenType.OR_ASSIGN, Pattern.compile("\\|="));
 
         // Whitespace and comments
         this.patterns.put(TokenType.WHITESPACE, Pattern.compile("[\\t\\n\\r\\f\\v ]+"));
-        this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\n]*|/\\*[^*]*\\*+([^/*][^*]*\\*+)*/"));
-
-        // End of file
-        // this.patterns.put(TokenType.EOF, Pattern.compile(""));
+        this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\\n]*|/\\*[^*]*\\*+([^/*][^*]*\\*+)*/"));
     }
 
     public List<Token> tokenize() {

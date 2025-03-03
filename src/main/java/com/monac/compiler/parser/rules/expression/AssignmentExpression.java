@@ -2,6 +2,7 @@ package com.monac.compiler.parser.rules.expression;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.parser.rules.operator.AssignmentOperator;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
@@ -16,32 +17,49 @@ public final class AssignmentExpression {
 
     public static Node parse(Parser parser) {
 
-//        Node left = UnaryExpression.parse(parser);
-//        if (left != null) {
-//            Node middle = AssignmentOperator.parse(parser);
-//            if (middle != null) {
-//                Node right = AssignmentExpression.parse(parser);
-//                if (right != null) {
-//                    Node result = new Node(NodeType.ASSIGNMENT_EXPRESSION, left.getLine(), left.getColumn());
-//                    result.setChildren(List.of(left, middle, right));
-//                    return result;
-//                } else {
-//                    Token actual = parser.peek();
-//                    // TODO: Make nice error message
-//                    parser.addError(null);
-//                    parser.synchronize();
-//                }
-//            } else {
-//                Token actual = parser.peek();
-//                // TODO: Make nice error message
-//                parser.addError(null);
-//                parser.synchronize();
-//            }
-//        } else {
-//            return ConditionalExpression.parse(parser);
-//        }
-//        return null; // is this okay?
-        return ConditionalExpression.parse(parser);
+        Node ce = ConditionalExpression.parse(parser);
+        if (ce != null) {
+            return ce;
+        } else {
+            Node ue = UnaryExpression.parse(parser);
+            if (ue != null) {
+                Node ao = AssignmentOperator.parse(parser);
+                if (ao != null) {
+                    Node ae = AssignmentExpression.parse(parser);
+                    if (ae != null) {
+                        Node result = new Node(NodeType.ASSIGNMENT_EXPRESSION, ue.getLine(), ue.getColumn());
+                        result.setChildren(List.of(ue, ao, ae));
+                        return result;
+                    } else {
+                        Token actual = parser.peek();
+                        parser.addError(new ParserException(
+                                "Syntax Error: Expected an expression after assignment operator.",
+                                actual.getLine(), actual.getColumn(),
+                                actual.getLexeme(),
+                                "Expected an expression (e.g., variable, function call, or literal).",
+                                "Ensure that an assignment expression follows the assignment operator."
+                        ));
+                        parser.synchronize();
+                        return null;
+                    }
+                } else {
+                    Token actual = parser.peek();
+                    parser.addError(new ParserException(
+                            "Syntax Error: Expected an assignment operator (=, +=, -=, etc.).",
+                            actual.getLine(), actual.getColumn(),
+                            actual.getLexeme(),
+                            "Expected an assignment operator.",
+                            "Check that an assignment operator follows the left-hand operand."
+                    ));
+                    parser.synchronize();
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        }
+
     }
+
 
 }
