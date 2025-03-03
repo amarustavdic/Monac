@@ -15,7 +15,7 @@ public final class SelectionStatement {
         if (parser.match(TokenType.IF)) {
             Token ifToken = parser.previous();
 
-            parser.consume(TokenType.LPAREN, "Expected '('");
+            parser.consume(TokenType.LEFT_PARENTHESIS, "Expected '('");
             Node expr = Expression.parse(parser);
 
             if (expr == null) {
@@ -51,7 +51,7 @@ public final class SelectionStatement {
         } else if (parser.match(TokenType.SWITCH)) {
             Token switchToken = parser.previous();
 
-            parser.consume(TokenType.LPAREN, "Expected '('");
+            parser.consume(TokenType.LEFT_PARENTHESIS, "Expected '('");
             Node expr = Expression.parse(parser);
 
             if (expr == null) {

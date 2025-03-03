@@ -37,7 +37,7 @@ public class Lexer {
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
         // Punctuation and grouping
-        this.patterns.put(TokenType.LPAREN, Pattern.compile("\\("));
+        this.patterns.put(TokenType.LEFT_PARENTHESIS, Pattern.compile("\\("));
         this.patterns.put(TokenType.RPAREN, Pattern.compile("\\)"));
         this.patterns.put(TokenType.LBRACKET, Pattern.compile("\\["));
         this.patterns.put(TokenType.RBRACKET, Pattern.compile("]"));

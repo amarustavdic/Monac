@@ -4,6 +4,7 @@ import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.grammar.expression.Expression;
+import com.monac.compiler.parser.grammar.expression.PostfixExpression;
 import com.monac.compiler.parser.grammar.statement.SelectionStatement;
 import com.monac.compiler.parser.tree.Node;
 
@@ -74,14 +75,8 @@ public class Parser {
         advance();
     }
 
-    // TODO: Maybe handle errors?
-    // Actual method for generating final AST
     public Node parse() {
-
-        // Define the rules in order of precedence
-
-        return Expression.parse(this);
+        return PostfixExpression.parse(this);
     }
-
 
 }
