@@ -11,6 +11,10 @@ import java.util.List;
 
 public final class SelectionStatement {
 
+    // <selection-statement> ::= if ( <expression> ) <statement>
+    //| if ( <expression> ) <statement> else <statement>
+    //| switch ( <expression> ) <statement>
+
     public static Node parse(Parser parser) {
         if (parser.match(TokenType.IF)) {
             Token ifToken = parser.previous();

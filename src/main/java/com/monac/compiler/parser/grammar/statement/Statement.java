@@ -13,8 +13,19 @@ public final class Statement {
     //| <jump-statement>
 
     public static Node parse(Parser parser) {
-        Node l = LabeledStatement.parse(parser);
-        if (l != null) return l;
+
+        try {
+            Node labeledStatement = LabeledStatement.parse(parser);
+            if (labeledStatement != null) return labeledStatement;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            return ExpressionStatement.parse(parser);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Node e = ExpressionStatement.parse(parser);
         if (e != null) return e;

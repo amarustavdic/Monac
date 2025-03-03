@@ -25,6 +25,8 @@ public enum NodeType {
 
     JUMP_STATEMENT,
     ITERATOR_STATEMENT,
+    EXPRESSION_STATEMENT,
+    LABELED_STATEMENT,
 
 
 }

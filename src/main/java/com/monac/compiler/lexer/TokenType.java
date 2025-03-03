@@ -7,6 +7,10 @@ public enum TokenType {
 
     STRUCT,
     UNION,
+    COLON,
+
+    CASE,
+    DEFAULT,
 
     // Keywords
     GOTO, CONTINUE, RETURN, BREAK,
