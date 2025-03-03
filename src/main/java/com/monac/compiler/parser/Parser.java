@@ -3,17 +3,15 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.grammar.expression.AdditiveExpression;
-import com.monac.compiler.parser.grammar.expression.Expression;
-import com.monac.compiler.parser.grammar.expression.PostfixExpression;
-import com.monac.compiler.parser.grammar.expression.UnaryExpression;
-import com.monac.compiler.parser.grammar.statement.SelectionStatement;
+import com.monac.compiler.parser.rules.expression.*;
 import com.monac.compiler.parser.tree.Node;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
 
+    private final List<ParserException> errors = new ArrayList<>();
     private final List<Token> tokens;
     private int cursor = 0;
 
@@ -80,7 +78,7 @@ public class Parser {
     public Node parse() {
 
         try {
-            return AdditiveExpression.parse(this);
+            return PrimaryExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
