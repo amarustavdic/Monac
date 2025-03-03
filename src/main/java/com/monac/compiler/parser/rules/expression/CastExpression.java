@@ -1,5 +1,6 @@
 package com.monac.compiler.parser.rules.expression;
 
+import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.Node;
 
@@ -10,12 +11,11 @@ public final class CastExpression {
 
     public static Node parse(Parser parser) {
 
-        try {
-            return UnaryExpression.parse(parser);
-
-        } catch (Exception e) {
-            return null;
+        if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+            // todo; later
         }
+
+        return UnaryExpression.parse(parser);
     }
 
 }
