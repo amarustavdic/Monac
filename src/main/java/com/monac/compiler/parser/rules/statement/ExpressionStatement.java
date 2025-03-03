@@ -17,23 +17,16 @@ public final class ExpressionStatement {
     public static Node parse(Parser parser) {
         Node expression = Expression.parse(parser);
         if (parser.match(TokenType.SEMICOLON)) {
-
-//            Node result = new Node(NodeType.EXPRESSION_STATEMENT, 0, 0);
-//            result.setLiteral("quick fix?");
-//            if (expression != null) {
-//                result.setChildren(List.of(expression));
-//            }
-
             return expression;
         } else {
             Token actual = parser.peek();
             parser.addError(new ParserException(
-                    "",
+                    "Missing semicolon ';' at the end of the statement.",
                     actual.getLine(),
                     actual.getColumn(),
                     actual.getLexeme(),
-                    "",
-                    ""
+                    "Expected ';' after an expression or statement.",
+                    "Ensure your statement ends with a semicolon."
             ));
             parser.synchronize();
             return null;

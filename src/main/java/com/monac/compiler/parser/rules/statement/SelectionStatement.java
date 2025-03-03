@@ -33,18 +33,8 @@ public final class SelectionStatement {
                             result.setChildren(List.of(expr, stmt));
                             return result;
 
-                        } else {
-                            Token actual = parser.peek();
-                            parser.addError(new ParserException(
-                                    "",
-                                    actual.getLine(),
-                                    actual.getColumn(),
-                                    actual.getLexeme(),
-                                    "",
-                                    ""
-                            ));
-                            parser.synchronize();
                         }
+                        return null; // To minimize cascading error reports
                     } else {
                         Token actual = parser.peek();
                         parser.addError(new ParserException(
