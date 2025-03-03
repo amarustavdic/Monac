@@ -28,5 +28,7 @@ public enum NodeType {
     EXPRESSION_STATEMENT,
     LABELED_STATEMENT,
 
+    RELATIONAL_EXPRESSION,
+
 
 }

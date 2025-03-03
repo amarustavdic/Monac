@@ -2,48 +2,36 @@ package com.monac.compiler.lexer;
 
 public enum TokenType {
 
-    CONST,
-    VOLATILE,
-
-    STRUCT,
-    UNION,
-    COLON,
-
-    SIZEOF,
-
-    CASE,
-    DEFAULT,
-
     // Keywords
+    CONST, VOLATILE,
+    STRUCT, UNION, CASE, DEFAULT,
     GOTO, CONTINUE, RETURN, BREAK,
     IF, ELSE, SWITCH, WHILE, DO, FOR,
 
-    // Identifiers and literals
-    IDENTIFIER,
-    STRING,
-    INTEGER_CONSTANT,
+    // Relational and equality operators
+    LT, GT, LE, GE, EQ, NE,
 
-    // Punctuation and grouping
+    // Size and type
+    SIZEOF,
+
+    // Identifiers and literals
+    IDENTIFIER, STRING, INTEGER_CONSTANT,
+
+    // Punctuation and grouping symbols
     LEFT_PARENTHESIS, RIGHT_PARENTHESIS,
     LBRACKET, RBRACKET,
     LBRACE, RBRACE,
     SEMICOLON,
-    DOT, // .
-    ARROW, // ->
+    COLON,
+    DOT, // . (dot operator)
+    ARROW, // -> (arrow operator)
 
-    // Operators
-    INCREMENT, // ++
-    DECREMENT, // --
-    SHL, // <<
-    SHR, // >>
-    PLUS, // +
-    MINUS, // -
-    MUL, // *
-    DIV, // /
-    MOD, // %
+    // Arithmetic and shift operators
+    PLUS, MINUS, MUL, DIV, MOD,
+    INCREMENT, DECREMENT, // ++, --
+
+    SHL, SHR, // <<, >>
 
     // Miscellaneous
-    WHITESPACE,
-    COMMENT,
-    EOF
+    WHITESPACE, COMMENT, EOF
 }

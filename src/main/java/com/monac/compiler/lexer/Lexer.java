@@ -18,7 +18,6 @@ public class Lexer {
     public Lexer(String input) {
         this.input = input;
 
-
         // Keywords
         this.patterns.put(TokenType.GOTO, Pattern.compile("\\bgoto\\b"));
         this.patterns.put(TokenType.CONTINUE, Pattern.compile("\\bcontinue\\b"));
@@ -32,8 +31,8 @@ public class Lexer {
         this.patterns.put(TokenType.FOR, Pattern.compile("\\bfor\\b"));
 
         // Identifiers and literals
-        this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*"));
-        this.patterns.put(TokenType.STRING, Pattern.compile("\"(\\\\.|[^\"])*\""));
+        this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*"));
+        this.patterns.put(TokenType.STRING, Pattern.compile("\"(\\\\[\\s\\S]|[^\"\\n])*\""));
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
         // Punctuation and grouping
@@ -43,6 +42,7 @@ public class Lexer {
         this.patterns.put(TokenType.RBRACKET, Pattern.compile("]"));
         this.patterns.put(TokenType.LBRACE, Pattern.compile("\\{"));
         this.patterns.put(TokenType.RBRACE, Pattern.compile("}"));
+        this.patterns.put(TokenType.COLON, Pattern.compile(":"));
         this.patterns.put(TokenType.SEMICOLON, Pattern.compile(";"));
 
         // Operators
@@ -58,10 +58,20 @@ public class Lexer {
         this.patterns.put(TokenType.DIV, Pattern.compile("/"));
         this.patterns.put(TokenType.MOD, Pattern.compile("%"));
 
-        // Whitespace and comments
-        this.patterns.put(TokenType.WHITESPACE, Pattern.compile("\\s+"));
-        this.patterns.put(TokenType.COMMENT, Pattern.compile("#.*"));
+        // Relational and equality operators
+        this.patterns.put(TokenType.LT, Pattern.compile("<"));
+        this.patterns.put(TokenType.GT, Pattern.compile(">"));
+        this.patterns.put(TokenType.LE, Pattern.compile("<="));
+        this.patterns.put(TokenType.GE, Pattern.compile(">="));
+        this.patterns.put(TokenType.EQ, Pattern.compile("=="));
+        this.patterns.put(TokenType.NE, Pattern.compile("!="));
 
+        // Whitespace and comments
+        this.patterns.put(TokenType.WHITESPACE, Pattern.compile("[\\t\\n\\r\\f\\v ]+"));
+        this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\n]*|/\\*[^*]*\\*+([^/*][^*]*\\*+)*/"));
+
+        // End of file
+        // this.patterns.put(TokenType.EOF, Pattern.compile(""));
     }
 
     public List<Token> tokenize() {
