@@ -3,24 +3,6 @@ package com.monac.compiler.parser.rules.expression;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.Node;
 
-
-/**
- * A utility class for parsing postfix expressions in the source code.
- * <p>
- * A postfix expression can take multiple forms, including:
- * <ul>
- *   <li>A primary expression</li>
- *   <li>An indexed expression (array subscript)</li>
- *   <li>A function call</li>
- *   <li>Member access using dot (.) or arrow (->)</li>
- *   <li>Post-increment (++) and post-decrement (--)</li>
- * </ul>
- * <p>
- * Since the original BNF grammar contains left recursion, it is rewritten
- * to be suitable for recursive descent parsing. However, for now, only
- * increment (++) and decrement (--) operations are handled.
- * </p>
- */
 public final class PostfixExpression {
 
     //<postfix-expression> ::= <primary-expression>
@@ -51,12 +33,9 @@ public final class PostfixExpression {
     // -----------------------------------------------------------------------
 
     public static Node parse(Parser parser) {
-        try {
-            return PrimaryExpression.parse(parser);
-        } catch (Exception e) {
-            parser.synchronize();
-            return null;
-        }
+
+        // Basically skipping this rule for now, and returning its terminal one.... todo later
+        return PrimaryExpression.parse(parser);
     }
 
     private static Node parsePrime(Parser parser, Node left) {
