@@ -1,12 +1,12 @@
-package com.monac.compiler.parser.rules.expression;
+package com.monac.compiler.parser.grammar.statement;
 
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.Node;
 
-public final class UnaryExpression {
+public final class LabeledStatement {
 
     public static Node parse(Parser parser) {
-        return PostfixExpression.parse(parser);
+        return null;
     }
 
 }

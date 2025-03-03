@@ -19,22 +19,31 @@ public class Lexer {
         this.input = input;
 
 
-        // Identifiers
+        // Keywords
+        this.patterns.put(TokenType.GOTO, Pattern.compile("\\bgoto\\b"));
+        this.patterns.put(TokenType.CONTINUE, Pattern.compile("\\bcontinue\\b"));
+        this.patterns.put(TokenType.RETURN, Pattern.compile("\\breturn\\b"));
+        this.patterns.put(TokenType.BREAK, Pattern.compile("\\bbreak\\b"));
+        this.patterns.put(TokenType.IF, Pattern.compile("\\bif\\b"));
+        this.patterns.put(TokenType.ELSE, Pattern.compile("\\belse\\b"));
+        this.patterns.put(TokenType.SWITCH, Pattern.compile("\\bswitch\\b"));
+        this.patterns.put(TokenType.WHILE, Pattern.compile("\\bwhile\\b"));
+        this.patterns.put(TokenType.DO, Pattern.compile("\\bdo\\b"));
+        this.patterns.put(TokenType.FOR, Pattern.compile("\\bfor\\b"));
+
+        // Identifiers and literals
         this.patterns.put(TokenType.IDENTIFIER, Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*"));
-
-        // String literals (supports escape sequences)
         this.patterns.put(TokenType.STRING, Pattern.compile("\"(\\\\.|[^\"])*\""));
-
-        // Integer literals
         this.patterns.put(TokenType.INTEGER_CONSTANT, Pattern.compile("\\d+"));
 
-        // Parentheses and brackets
+        // Punctuation and grouping
         this.patterns.put(TokenType.LPAREN, Pattern.compile("\\("));
         this.patterns.put(TokenType.RPAREN, Pattern.compile("\\)"));
         this.patterns.put(TokenType.LBRACKET, Pattern.compile("\\["));
         this.patterns.put(TokenType.RBRACKET, Pattern.compile("]"));
         this.patterns.put(TokenType.LBRACE, Pattern.compile("\\{"));
         this.patterns.put(TokenType.RBRACE, Pattern.compile("}"));
+        this.patterns.put(TokenType.SEMICOLON, Pattern.compile(";"));
 
         // Operators
         this.patterns.put(TokenType.DOT, Pattern.compile("\\."));

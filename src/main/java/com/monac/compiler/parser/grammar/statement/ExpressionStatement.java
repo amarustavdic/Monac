@@ -1,8 +1,8 @@
-package com.monac.compiler.parser.rules.statement;
+package com.monac.compiler.parser.grammar.statement;
 
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.expression.Expression;
+import com.monac.compiler.parser.grammar.expression.Expression;
 import com.monac.compiler.parser.tree.Node;
 
 public final class ExpressionStatement {

@@ -3,7 +3,8 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.expression.*;
+import com.monac.compiler.parser.grammar.expression.Expression;
+import com.monac.compiler.parser.grammar.statement.SelectionStatement;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.List;
@@ -64,10 +65,10 @@ public class Parser {
 
         while (!isAtEnd()) {
             if (previous().getType() == TokenType.SEMICOLON) return;
-
-            switch (peek().getType()) {
-
-            }
+//
+//            switch (peek().getType()) {
+//
+//            }
         }
 
         advance();

@@ -1,4 +1,4 @@
-package com.monac.compiler.parser.rules.statement;
+package com.monac.compiler.parser.grammar.statement;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;

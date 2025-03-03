@@ -1,9 +1,9 @@
-package com.monac.compiler.parser.rules.statement;
+package com.monac.compiler.parser.grammar.statement;
 
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
-import com.monac.compiler.parser.rules.expression.Expression;
+import com.monac.compiler.parser.grammar.expression.Expression;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 import java.util.ArrayList;
