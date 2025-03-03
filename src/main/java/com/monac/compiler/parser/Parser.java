@@ -90,7 +90,7 @@ public class Parser {
     public Node parse() {
 
         try {
-            return AdditiveExpression.parse(this);
+            return ShiftExpression.parse(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
