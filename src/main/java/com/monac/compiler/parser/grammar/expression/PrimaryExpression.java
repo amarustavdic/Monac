@@ -49,7 +49,7 @@ public final class PrimaryExpression {
 
         if (parser.match(TokenType.LEFT_PARENTHESIS)) {
             Node expression = Expression.parse(parser);
-            if (parser.match(TokenType.RPAREN)) {
+            if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
                 return expression;
             } else {
                 throw new Exception("Expected closed parenthesis.");

@@ -23,7 +23,7 @@ public final class SelectionStatement {
                 return null;
             }
 
-            parser.consume(TokenType.RPAREN, "Expected ')'");
+            parser.consume(TokenType.RIGHT_PARENTHESIS, "Expected ')'");
             Node stmt = Statement.parse(parser);
 
             if (stmt == null) {
@@ -59,7 +59,7 @@ public final class SelectionStatement {
                 return null;
             }
 
-            parser.consume(TokenType.RPAREN, "Expected ')'");
+            parser.consume(TokenType.RIGHT_PARENTHESIS, "Expected ')'");
             Node stmt = Statement.parse(parser);
 
             if (stmt == null) {
