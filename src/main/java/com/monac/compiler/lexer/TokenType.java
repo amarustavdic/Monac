@@ -9,6 +9,8 @@ public enum TokenType {
     UNION,
     COLON,
 
+    SIZEOF,
+
     CASE,
     DEFAULT,
 
