@@ -30,6 +30,7 @@ public enum NodeType {
 
     RELATIONAL_EXPRESSION,
     EQUALITY_EXPRESSION,
+    AND_EXPRESSION,
 
 
 }
