@@ -15,5 +15,7 @@ public enum NodeType {
     COMPOUND_STATEMENT,
     SELECTION_STATEMENT,
 
+    IDENTIFIER,
+
 
 }
