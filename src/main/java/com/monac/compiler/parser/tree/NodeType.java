@@ -19,5 +19,9 @@ public enum NodeType {
 
     UNARY_EXPRESSION,
 
+    TYPE_QUALIFIER,
+
+    STRUCT_OR_UNION,
+
 
 }

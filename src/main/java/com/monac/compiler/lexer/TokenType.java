@@ -2,6 +2,12 @@ package com.monac.compiler.lexer;
 
 public enum TokenType {
 
+    CONST,
+    VOLATILE,
+
+    STRUCT,
+    UNION,
+
     // Keywords
     GOTO, CONTINUE, RETURN, BREAK,
     IF, ELSE, SWITCH, WHILE, DO, FOR,
