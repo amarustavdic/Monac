@@ -5,8 +5,17 @@ import com.monac.compiler.parser.tree.Node;
 
 public final class CastExpression {
 
+    // <cast-expression> ::= <unary-expression>
+    //| ( <type-name> ) <cast-expression>
+
     public static Node parse(Parser parser) {
-        return UnaryExpression.parse(parser);
+
+        try {
+            return UnaryExpression.parse(parser);
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

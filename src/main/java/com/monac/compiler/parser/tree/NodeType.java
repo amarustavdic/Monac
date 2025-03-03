@@ -17,5 +17,7 @@ public enum NodeType {
 
     IDENTIFIER,
 
+    UNARY_EXPRESSION,
+
 
 }

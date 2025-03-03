@@ -3,8 +3,10 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
+import com.monac.compiler.parser.grammar.expression.AdditiveExpression;
 import com.monac.compiler.parser.grammar.expression.Expression;
 import com.monac.compiler.parser.grammar.expression.PostfixExpression;
+import com.monac.compiler.parser.grammar.expression.UnaryExpression;
 import com.monac.compiler.parser.grammar.statement.SelectionStatement;
 import com.monac.compiler.parser.tree.Node;
 
@@ -76,7 +78,14 @@ public class Parser {
     }
 
     public Node parse() {
-        return PostfixExpression.parse(this);
+
+        try {
+            return AdditiveExpression.parse(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

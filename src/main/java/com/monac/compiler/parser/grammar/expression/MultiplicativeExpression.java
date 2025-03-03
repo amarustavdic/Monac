@@ -29,6 +29,7 @@ public final class MultiplicativeExpression {
     // This above should be it, I mean without left recursion
 
     public static Node parse(Parser parser) {
+
         Node left = CastExpression.parse(parser);
         if (left == null) return null;
         return parsePrime(parser, left);

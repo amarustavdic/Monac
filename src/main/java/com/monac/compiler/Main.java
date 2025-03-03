@@ -19,7 +19,9 @@ public class Main {
             Parser parser = new Parser(new Lexer(input));
             var ast = parser.parse();
 
-            ast.accept(new LiteralPrinter());
+            if (ast != null) {
+                ast.accept(new LiteralPrinter());
+            }
 
             System.out.print(">>> ");
         }
