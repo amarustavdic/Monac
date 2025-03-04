@@ -28,7 +28,16 @@ public class ParseTreePrinter implements ParseTreeVisitor {
     }
 
     public String formatNode(Node node) {
-        return node.getType() + "";
+        Object literal = node.getLiteral();
+        if (literal != null) {
+            if (literal instanceof Integer) {
+                return "\033[34m" + literal.toString() + "\033[0m"; // Blue for integers
+            } else {
+                return "\033[32m" + literal.toString() + "\033[0m"; // Green for other literals
+            }
+        } else {
+            return node.getType().toString();
+        }
     }
 
 }

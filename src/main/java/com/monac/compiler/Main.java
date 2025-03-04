@@ -4,7 +4,7 @@ import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.parser.tree.Node;
-import com.monac.compiler.util.LiteralPrinter;
+import com.monac.compiler.util.ParseTreePrinter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +32,7 @@ public class Main {
         }
 
         if (tree != null) {
-            tree.accept(new LiteralPrinter());
+            tree.accept(new ParseTreePrinter());
         }
     }
 
@@ -48,7 +48,7 @@ public class Main {
                 System.out.println(error);
             }
             if (ast != null) {
-                ast.accept(new LiteralPrinter());
+                ast.accept(new ParseTreePrinter());
             }
             System.out.print(">>> ");
         }
