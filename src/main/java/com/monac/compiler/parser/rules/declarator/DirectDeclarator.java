@@ -43,10 +43,16 @@ import java.util.List;
  */
 public class DirectDeclarator {
 
-
+    /**
+     * Parses a direct declarator.
+     *
+     * @param parser The parser instance used to extract tokens.
+     * @return A {@link Node} representing the parsed direct declarator,
+     * or {@code null} if parsing fails.
+     */
     public static Node parse(Parser parser) {
 
-        // Handle ( <declarator> )
+        // Handle nested declarators in parentheses: ( <declarator> )
         if (parser.match(TokenType.LPAREN)) {
             Node declarator = Declarator.parse(parser);
             if (declarator != null) {
@@ -54,37 +60,50 @@ public class DirectDeclarator {
                 if (parser.match(TokenType.RPAREN)) {
                     return declarator;
                 } else {
+                    // Handle error: missing closing parenthesis
                     parser.addError(new ParserException(
-                            "error message",
+                            "Syntax error: expected ')' after declarator",
                             actual.getLine(), actual.getColumn(), actual.getLexeme(),
-                            "expected ')'", "suggestion"
+                            "expected ')'", "Ensure the declarator is correctly enclosed in parentheses."
                     ));
                     parser.synchronize();
                     return null;
                 }
             } else {
-                // todo handle error and parser sync
-                parser.addError(null);
+                // Handle error: invalid declarator inside parentheses
+                parser.addError(new ParserException(
+                        "Syntax error: invalid declarator inside parentheses",
+                        parser.peek().getLine(), parser.peek().getColumn(), parser.peek().getLexeme(),
+                        "expected a valid declarator", "Ensure the declarator inside parentheses is valid."
+                ));
                 parser.synchronize();
                 return null;
             }
         }
 
-        // The rest :P
+        // Handle identifier-based declarators
         Node identifier = Identifier.parse(parser);
         if (identifier == null) return null;
+
         return parsePrime(parser, identifier);
     }
 
+    /**
+     * Parses the suffix of a direct declarator.
+     *
+     * @param parser The parser instance used to extract tokens.
+     * @param left The left-hand side of the direct declarator (initially an identifier or nested declarator).
+     * @return A {@link Node} representing the parsed direct declarator.
+     */
     public static Node parsePrime(Parser parser, Node left) {
 
         while (parser.match(TokenType.LBRACKET, TokenType.LPAREN)) {
             Token token = parser.previous();
 
+            // Handle array indexing: [ {<constant-expression>}? ]
             if (token.getType() == TokenType.LBRACKET) {
                 Node constantExpression = ConstantExpression.parse(parser);
 
-                Token actual = parser.peek();
                 if (parser.match(TokenType.RBRACKET)) {
 
                     Node result = new Node(NodeType.DIRECT_DECLARATOR, token.getLine(), token.getColumn());
@@ -94,30 +113,32 @@ public class DirectDeclarator {
                     }
                     left = result;
                 } else {
+                    // Handle error: missing closing bracket
                     parser.addError(new ParserException(
-                            "Expected closing ']' after constant expression",
-                            actual.getLine(), actual.getColumn(), actual.getLexeme(),
-                            "expected ']'", "Ensure brackets are correctly paired"
+                            "Syntax error: expected ']' after constant expression",
+                            token.getLine(), token.getColumn(), token.getLexeme(),
+                            "expected ']'", "Ensure the array index is properly closed."
                     ));
                     parser.synchronize();
                     return null;
                 }
             }
 
+            // Handle function-like declarations: ( <parameter-type-list> ) or ( {<identifier>}* )
             if (token.getType() == TokenType.LPAREN) {
                 Node parameterTypeList = ParameterTypeList.parse(parser);
                 if (parameterTypeList != null) {
-                    Token actual = parser.peek();
                     if (parser.match(TokenType.RPAREN)) {
                         Node result = new Node(NodeType.DIRECT_DECLARATOR, token.getLine(), token.getColumn());
                         result.setLiteral("( <parameter-type-list> )");
                         result.setChildren(List.of(left, parameterTypeList));
                         left = result;
                     } else {
+                        // Handle error: missing closing parenthesis after parameter type list
                         parser.addError(new ParserException(
-                                "Expected closing ')' after parameter type list",
-                                actual.getLine(), actual.getColumn(), actual.getLexeme(),
-                                "expected ')'", "Ensure function parameters are enclosed in parentheses"
+                                "Syntax error: expected ')' after parameter type list",
+                                token.getLine(), token.getColumn(), token.getLexeme(),
+                                "expected ')'", "Ensure the function parameters are correctly enclosed in parentheses."
                         ));
                         parser.synchronize();
                         return null;
@@ -126,6 +147,7 @@ public class DirectDeclarator {
                     List<Node> children = new ArrayList<>();
                     children.add(left);
 
+                    // Parse function parameter identifiers
                     Node identifier;
                     while ((identifier = Identifier.parse(parser)) != null) {
                         children.add(identifier);
@@ -138,10 +160,11 @@ public class DirectDeclarator {
 
                         left = result;
                     } else {
+                        // Handle error: missing closing parenthesis after identifier list
                         parser.addError(new ParserException(
-                                "Expected closing ')' after identifier list",
+                                "Syntax error: expected ')' after function parameter identifiers",
                                 token.getLine(), token.getColumn(), token.getLexeme(),
-                                "expected ')'", "Ensure identifier list is enclosed in parentheses"
+                                "expected ')'", "Ensure all function parameters are enclosed in parentheses."
                         ));
                         parser.synchronize();
                         return null;
