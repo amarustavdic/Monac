@@ -17,42 +17,43 @@ public final class FunctionDefinition {
 
     public static Node parse(Parser parser) {
 
-        List<Node> children = new ArrayList<>();
+        List<Node> children = new ArrayList<>(declarationSpecifiers(parser)); // {<declaration-specifier>}*
 
-        Node declarationSpecifier; // void, char or int
-        while ((declarationSpecifier = DeclarationSpecifier.parse(parser)) != null) {
-            children.add(declarationSpecifier);
-        }
+        Node declarator = Declarator.parse(parser); // <declarator>
+        if (declarator == null) return null;
+        children.add(declarator);
 
-        Node declarator = Declarator.parse(parser);
+        children.addAll(declarations(parser)); // {<declaration>}*
 
-        if (declarator != null) {
-            children.add(declarator);
-
-            Node declaration; // optional
-            while ((declaration = Declaration.parse(parser)) != null) {
-                children.add(declaration);
-            }
-
-            Node compoundStatement = CompoundStatement.parse(parser);
-            if (compoundStatement != null) {
-                children.add(compoundStatement);
-
-                Node result = new Node(
-                        NodeType.FUNCTION_DEFINITION,
-                        children.getFirst().getLine(),
-                        children.getFirst().getColumn()
-                );
-                result.setChildren(children);
-                result.setLiteral("<function-definition>");
-                return result;
-            } else {
-                // error handling and sync todo
-                return null;
-            }
-        } else {
+        Node compoundStatement = CompoundStatement.parse(parser); // <compound-statement>
+        if (compoundStatement == null) {
+            parser.addError(null); // todo
+            parser.synchronize();
             return null;
         }
+
+        Node result = new Node(NodeType.FUNCTION_DEFINITION, children.getFirst().getLine(), children.getLast().getColumn());
+        result.setChildren(children);
+        result.setLiteral("<function-definition>");
+        return result;
+    }
+
+    private static List<Node> declarationSpecifiers(Parser parser) {
+        List<Node> declarationSpecifiers = new ArrayList<>();
+        Node declarationSpecifier;
+        while ((declarationSpecifier = DeclarationSpecifier.parse(parser)) != null) {
+            declarationSpecifiers.add(declarationSpecifier);
+        }
+        return declarationSpecifiers;
+    }
+
+    private static List<Node> declarations(Parser parser) {
+        List<Node> declarations = new ArrayList<>();
+        Node declaration;
+        while ((declaration = Declaration.parse(parser)) != null) {
+            declarations.add(declaration);
+        }
+        return declarations;
     }
 
 }
