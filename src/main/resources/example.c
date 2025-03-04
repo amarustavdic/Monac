@@ -1,3 +1,3 @@
-void f(x {
+void f() {
     x + 3;
 }

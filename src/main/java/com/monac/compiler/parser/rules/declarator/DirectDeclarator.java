@@ -4,7 +4,7 @@ import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.ParserException;
-import com.monac.compiler.parser.rules.ParameterTypeList;
+import com.monac.compiler.parser.rules.list.ParameterTypeList;
 import com.monac.compiler.parser.rules.expression.ConstantExpression;
 import com.monac.compiler.parser.rules.other.Identifier;
 import com.monac.compiler.parser.tree.Node;
@@ -13,24 +13,36 @@ import com.monac.compiler.parser.tree.NodeType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parses a {@code <direct-declarator>} non-terminal rule.
+ *
+ * <p>Originally BNF for this rule looked like:</p>
+ * <pre>{@code
+ * <direct-declarator> ::= <identifier>
+ * | ( <declarator> )
+ * | <direct-declarator> [ {<constant-expression>}? ]
+ * | <direct-declarator> ( <parameter-type-list> )
+ * | <direct-declarator> ( {<identifier>}* )
+ * }</pre>
+ *
+ * <p>But original grammar rule cannot be implemented as is
+ * in a top-down recursive descent parser, therefore I had
+ * to transform, and eliminate left-recursion.
+ * </p>
+ *
+ * <p>Transformed BNF (right-recursive):</p>
+ * <pre>{@code
+ * <direct-declarator> ::= <identifier> <direct-declarator-prime>
+ * | ( <declarator> )
+ *
+ * <direct-declarator-prime> ::= [ {<constant-expression>}? ]
+ * | ( <parameter-type-list> )
+ * | ( {<identifier>}* )
+ * | ɛ
+ * }</pre>
+ */
 public class DirectDeclarator {
 
-    // <direct-declarator> ::= <identifier>
-    //| ( <declarator> )
-    //| <direct-declarator> [ {<constant-expression>}? ]
-    //| <direct-declarator> ( <parameter-type-list> )
-    //| <direct-declarator> ( {<identifier>}* )
-
-    // well but there is a problem ofc, left-recursion....
-
-    // well this bellow could be right I am not sure if I did it correctly
-
-    // <direct-declarator> ::= <identifier> <direct-declarator'> | ( <declarator> )
-    //
-    // <direct-declarator'> ::= [ {<constant-expression>}? ]
-    //                        | ( <parameter-type-list> )
-    //                        | ( {<identifier>}* )
-    //                        | ɛ
 
     public static Node parse(Parser parser) {
 
