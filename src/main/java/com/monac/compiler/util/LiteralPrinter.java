@@ -12,8 +12,9 @@ public class LiteralPrinter extends ParseTreePrinter {
             } else {
                 return "\033[32m" + literal.toString() + "\033[0m"; // Green for other literals
             }
+        } else {
+            return node.getType().toString();
         }
-        return "";
     }
 
 }

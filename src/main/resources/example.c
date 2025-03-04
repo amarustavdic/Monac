@@ -1,3 +1,3 @@
-int main(d) {
+int main() {
 
 }

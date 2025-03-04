@@ -54,9 +54,13 @@ public final class DirectDeclarator {
             List<Node> children = new ArrayList<>();
             children.add(left);
 
+            Node result = new Node(NodeType.DIRECT_DECLARATOR, 0, 0);
+
             // Check for an empty parameter list
             if (parser.match(TokenType.RPAREN)) {
                 // Empty parameter list case (e.g., int main())
+                result.setChildren(children);
+
             } else {
                 Node identifier;
                 while ((identifier = Identifier.parse(parser)) != null) {
@@ -68,10 +72,9 @@ public final class DirectDeclarator {
                     parser.synchronize(); // Error recovery
                     return null;
                 }
-            }
 
-            Node result = new Node(NodeType.DIRECT_DECLARATOR, 0, 0);
-            result.setChildren(children);
+                result.setChildren(children);
+            }
 
             left = result;
         }
