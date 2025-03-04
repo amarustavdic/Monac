@@ -35,6 +35,8 @@ public final class FunctionDefinition {
             parser.synchronize();
             return null;
         }
+        children.add(compoundStatement);
+
 
         Node result = new Node(NodeType.FUNCTION_DEFINITION, children.getFirst().getLine(), children.getLast().getColumn());
         result.setChildren(children);

@@ -35,7 +35,6 @@ public final class CompoundStatement {
 
             if (parser.match(TokenType.RBRACE)) {
                 Node result = new Node(NodeType.COMPOUND_STATEMENT, lBrace.getLine(), lBrace.getColumn());
-                result.setLiteral("{...}");
                 result.setChildren(children);
                 return result;
             } else {
