@@ -41,7 +41,7 @@ import java.util.List;
  * | ɛ
  * }</pre>
  */
-public class DirectDeclarator {
+public final class DirectDeclarator {
 
     /**
      * Parses a direct declarator.

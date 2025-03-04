@@ -52,5 +52,7 @@ public enum NodeType {
 
     TRANSLATION_UNIT,
 
+    INIT_DECLARATOR,
+
 
 }
