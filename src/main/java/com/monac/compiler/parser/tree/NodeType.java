@@ -48,6 +48,7 @@ public enum NodeType {
     TYPE_SPECIFIER,
 
     FUNCTION_DEFINITION,
+    DIRECT_DECLARATOR,
 
 
 }

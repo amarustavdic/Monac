@@ -13,14 +13,14 @@ public final class PrimaryExpression {
 
     public static Node parse(Parser parser) {
 
-        if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+        if (parser.match(TokenType.LPAREN)) {
 
             // TODO: This one might ... idk what yet
             Node expression = Expression.parse(parser);
             // Figure out how to handle expression, does it return null possibly?
 
             if (expression != null) {
-                if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                if (parser.match(TokenType.RPAREN)) {
                     return expression;
                 } else {
                     Token token = parser.peek();

@@ -47,7 +47,7 @@ public enum TokenType {
     IDENTIFIER, STRING, INTEGER_CONSTANT,
 
     // Punctuation and grouping symbols
-    LEFT_PARENTHESIS, RIGHT_PARENTHESIS,
+    LPAREN, RPAREN,
     LBRACKET, RBRACKET,
     LBRACE, RBRACE,
     SEMICOLON,

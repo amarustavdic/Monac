@@ -7,7 +7,7 @@ import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.parser.rules.expression.Expression;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
-import java.util.ArrayList;
+
 import java.util.List;
 
 public final class SelectionStatement {
@@ -21,10 +21,10 @@ public final class SelectionStatement {
         // Try parsing if
         if (parser.match(TokenType.IF)) {
             Token ifToken = parser.previous();
-            if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+            if (parser.match(TokenType.LPAREN)) {
                 Node expr = Expression.parse(parser);
                 if (expr != null) {
-                    if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                    if (parser.match(TokenType.RPAREN)) {
                         Node stmt = Statement.parse(parser);
                         if (stmt != null) {
 

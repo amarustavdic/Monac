@@ -11,7 +11,7 @@ public final class CastExpression {
 
     public static Node parse(Parser parser) {
 
-        if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+        if (parser.match(TokenType.LPAREN)) {
             // todo; later
         }
 

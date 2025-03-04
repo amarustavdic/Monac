@@ -20,10 +20,10 @@ public final class IterationStatement {
 
         if (parser.match(TokenType.WHILE)) {
             Token token = parser.previous();
-            if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+            if (parser.match(TokenType.LPAREN)) {
                 Node expression = Expression.parse(parser);
                 if (expression != null) {
-                    if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                    if (parser.match(TokenType.RPAREN)) {
                         Node statement = Statement.parse(parser);
                         if (statement != null) {
                             Node result = new Node(NodeType.ITERATOR_STATEMENT, token.getLine(), token.getColumn());
@@ -49,10 +49,10 @@ public final class IterationStatement {
             Node statement = Statement.parse(parser);
             if (statement != null) {
                 if (parser.match(TokenType.WHILE)) {
-                    if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+                    if (parser.match(TokenType.LPAREN)) {
                         Node expression = Expression.parse(parser);
                         if (expression != null) {
-                            if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                            if (parser.match(TokenType.RPAREN)) {
                                 if (parser.match(TokenType.SEMICOLON)) {
                                     Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getColumn());
                                     result.setLiteral(token.getLexeme());
@@ -80,13 +80,13 @@ public final class IterationStatement {
 
         if (parser.match(TokenType.FOR)) {
             Token token = parser.previous();
-            if (parser.match(TokenType.LEFT_PARENTHESIS)) {
+            if (parser.match(TokenType.LPAREN)) {
                 Node expression1 = Expression.parse(parser);
                 if (parser.match(TokenType.SEMICOLON)) {
                     Node expression2 = Expression.parse(parser);
                     if (parser.match(TokenType.SEMICOLON)) {
                         Node expression3 = Expression.parse(parser);
-                        if (parser.match(TokenType.RIGHT_PARENTHESIS)) {
+                        if (parser.match(TokenType.RPAREN)) {
                             Node statement = Statement.parse(parser);
                             if (statement == null) {
                                 throw new Exception();
