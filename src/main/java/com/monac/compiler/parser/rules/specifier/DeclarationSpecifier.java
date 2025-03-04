@@ -3,6 +3,9 @@ package com.monac.compiler.parser.rules.specifier;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.rules.qualifier.TypeQualifier;
 import com.monac.compiler.parser.tree.Node;
+import com.monac.compiler.parser.tree.NodeType;
+
+import java.util.List;
 
 /**
  * Parses a declaration specifier, which defines properties of a declaration.
@@ -37,13 +40,25 @@ public final class DeclarationSpecifier {
      */
     public static Node parse(Parser parser) {
 
+        Node result = new Node(NodeType.DECLARATION_SPECIFIER, 0, 0);
+        result.setLiteral("<declaration-specifier>");
+
         Node storageClassSpecifier = StorageClassSpecifier.parse(parser);
-        if (storageClassSpecifier != null) return storageClassSpecifier;
+        if (storageClassSpecifier != null) {
+            result.setChildren(List.of(storageClassSpecifier));
+        };
 
         Node typeSpecifier = TypeSpecifier.parse(parser);
-        if (typeSpecifier != null) return typeSpecifier;
+        if (typeSpecifier != null) {
+            result.setChildren(List.of(typeSpecifier));
+        };
 
-        return TypeQualifier.parse(parser);
+        Node typeQualifier = TypeQualifier.parse(parser);
+        if (typeQualifier != null) {
+            result.setChildren(List.of(typeQualifier));
+        }
+
+        return null;
     }
 
 }

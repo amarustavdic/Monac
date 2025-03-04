@@ -32,7 +32,7 @@ public final class TypeSpecifier {
             result.setLiteral(token.getLexeme());
             return result;
         }
-        return TypedefName.parse(parser);
+        return null;
     }
 
 }
