@@ -17,7 +17,11 @@ public final class FunctionDefinition {
 
     public static Node parse(Parser parser) {
 
-        List<Node> children = new ArrayList<>(declarationSpecifiers(parser)); // {<declaration-specifier>}*
+        List<Node> children = declarationSpecifiers(parser); // {<declaration-specifier>}* zero or more
+
+
+
+
 
         Node declarator = Declarator.parse(parser); // <declarator>
         if (declarator == null) return null;

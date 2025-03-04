@@ -46,16 +46,19 @@ public final class DeclarationSpecifier {
         Node storageClassSpecifier = StorageClassSpecifier.parse(parser);
         if (storageClassSpecifier != null) {
             result.setChildren(List.of(storageClassSpecifier));
+            return result;
         };
 
         Node typeSpecifier = TypeSpecifier.parse(parser);
         if (typeSpecifier != null) {
             result.setChildren(List.of(typeSpecifier));
+            return result;
         };
 
         Node typeQualifier = TypeQualifier.parse(parser);
         if (typeQualifier != null) {
             result.setChildren(List.of(typeQualifier));
+            return result;
         }
 
         return null;
