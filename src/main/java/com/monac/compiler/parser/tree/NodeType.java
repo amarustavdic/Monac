@@ -54,5 +54,7 @@ public enum NodeType {
 
     INIT_DECLARATOR,
 
+    DECLARATION,
+
 
 }
