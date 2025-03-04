@@ -44,7 +44,7 @@ public final class FunctionDefinition {
                         children.getFirst().getColumn()
                 );
                 result.setChildren(children);
-                result.setLiteral("function");
+                result.setLiteral("<function-definition>");
                 return result;
             } else {
                 // error handling and sync todo

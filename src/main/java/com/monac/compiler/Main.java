@@ -27,6 +27,10 @@ public class Main {
         Parser parser = new Parser(new Lexer(content));
         Node tree = parser.parse();
 
+        for (var error : parser.getErrors()) {
+            System.out.println(error);
+        }
+
         if (tree != null) {
             tree.accept(new LiteralPrinter());
         }
