@@ -55,7 +55,6 @@ public final class TranslationUnit {
                 children.getLast().getLine()
         );
         result.setChildren(children);
-        result.setLiteral("<translation-unit>");
 
         return result;
     }

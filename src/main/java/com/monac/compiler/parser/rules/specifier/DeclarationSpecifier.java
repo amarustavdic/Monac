@@ -41,7 +41,6 @@ public final class DeclarationSpecifier {
     public static Node parse(Parser parser) {
 
         Node result = new Node(NodeType.DECLARATION_SPECIFIER, 0, 0);
-        result.setLiteral("<declaration-specifier>");
 
         Node storageClassSpecifier = StorageClassSpecifier.parse(parser);
         if (storageClassSpecifier != null) {

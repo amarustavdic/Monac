@@ -38,7 +38,7 @@ public final class FunctionDefinition {
 
         Node result = new Node(NodeType.FUNCTION_DEFINITION, children.getFirst().getLine(), children.getLast().getColumn());
         result.setChildren(children);
-        result.setLiteral("<function-definition>");
+
         return result;
     }
 
