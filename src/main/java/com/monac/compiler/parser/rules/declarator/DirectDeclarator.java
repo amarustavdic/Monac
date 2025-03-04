@@ -36,11 +36,11 @@ import java.util.List;
  * <p>Transformed BNF (right-recursive):</p>
  * <pre>{@code
  * <direct-declarator> ::= <identifier> <direct-declarator-prime>
- * | ( <declarator> )
+ * | ( <declarator> ) <direct-declarator-prime>
  *
- * <direct-declarator-prime> ::= [ {<constant-expression>}? ]
- * | ( <parameter-type-list> )
- * | ( {<identifier>}* )
+ * <direct-declarator-prime> ::= [ {<constant-expression>}? ] <direct-declarator-prime>
+ * | ( <parameter-type-list> ) <direct-declarator-prime>
+ * | ( {<identifier>}* ) <direct-declarator-prime>
  * | ɛ
  * }</pre>
  */
