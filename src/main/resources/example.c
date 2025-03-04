@@ -1,3 +1,7 @@
-void f() {
-    x + 3;
+int add() {
+
+}
+
+int main() {
+
 }

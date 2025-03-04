@@ -3,10 +3,6 @@ package com.monac.compiler.parser;
 import com.monac.compiler.lexer.Lexer;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
-import com.monac.compiler.parser.rules.definition.FunctionDefinition;
-import com.monac.compiler.parser.rules.expression.*;
-import com.monac.compiler.parser.rules.statement.SelectionStatement;
-import com.monac.compiler.parser.rules.statement.Statement;
 import com.monac.compiler.parser.rules.unit.TranslationUnit;
 import com.monac.compiler.parser.tree.Node;
 
