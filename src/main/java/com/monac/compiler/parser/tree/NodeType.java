@@ -56,5 +56,7 @@ public enum NodeType {
 
     DECLARATION,
 
+    POSTFIX_EXPRESSION,
+
 
 }

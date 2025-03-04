@@ -13,6 +13,9 @@ import com.monac.compiler.parser.tree.NodeType;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: I might have messed up this left-recursion elimination, CHECK THIS IMPORTANT!
+
+
 /**
  * Parses a {@code <direct-declarator>} non-terminal rule.
  *

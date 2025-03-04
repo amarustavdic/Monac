@@ -3,6 +3,7 @@ package com.monac.compiler.parser.rules.specifier;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.rules.TypedefName;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 
@@ -31,7 +32,7 @@ public final class TypeSpecifier {
             result.setLiteral(token.getLexeme());
             return result;
         }
-        return null;
+        return TypedefName.parse(parser);
     }
 
 }
