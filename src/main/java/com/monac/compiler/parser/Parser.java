@@ -7,6 +7,7 @@ import com.monac.compiler.parser.rules.definition.FunctionDefinition;
 import com.monac.compiler.parser.rules.expression.*;
 import com.monac.compiler.parser.rules.statement.SelectionStatement;
 import com.monac.compiler.parser.rules.statement.Statement;
+import com.monac.compiler.parser.rules.unit.TranslationUnit;
 import com.monac.compiler.parser.tree.Node;
 
 import java.util.ArrayList;
@@ -91,7 +92,7 @@ public class Parser {
     }
 
     public Node parse() {
-        return FunctionDefinition.parse(this);
+        return TranslationUnit.parse(this);
     }
 
 }

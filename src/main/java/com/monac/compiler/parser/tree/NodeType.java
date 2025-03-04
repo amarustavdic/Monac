@@ -50,5 +50,7 @@ public enum NodeType {
     FUNCTION_DEFINITION,
     DIRECT_DECLARATOR,
 
+    TRANSLATION_UNIT,
+
 
 }
