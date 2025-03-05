@@ -23,7 +23,7 @@ public final class DirectDeclarator {
     direct-declarator-prime ->
 	      "[" {constant-expression}? "]" direct-declarator-prime
 	    | "(" parameter-type-list ")" direct-declarator-prime
-	    | "(" {identifier}* ")" direct-declarator-prime
+	    | "(" {identifier}? ")" direct-declarator-prime             todo check, but apparently in K&R this was allowed
 	    | ɛ
 
     declarator -> {pointer}? direct-declarator
@@ -62,9 +62,17 @@ public final class DirectDeclarator {
                 result.setChildren(children);
 
             } else {
-                Node identifier;
-                while ((identifier = Identifier.parse(parser)) != null) {
-                    children.add(identifier);
+
+                Node parameterTypeList = ParameterTypeList.parse(parser);
+                if (parameterTypeList != null) {
+                    children.add(parameterTypeList);
+                } else {
+
+                    // this rule bellow was apparently for old C-lang // todo check
+                    Node identifier;
+                    while ((identifier = Identifier.parse(parser)) != null) {
+                        children.add(identifier);
+                    }
                 }
 
                 if (!parser.match(TokenType.RPAREN)) {

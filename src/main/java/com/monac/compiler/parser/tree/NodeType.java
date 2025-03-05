@@ -62,5 +62,10 @@ public enum NodeType {
 
     DECLARATOR,
 
+    PARAMETER_TYPE_LIST,
+    PARAMETER_LIST,
+
+    PARAMETER_DECLARATION,
+
 
 }
