@@ -1,12 +1,6 @@
 int main() {
 
 
-    for (1;2;3) {
-
-    }
-
-    do {
-
-    } while (1);
+    if (2) goto x;
 
 }
