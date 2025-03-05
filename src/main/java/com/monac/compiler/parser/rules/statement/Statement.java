@@ -21,7 +21,7 @@ public final class Statement {
         Node ls = LabeledStatement.parse(parser);
         if (ls != null) return ls;
 
-        // todo; review
+        // done
         Node es = ExpressionStatement.parse(parser);
         if (es != null) return es;
 

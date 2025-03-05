@@ -1,6 +1,8 @@
 int main() {
 
 
-    if (2) goto x;
+    if (2) {
+
+    }
 
 }

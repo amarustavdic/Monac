@@ -10,31 +10,38 @@ import com.monac.compiler.parser.tree.NodeType;
 
 import java.util.List;
 
+/**
+ * Parses an expression statement.
+ *
+ * <p>Grammar:</p>
+ * <pre>{@code
+ * <expression-statement> ::= {<expression>}? ;
+ * }</pre>
+ */
 public final class ExpressionStatement {
 
-    // <expression-statement> ::= {<expression>}? ;
-
+    /**
+     * Parses an expression statement.
+     *
+     * @param parser The parser instance.
+     * @return A {@link Node} representing the parsed expression statement, or {@code null} if parsing fails.
+     */
     public static Node parse(Parser parser) {
         Node expression = Expression.parse(parser);
-        if (expression != null) {
-            if (parser.match(TokenType.SEMICOLON)) {
-                return expression;
-            } else {
-                Token actual = parser.peek();
-                parser.addError(new ParserException(
-                        "Missing semicolon ';' at the end of the statement.",
-                        actual.getLine(),
-                        actual.getColumn(),
-                        actual.getLexeme(),
-                        "Expected ';' after an expression or statement.",
-                        "Ensure your statement ends with a semicolon."
-                ));
-                parser.synchronize();
-                return null;
-            }
-        } else {
+
+        if (expression != null && !parser.match(TokenType.SEMICOLON)) {
+            Token actual = parser.peek();
+            parser.addError(new ParserException(
+                    "Expected ';' at the end of the expression statement.",
+                    actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                    "';'",
+                    "Make sure every expression statement ends with a semicolon, e.g., 'x = 5;'."
+            ));
+            parser.synchronize();
             return null;
         }
+
+        return expression;
     }
 
 }
