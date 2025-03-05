@@ -50,7 +50,6 @@ public final class InitDeclarator {
                 // Create a new node representing the initialized declarator
                 Node result = new Node(NodeType.INIT_DECLARATOR, declarator.getLine(), declarator.getColumn());
                 result.setChildren(List.of(declarator, initializer));
-                result.setLiteral("=");
                 return result;
             } else {
                 parser.addError(new ParserException(

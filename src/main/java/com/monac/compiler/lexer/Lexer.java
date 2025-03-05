@@ -99,7 +99,7 @@ public class Lexer {
 
         // Whitespace and comments
         this.patterns.put(TokenType.WHITESPACE, Pattern.compile("[\\t\\n\\r\\f\\v ]+"));
-        this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\\n]*|/\\*[^*]*\\*+([^/*][^*]*\\*+)*/"));
+        this.patterns.put(TokenType.COMMENT, Pattern.compile("//[^\\n]*|/\\\\*[^*]*\\\\*+([^/*][^*]*\\\\*+)*/"));
     }
 
     public List<Token> tokenize() {
@@ -115,14 +115,17 @@ public class Lexer {
                     String value = matcher.group();
                     int length = value.length();
 
-                    switch (type) {
-                        case WHITESPACE, COMMENT -> updatePosition(value);
-                        default -> {
-                            tokens.add(new Token(type, value, line, column));
-                            updatePosition(value);
-                        }
+                    // If it's a whitespace or comment, skip adding it to the token list
+                    if (type == TokenType.WHITESPACE || type == TokenType.COMMENT) {
+                        updatePosition(value);
+                        cursor += length;
+                        matched = true;
+                        break;
                     }
 
+                    // Add other tokens to the list
+                    tokens.add(new Token(type, value, line, column));
+                    updatePosition(value);
                     cursor += length;
                     matched = true;
                     break;
