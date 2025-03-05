@@ -1,7 +1,6 @@
 int main() {
 
-    goto x;
-    continue;
-    break;
-    return;
+    while (1) {
+        int x = 1;
+    }
 }

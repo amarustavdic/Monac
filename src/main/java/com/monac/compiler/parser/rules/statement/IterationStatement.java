@@ -3,6 +3,7 @@ package com.monac.compiler.parser.rules.statement;
 import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
+import com.monac.compiler.parser.ParserException;
 import com.monac.compiler.parser.rules.expression.Expression;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
@@ -16,102 +17,50 @@ public final class IterationStatement {
     //| do <statement> while ( <expression> ) ;
     //| for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
 
-    public static Node parse(Parser parser) throws Exception {
+    public static Node parse(Parser parser) {
 
         if (parser.match(TokenType.WHILE)) {
             Token token = parser.previous();
-            if (parser.match(TokenType.LPAREN)) {
-                Node expression = Expression.parse(parser);
-                if (expression != null) {
-                    if (parser.match(TokenType.RPAREN)) {
-                        Node statement = Statement.parse(parser);
-                        if (statement != null) {
-                            Node result = new Node(NodeType.ITERATOR_STATEMENT, token.getLine(), token.getColumn());
-                            result.setLiteral(token.getLexeme());
-                            result.setChildren(List.of(expression, statement));
-                            return result;
-                        } else {
-                            throw new Exception();
-                        }
-                    } else {
-                        throw new Exception("Expecting ')' after expression.");
-                    }
-                } else {
-                    throw new Exception("Expression expected");
-                }
-            } else {
-                throw new Exception("Expecting '(' after 'while' keyword.");
-            }
-        }
 
-        if (parser.match(TokenType.DO)) {
-            Token token = parser.previous();
+            if (!parser.match(TokenType.LPAREN)) {
+                Token actual = parser.peek();
+                parser.addError(new ParserException(
+                        "Expected '(' after keyword while.",
+                        token.getLine(),
+                        token.getColumn(),
+                        token.getLexeme(),
+                        "(",
+                        "Make sure that 'while' is followed by '('."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            Node expression = Expression.parse(parser);
+            if (expression == null) {
+                parser.addError(null); // todo
+                parser.synchronize();
+                return null;
+            }
+
+            if (!parser.match(TokenType.RPAREN)) {
+                parser.addError(null); // todo
+                parser.synchronize();
+                return null;
+            }
+
             Node statement = Statement.parse(parser);
-            if (statement != null) {
-                if (parser.match(TokenType.WHILE)) {
-                    if (parser.match(TokenType.LPAREN)) {
-                        Node expression = Expression.parse(parser);
-                        if (expression != null) {
-                            if (parser.match(TokenType.RPAREN)) {
-                                if (parser.match(TokenType.SEMICOLON)) {
-                                    Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getColumn());
-                                    result.setLiteral(token.getLexeme());
-                                    result.setChildren(List.of(statement, expression));
-                                    return result;
-                                } else {
-                                    throw new Exception();
-                                }
-                            } else {
-                                throw new Exception();
-                            }
-                        } else {
-                            throw new Exception();
-                        }
-                    } else {
-                        throw new Exception();
-                    }
-                } else {
-                    throw new Exception();
-                }
-            } else {
-                throw new Exception();
+            if (statement == null) {
+                parser.addError(null);
+                parser.synchronize();
+                return null;
             }
-        }
 
-        if (parser.match(TokenType.FOR)) {
-            Token token = parser.previous();
-            if (parser.match(TokenType.LPAREN)) {
-                Node expression1 = Expression.parse(parser);
-                if (parser.match(TokenType.SEMICOLON)) {
-                    Node expression2 = Expression.parse(parser);
-                    if (parser.match(TokenType.SEMICOLON)) {
-                        Node expression3 = Expression.parse(parser);
-                        if (parser.match(TokenType.RPAREN)) {
-                            Node statement = Statement.parse(parser);
-                            if (statement == null) {
-                                throw new Exception();
-                            }
-                            Node result = new Node(NodeType.ITERATOR_STATEMENT, token.getLine(), token.getColumn());
-                            result.setLiteral(token.getLexeme());
-                            List<Node> children = new ArrayList<>();
-                            if (expression1 != null) children.add(expression1);
-                            if (expression2 != null) children.add(expression2);
-                            if (expression3 != null) children.add(expression3);
-                            children.add(statement);
-                            result.setChildren(children);
-                            return result;
-                        } else {
-                            throw new Exception();
-                        }
-                    } else {
-                        throw new Exception();
-                    }
-                } else {
-                    throw new Exception();
-                }
-            } else {
-                throw new Exception();
-            }
+            Node result = new Node(NodeType.ITERATOR_STATEMENT, token.getLine(), token.getColumn());
+            result.setChildren(List.of(expression, statement));
+            result.setLiteral(token.getLexeme());
+
+            return result;
         }
 
         return null;
