@@ -4,6 +4,8 @@ import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.Node;
 
 /**
+ * Base class for all statements.
+ *
  * <pre>{@code
  * <statement> ::= <labeled-statement>
  * | <expression-statement>
