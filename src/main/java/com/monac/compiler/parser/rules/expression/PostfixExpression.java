@@ -66,7 +66,6 @@ public final class PostfixExpression {
 
             Node result = new Node(NodeType.POSTFIX_EXPRESSION, left.getLine(), left.getColumn());
             result.setChildren(assignmentExpressions);
-            result.setLiteral("<postfix-expression>");
 
             left = result;
         }
