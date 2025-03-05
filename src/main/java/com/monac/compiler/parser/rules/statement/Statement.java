@@ -20,6 +20,9 @@ public final class Statement {
         Node ss = SelectionStatement.parse(parser);
         if (ss != null) return ss;
 
+        Node js = JumpStatement.parse(parser);
+        if (js != null) return js;
+
         return ExpressionStatement.parse(parser);
     }
 

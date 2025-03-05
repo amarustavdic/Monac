@@ -17,57 +17,29 @@ public final class JumpStatement {
     //  | break ;
     //  | return {<expression>}? ;
 
-    public static Node parse(Parser parser) throws Exception {
-
-        if (parser.match(TokenType.GOTO)) {
-            Token token = parser.previous();
-            Node identifier = Identifier.parse(parser);
-            if (identifier != null) {
-                if (parser.match(TokenType.SEMICOLON)) {
-                    Node result = new Node(NodeType.JUMP_STATEMENT, identifier.getLine(), identifier.getColumn());
-                    result.setLiteral(token.getLexeme());
-                    result.setChildren(List.of(identifier));
-                    return result;
-                } else {
-                    throw new Exception("Expected ';' after 'goto <identifier>'.");
-                }
-            } else {
-                throw new Exception("Expected identifier after 'goto' statement.");
-            }
-        }
-
-        if (parser.match(TokenType.CONTINUE)) {
-            Token token = parser.previous();
-            if (parser.match(TokenType.SEMICOLON)) {
-                Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getLine());
-                result.setLiteral(token.getLexeme());
-                return result;
-            } else {
-                throw new Exception("Expected ';' after 'continue'.");
-            }
-        }
-
-        if (parser.match(TokenType.BREAK)) {
-            Token token = parser.previous();
-            if (parser.match(TokenType.SEMICOLON)) {
-                Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getLine());
-                result.setLiteral(token.getLexeme());
-                return result;
-            } else {
-                throw new Exception("Expected ';' after 'break'.");
-            }
-        }
+    public static Node parse(Parser parser) {
 
         if (parser.match(TokenType.RETURN)) {
-            Token token = parser.previous();
-            Node expression = Expression.parse(parser);
-            Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getLine());
+            Token token = parser.previous(); // return token
+
+            Node expression = Expression.parse(parser); // optional
+
+            if (!parser.match(TokenType.SEMICOLON)) {
+                parser.addError(null); // todo
+                parser.synchronize();
+                return null;
+            }
+
+            Node result = new Node(NodeType.JUMP_STATEMENT, token.getLine(), token.getColumn());
             result.setLiteral(token.getLexeme());
+
             if (expression != null) {
                 result.setChildren(List.of(expression));
             }
+
             return result;
         }
+
 
         return null;
     }
