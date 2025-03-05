@@ -11,12 +11,27 @@ import com.monac.compiler.parser.tree.NodeType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parses iteration statements, including:
+ * <ul>
+ *     <li><b>while-loop</b></li>
+ *     <li><b>do-while-loop</b></li>
+ *     <li><b>for-loop</b></li>
+ * </ul>
+ *
+ * <pre>{@code
+ * <iteration-statement> ::= while ( <expression> ) <statement>
+ * | do <statement> while ( <expression> ) ;
+ * | for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
+ * }</pre>
+ */
 public final class IterationStatement {
 
-    // <iteration-statement> ::= while ( <expression> ) <statement>
-    //| do <statement> while ( <expression> ) ;
-    //| for ( {<expression>}? ; {<expression>}? ; {<expression>}? ) <statement>
-
+    /**
+     * Parses an iteration statement (while, do-while, or for-loop).
+     * @param parser The parser instance.
+     * @return A {@link Node} representing the loop structure, or {@code null} if parsing fails.
+     */
     public static Node parse(Parser parser) {
 
         // Process while statement
@@ -173,7 +188,95 @@ public final class IterationStatement {
 
         // Process for statement
         if (parser.match(TokenType.FOR)) {
+            Token token = parser.previous();
+            Node expr1, expr2, expr3, statement;
 
+            // Expect '(' after 'for'
+            if (!parser.match(TokenType.LPAREN)) {
+                Token actual = parser.peek();
+                parser.addError(new ParserException(
+                        "Expected '(' after 'for'.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "'('",
+                        "A 'for' loop must start with an opening parenthesis, e.g., 'for (int i = 0; i < 10; i++)'."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            // Parse first expression (optional)
+            expr1 = Expression.parse(parser);
+
+            // Expect first semicolon
+            if (!parser.match(TokenType.SEMICOLON)) {
+                Token actual = parser.previous();
+                parser.addError(new ParserException(
+                        "Expected ';' after initialization in 'for' loop.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "';'",
+                        "A 'for' loop must have semicolons separating expressions, e.g., 'for (int i = 0; i < 10; i++)'."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            // Parse second expression (optional)
+            expr2 = Expression.parse(parser);
+
+            // Expect second semicolon
+            if (!parser.match(TokenType.SEMICOLON)) {
+                Token actual = parser.previous();
+                parser.addError(new ParserException(
+                        "Expected ';' after condition in 'for' loop.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "';'",
+                        "The second semicolon is required in a 'for' loop, e.g., 'for (int i = 0; i < 10; i++)'."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            // Parse third expression (optional)
+            expr3 = Expression.parse(parser);
+
+            // Expect closing parenthesis
+            if (!parser.match(TokenType.RPAREN)) {
+                Token actual = parser.previous();
+                parser.addError(new ParserException(
+                        "Expected ')' to close 'for' loop header.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "')'",
+                        "Ensure that your 'for' loop header is correctly closed, e.g., 'for (int i = 0; i < 10; i++)'."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            // Parse loop body
+            statement = Statement.parse(parser);
+            if (statement == null) {
+                Token actual = parser.peek();
+                parser.addError(new ParserException(
+                        "Expected a statement or block after 'for' loop header.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "<statement>",
+                        "A 'for' loop must have a valid body, e.g., 'for (...) { ... }'."
+                ));
+                parser.synchronize();
+                return null;
+            }
+
+            List<Node> children = new ArrayList<>();
+            if (expr1 != null) children.add(expr1);
+            if (expr2 != null) children.add(expr2);
+            if (expr3 != null) children.add(expr3);
+            children.add(statement);
+
+            Node result = new Node(NodeType.ITERATOR_STATEMENT, token.getLine(), token.getColumn());
+            result.setChildren(children);
+            result.setLiteral(token.getLexeme());
+
+            return result;
         }
 
         return null;
