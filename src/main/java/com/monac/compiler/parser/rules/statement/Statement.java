@@ -3,16 +3,25 @@ package com.monac.compiler.parser.rules.statement;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.tree.Node;
 
+/**
+ * <pre>{@code
+ * <statement> ::= <labeled-statement>
+ * | <expression-statement>
+ * | <compound-statement>
+ * | <selection-statement>
+ * | <iteration-statement>
+ * | <jump-statement>
+ * }</pre>
+ */
 public final class Statement {
 
-    // <statement> ::= <labeled-statement>
-    //| <expression-statement>
-    //| <compound-statement>
-    //| <selection-statement>
-    //| <iteration-statement>
-    //| <jump-statement>
-
     public static Node parse(Parser parser) {
+
+        Node ls = LabeledStatement.parse(parser);
+        if (ls != null) return ls;
+
+        Node es = ExpressionStatement.parse(parser);
+        if (es != null) return es;
 
         Node cs = CompoundStatement.parse(parser);
         if (cs != null) return cs;
@@ -23,10 +32,7 @@ public final class Statement {
         Node is = IterationStatement.parse(parser);
         if (is != null) return is;
 
-        Node js = JumpStatement.parse(parser);
-        if (js != null) return js;
-
-        return ExpressionStatement.parse(parser);
+        return JumpStatement.parse(parser);
     }
 
 }
