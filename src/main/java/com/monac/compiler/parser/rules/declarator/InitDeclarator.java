@@ -3,7 +3,7 @@ package com.monac.compiler.parser.rules.declarator;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.ParserException;
-import com.monac.compiler.parser.rules.Initializer;
+import com.monac.compiler.parser.rules.other.Initializer;
 import com.monac.compiler.parser.tree.Node;
 import com.monac.compiler.parser.tree.NodeType;
 

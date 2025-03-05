@@ -67,5 +67,7 @@ public enum NodeType {
 
     PARAMETER_DECLARATION,
 
+    INITIALIZER_LIST,
+
 
 }
