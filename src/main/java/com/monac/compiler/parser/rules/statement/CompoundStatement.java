@@ -11,10 +11,22 @@ import com.monac.compiler.parser.tree.NodeType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parses compound statement.
+ *
+ * <p><b>Grammar Rule:</b></p>
+ * <pre>{@code
+ * <compound-statement> ::= { {<declaration>}* {<statement>}* }
+ * }</pre>
+ */
 public final class CompoundStatement {
 
-    // <compound-statement> ::= { {<declaration>}* {<statement>}* }
-
+    /**
+     * Parses a compound statement.
+     *
+     * @param parser The parser instance handling the source code.
+     * @return A {@link Node} representing the compound statement, or {@code null} if parsing fails.
+     */
     public static Node parse(Parser parser) {
 
         if (parser.match(TokenType.LBRACE)) {
