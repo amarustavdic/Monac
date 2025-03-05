@@ -69,5 +69,7 @@ public enum NodeType {
 
     INITIALIZER_LIST,
 
+    ENUMERATOR,
+
 
 }
