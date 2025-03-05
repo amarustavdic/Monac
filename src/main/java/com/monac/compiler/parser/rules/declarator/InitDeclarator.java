@@ -1,5 +1,6 @@
 package com.monac.compiler.parser.rules.declarator;
 
+import com.monac.compiler.lexer.Token;
 import com.monac.compiler.lexer.TokenType;
 import com.monac.compiler.parser.Parser;
 import com.monac.compiler.parser.ParserException;
@@ -12,24 +13,16 @@ import java.util.List;
 /**
  * Parses an initialized declarator, which defines a variable with or without an initializer.
  *
- * <p>An initialized declarator can be one of the following:</p>
- * <ul>
- *     <li>A simple declarator (e.g., {@code int x;})</li>
- *     <li>A declarator with an initializer (e.g., {@code int x = 5;})</li>
- * </ul>
- *
  * <p>Grammar rule:</p>
  * <pre>{@code
  * <init-declarator> ::= <declarator>
  * | <declarator> = <initializer>
  * }</pre>
- *
- * <p>This rule is crucial for parsing variable definitions with optional initial values.</p>
  */
 public final class InitDeclarator {
 
     /**
-     * Parses an initialized declarator from the provided parser.
+     * Parses an initialized declarator.
      *
      * <p>Attempts to parse a declarator. If an assignment operator ('=') is found,
      * it also attempts to parse an initializer.</p>
@@ -41,32 +34,26 @@ public final class InitDeclarator {
     public static Node parse(Parser parser) {
 
         Node declarator = Declarator.parse(parser);
+        if (!parser.match(TokenType.ASSIGN)) return declarator;
 
-        // Check if there is an assignment ('=') indicating an initializer
-        if (parser.match(TokenType.ASSIGN)) {
-            Node initializer = Initializer.parse(parser);
-
-            if (initializer != null) {
-                // Create a new node representing the initialized declarator
-                Node result = new Node(NodeType.INIT_DECLARATOR, declarator.getLine(), declarator.getColumn());
-                result.setChildren(List.of(declarator, initializer));
-                return result;
-            } else {
-                parser.addError(new ParserException(
-                        "Invalid initializer",
-                        parser.peek().getLine(),
-                        parser.peek().getColumn(),
-                        parser.peek().getLexeme(),
-                        "Expected an initializer after '='",
-                        "Provide a valid expression or value after '='"
-                ));
-                parser.synchronize();
-                return null;
-            }
+        Node initializer = Initializer.parse(parser);
+        if (initializer == null) {
+            Token actual = parser.peek();
+            parser.addError(new ParserException(
+                    "Invalid initializer",
+                    actual.getLine(),
+                    actual.getColumn(),
+                    actual.getLexeme(),
+                    "Expected an initializer expression after '='.",
+                    "An initializer should be a valid expression or value, such as a constant, a variable, or an expression. For example, 'x = 5;' or 'y = x + 1;'."
+            ));
+            parser.synchronize();
+            return null;
         }
 
-        // If no initializer is present, return the declarator as is
-        return declarator;
+        Node result = new Node(NodeType.INIT_DECLARATOR, declarator.getLine(), declarator.getColumn());
+        result.setChildren(List.of(declarator, initializer));
+        return result;
     }
 
 }
