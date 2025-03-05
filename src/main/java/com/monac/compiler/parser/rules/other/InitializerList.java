@@ -30,7 +30,7 @@ import java.util.List;
  * <initializer-list-prime> ::= , <initializer> | ɛ
  * }</pre>
  */
-public class InitializerList {
+public final class InitializerList {
 
     public static Node parse(Parser parser) {
         Node initializer = Initializer.parse(parser);
