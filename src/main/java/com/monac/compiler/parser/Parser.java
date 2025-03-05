@@ -72,20 +72,30 @@ public class Parser {
         errors.add(e);
     }
 
-    // Method for putting parser back in sync after error encountering
     public void synchronize() {
-        advance();
+        // If we're already at a statement boundary, stop immediately
+        if (previous().getType() == TokenType.SEMICOLON) {
+            return;
+        }
 
         while (!isAtEnd()) {
-            if (previous().getType() == TokenType.SEMICOLON) return;
-//
-//            switch (peek().getType()) {
-//
-//            }
+            // Stop if the last token was a semicolon (end of statement)
+            if (previous().getType() == TokenType.SEMICOLON) {
+                return;
+            }
+
+            // Stop at the beginning of a likely new statement
+            switch (peek().getType()) {
+                case GOTO, CONTINUE, BREAK, RETURN,
+                     CONST, IF, WHILE, FOR, SWITCH:
+                    return;
+            }
+
             advance();
         }
-        advance();
     }
+
+
 
     public Node parse() {
         return TranslationUnit.parse(this);
