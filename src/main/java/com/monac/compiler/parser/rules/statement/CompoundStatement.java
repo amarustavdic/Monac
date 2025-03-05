@@ -18,36 +18,33 @@ public final class CompoundStatement {
     public static Node parse(Parser parser) {
 
         if (parser.match(TokenType.LBRACE)) {
-            Token lBrace = parser.previous();
+            Token token = parser.previous();
             List<Node> children = new ArrayList<>();
 
-            // Parse multiple declarations
+            // Parse multiple declarations (zero or more)
             Node declaration;
-            while ((declaration = Declaration.parse(parser)) != null) {
-                children.add(declaration);
-            }
+            while ((declaration = Declaration.parse(parser)) != null) children.add(declaration);
 
-            // Parse multiple statements
+            // Parse multiple statements (zero or more)
             Node statement;
-            while ((statement = Statement.parse(parser)) != null) {
-                children.add(statement);
+            while ((statement = Statement.parse(parser)) != null) children.add(statement);
+
+            // Expect right brace at end of compound
+            if (!parser.match(TokenType.RBRACE)) {
+                Token actual = parser.previous();
+                parser.addError(new ParserException(
+                        "Expected closing '}', at the end of compound statement.",
+                        actual.getLine(), actual.getColumn(), actual.getLexeme(),
+                        "}", "Make sure that every '{' has its closing pair '}'"
+                ));
+                parser.synchronize();
+                return null;
             }
 
-            if (parser.match(TokenType.RBRACE)) {
-                Node result = new Node(NodeType.COMPOUND_STATEMENT, lBrace.getLine(), lBrace.getColumn());
-                result.setChildren(children);
-                return result;
-            } else {
-                Token actual = parser.peek();
-                parser.addError(new ParserException(
-                        "Syntax Error: Missing closing '}' for compound statement.",
-                        actual.getLine(),
-                        actual.getColumn(),
-                        actual.getLexeme(),
-                        "Expected '}' to close the compound block.",
-                        "Ensure every '{' has a matching '}'."
-                ));
-            }
+            Node result = new Node(NodeType.COMPOUND_STATEMENT, token.getLine(), token.getColumn());
+            result.setChildren(children);
+
+            return result;
         }
         return null;
     }

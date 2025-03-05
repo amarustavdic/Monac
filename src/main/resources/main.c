@@ -1,6 +1,7 @@
 int main() {
 
-    while (1) {
-        int x = 1;
-    }
+    do {
+
+    } while (2);
+
 }

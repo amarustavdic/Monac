@@ -73,27 +73,25 @@ public class Parser {
     }
 
     public void synchronize() {
-        // If we're already at a statement boundary, stop immediately
-        if (previous().getType() == TokenType.SEMICOLON) {
-            return;
-        }
-
         while (!isAtEnd()) {
-            // Stop if the last token was a semicolon (end of statement)
-            if (previous().getType() == TokenType.SEMICOLON) {
-                return;
-            }
+            TokenType prevType = previous().getType();
+            TokenType currentType = peek().getType();
 
-            // Stop at the beginning of a likely new statement
-            switch (peek().getType()) {
+            // Stop if we just passed a statement-ending semicolon
+            if (prevType == TokenType.SEMICOLON) return;
+
+            // Stop at the beginning of a what would be likely new statement
+            switch (currentType) {
                 case GOTO, CONTINUE, BREAK, RETURN,
-                     CONST, IF, WHILE, FOR, SWITCH:
+                     CONST,
+                     IF, WHILE, FOR, SWITCH,
+                     LBRACE: // `{` also starts a new block
                     return;
             }
-
             advance();
         }
     }
+
 
 
 
